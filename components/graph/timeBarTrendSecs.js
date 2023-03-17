@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { data as jsonData } from './source';
 
-function toUTCTime(logSourceTime){
+function toUTCTimeString(logSourceTime){
   const actualTime = new Date(0);
   actualTime.setUTCSeconds(logSourceTime);
  return actualTime.toUTCString();
@@ -21,11 +21,11 @@ function toUTCMinutesSeconds(logSourceTime){
   return `${hourString}${minutesSeconds}`;
 }
 
-function make2Entities1Relation (jsonData){
+function populateNodesEdges (jsonData){
   const loggedDate = toUTCMinutesSeconds(jsonData.logsourceTime);
-  const displayedTime = toUTCTime(jsonData.logsourceTime);
-  const loggedDate2 = toUTCMinutesSeconds(1636286400);
-  const displayedTime2 = toUTCTime(1636286400);
+  const displayedTime = toUTCTimeString(jsonData.logsourceTime);
+  const loggedDate2 = toUTCMinutesSeconds(1636095568);
+  const displayedTime2 = toUTCTimeString(1636095568);
  
   // This format if we want custom shapes and sizes according
   // to data
@@ -36,12 +36,12 @@ function make2Entities1Relation (jsonData){
                      size: 20, 
                      direction: 'up'};
                        
-
    const data = {
      nodes:[
        { id: 'node0', ...circle, label: jsonData.computerName, date: loggedDate  },
        { id: 'node1', ...circle, label: jsonData.originatingComputer, date: loggedDate },
-     ],
+       { id: 'node2', ...triangle, label: jsonData.logonProcess, date: loggedDate2 },    
+      ],
      edges: [
        { source: 'node0', target: 'node1', label: `${jsonData.message}\n ${displayedTime}`},
      ],
@@ -61,7 +61,7 @@ const TimeBarTrendMins = () => {
       const G6 = require('@antv/g6');
       
       
-      const nodeEdgeData = make2Entities1Relation(jsonData);
+      const nodeEdgeData = populateNodesEdges(jsonData);
 
       const container = ref.current;
       const width = container.scrollWidth;
@@ -85,8 +85,8 @@ const TimeBarTrendMins = () => {
         console.log(`${i}seconds, timeString=${timeString}`)
       } */
 
-      // Scale: Seconds | 
-      // time= 6:59.08 am
+      // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
+      // time = 6:59.08 am
       // window: 6:58.38am  - 6:59.38 am (60seconds)
       // 58mins38secs (3518secs) to 59mins38secons(3578secs)  
       for (let i = 3518; i < 3578; i++) {
@@ -100,7 +100,7 @@ const TimeBarTrendMins = () => {
           date: `06${timeString}`,
           value: Math.round(Math.random() * 200),
         });
-        console.log(`${i}seconds, timeString=${timeString}`)
+        //console.log(`${i}seconds, timeString=${timeString}`)
       }
 
 
@@ -113,14 +113,23 @@ const TimeBarTrendMins = () => {
         height: 180,
         padding: 20,
         type: 'trend',
+        tick: {tickLabelFormatter: (d) => {
+          console.log(`d => ${JSON.stringify(d, null, 3)}`);
+          const dateStr = `${d.date}`;
+          const displayDate = dateStr.slice(0,2) + ':' + dateStr.slice(2)
+          return displayDate;
+        }},
         trend: {
           data: timeBarData,
         },
         slider: {
           start: 0.1,
           end: 0.9,
+          textStyle:{}
         }
       });
+
+    
       
       // constrained the layout inside the area
       // x: offset dist from left in px
@@ -162,14 +171,18 @@ const TimeBarTrendMins = () => {
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
-          type: 'force2',
+          type: 'force',
+          center: [200, 200],
           preventOverlap: true,
           linkDistance: d => {
             if (d.source.id === 'node0') {
-              return 400;
+              return 200;
             }
-            return 250;
+            return 150;
           },
+          nodeStrength: 30,
+          edgeStrength: 0.1,
+          collideStrength: 0.8,
           onTick,
           
         },
