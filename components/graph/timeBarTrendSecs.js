@@ -1,33 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { data as jsonData } from './source';
 
-function toUTCTimeString(logSourceTime){
+
+function getUTCDateObject(logsourceTime){
   const actualTime = new Date(0);
-  actualTime.setUTCSeconds(logSourceTime);
- return actualTime.toUTCString();
+  actualTime.setUTCSeconds(logsourceTime);
+  return actualTime;
 }
 
-function toUTCMinutesSeconds(logSourceTime){
-  const actualDateTime = new Date(0);
-  actualDateTime.setUTCSeconds(logSourceTime);
-  const hours = actualDateTime.getUTCHours();
-  const minutes = actualDateTime.getUTCMinutes();
-  const seconds = actualDateTime.getUTCSeconds();
-  const hourString = hours.toString(); 
-  const minutesString = minutes < 10 ? `0${minutes.toString()}` : `${minutes.toString()}`;
-  const secondsString = seconds < 10 ? `0${seconds.toString()}` : `${seconds.toString()}`;
-  const minutesSeconds = `${minutesString}.${secondsString}`;
 
-  return `${hourString}${minutesSeconds}`;
+function toUTCTimeString(logsourceTime){
+  const dateObjUTC = getUTCDateObject(logsourceTime);
+ return dateObjUTC.toUTCString();
+}
+
+function toTimeString(number){
+  return number < 10 ? `0${number.toString()}` : `${number.toString()}`;
+}
+function getUTCHrMinSec(logsourceTime){
+  const dateObjUTC = getUTCDateObject(logsourceTime);
+  const hours = dateObjUTC.getUTCHours();
+  const minutes = dateObjUTC.getUTCMinutes();
+  const seconds = dateObjUTC.getUTCSeconds();
+
+  const hoursString = toTimeString(hours);
+  const minutesString = toTimeString(minutes);
+  const secondsString = toTimeString(seconds); 
+
+  return hoursString + `:` + minutesString + `.` + secondsString;
 }
 
 function populateNodesEdges (jsonData){
-  const loggedDate = toUTCMinutesSeconds(jsonData.logsourceTime);
   const displayedTime = toUTCTimeString(jsonData.logsourceTime);
-  const loggedDate2 = toUTCMinutesSeconds(1636095568);
-  const displayedTime2 = toUTCTimeString(1636095568);
  
-  // This format if we want custom shapes and sizes according
+  // This format if we want to customise shapes and sizes according
   // to data
   const circle = { type: 'circle', 
                    size: 48 };
@@ -35,15 +41,24 @@ function populateNodesEdges (jsonData){
   const triangle = { type: 'triangle',
                      size: 20, 
                      direction: 'up'};
-                       
+   
+   // node and edge definition will be based on backend logic                  
    const data = {
      nodes:[
-       { id: 'node0', ...circle, label: jsonData.computerName, date: loggedDate  },
-       { id: 'node1', ...circle, label: jsonData.originatingComputer, date: loggedDate },
-       { id: 'node2', ...triangle, label: jsonData.logonProcess, date: loggedDate2 },    
+       { id: 'node0', ...circle, label: jsonData.computerName, date: jsonData.logsourceTime  },
+       { id: 'node1', ...circle, label: jsonData.originatingComputer, date: jsonData.logsourceTime },
+       { id: 'node2', ...triangle, label: jsonData.logonProcess, date: 1636095550 },    
+       { id: 'node3', ...triangle, label: `vector`, date: 1636095554 },    
       ],
      edges: [
-       { source: 'node0', target: 'node1', label: `${jsonData.message}\n ${displayedTime}`},
+       { source: 'node0', 
+         target: 'node1', 
+         label: `${jsonData.message}\n ${displayedTime} `, 
+      },
+      { source: 'node2', 
+         target: 'node3', 
+         label: `sent 3 files to \n ${toUTCTimeString(1636095555)} `, 
+      },
      ],
    } 
    return data;
@@ -51,10 +66,11 @@ function populateNodesEdges (jsonData){
 
 
 
-const TimeBarTrendMins = () => {
+const TimeBarTrendSecs = () => {
     const ref = React.useRef(null)
     const [graph, setGraph] = useState(null);
     const [timeBar, setTimeBar] = useState(null);
+    const [frequency, setFrequency] = useState(null);
   
 
     useEffect(() => {
@@ -68,36 +84,18 @@ const TimeBarTrendMins = () => {
       const height = (container.scrollHeight || 700) - 100;
       const timeBarData = [];
 
-      // Scale: Minutes | 
-      // time= 6.59
-      // window: 6.55 am  - 7.05 am (10minutes)
-/*       for (let i = 415; i < 425; i++) {
-        const hour = Math.floor(i / 60);
-        //const hourString = hour.toString();
-        const hourString = hour < 10 ? `0${hour.toString()}`: `${hour.toString()}`;
-        const minute = i % 60; 
-        const minuteString = minute < 10 ?  `0${minute.toString()}`: `${minute.toString()}`;
-        const timeString = `${hourString}${minuteString}`;
-        timeBarData.push({
-          date: `${timeString}`,
-          value: Math.round(Math.random() * 200)
-        });
-        console.log(`${i}seconds, timeString=${timeString}`)
-      } */
+      const range = 18; // number of units that window will show
+      const axisMin = jsonData.logsourceTime - (range / 2);
+      const axisMax = jsonData.logsourceTime + (range / 2) + 1;
+     
 
       // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
       // time = 6:59.08 am
-      // window: 6:58.38am  - 6:59.38 am (60seconds)
-      // 58mins38secs (3518secs) to 59mins38secons(3578secs)  
-      for (let i = 3518; i < 3578; i++) {
-        const minute = Math.floor(i / 60);
-        //const minuteString = minute.toString();
-        const minuteString = minute < 10 ? `0${minute.toString()}`: `${minute.toString()}`;
-        const seconds = i % 60; 
-        const secondsString = seconds < 10 ?  `0${seconds.toString()}`: `${seconds.toString()}`;
-        const timeString = `${minuteString}.${secondsString}`;
+      // window: 6:58.59am  - 6:59.17 am (60seconds)
+      for (let i = axisMin; i < axisMax; i++) {
+        console.log(`i = ${i}`);
         timeBarData.push({
-          date: `06${timeString}`,
+          date: i,
           value: Math.round(Math.random() * 200),
         });
         //console.log(`${i}seconds, timeString=${timeString}`)
@@ -105,27 +103,130 @@ const TimeBarTrendMins = () => {
 
 
       const nodeSize = 36;
-    
+      console.log(G6.TimeBar);
       const newTimebar = new G6.TimeBar({
         x: 0,
         y: 0,
         width,
-        height: 180,
+        height: 150,
         padding: 20,
         type: 'trend',
-        tick: {tickLabelFormatter: (d) => {
-          console.log(`d => ${JSON.stringify(d, null, 3)}`);
-          const dateStr = `${d.date}`;
-          const displayDate = dateStr.slice(0,2) + ':' + dateStr.slice(2)
-          return displayDate;
-        }},
-        trend: {
-          data: timeBarData,
+        tick: {
+          tickLabelFormatter: (d) => {
+            // convert the data accordingly
+            console.log(`d => ${JSON.stringify(d, null, 3)}`);
+            setFrequency(d.value)
+            return getUTCHrMinSec(d.date);
         },
-        slider: {
-          start: 0.1,
-          end: 0.9,
-          textStyle:{}
+          tickLabelStyle:{ 
+            fontSize: 13, 
+            fontFamily: 'Arial',
+            fillOpacity: 0.9,
+            stroke: 'blue',
+            strokeOpacity: 0.9,
+          },
+          tickLineStyle: {
+            width: 30, //<<==== no effect, not working
+            height: 15, //<===== no effect, not working 
+            //offset: 250, //<===== no effect, not working
+            stroke: 'orange',
+            lineWidth: 5,  
+            strokeOpacity: 1,
+          }
+      },
+        trend: {
+          height: 60,
+
+          data: timeBarData,
+          smooth: false,
+          lineStyle: {
+            stroke: 'blue',
+            lineWidth: 10,
+          },
+          isArea: true,
+          areaStyle:{
+            fill: 'pink',
+          },
+        },
+        slider: { 
+          backgroundStyle: { // ShapeStyle object format
+            fill: 'transparent', 
+          },
+          foregroundStyle: { // ShapeStyle object format
+            fill: 'cyan', 
+            fillOpacity: 0.3,
+          }, 
+          height: 60,
+          start: 0.25,
+          end: 0.75,
+          handlerStyle:{
+            height: 500, // <===== not working
+            width: 2, 
+            fill:'gray',
+            fillOpacity:0.7,
+            stroke: 'lightgray',
+            strokeOpacity: 0.7,
+            /* style:{  //<========== not working
+            }, */
+          },
+        },
+        /* textStyle of slider display texts */
+        textStyle: { 
+          fill: 'black',
+          fontFamily: 'Arial',
+          fontSize: 0, // <=== turn off displayed text with 0.
+        },
+        backgroundStyle: {
+          fill: 'black'
+        },
+        controllerCfg:{
+          fontFamily: 'Arial',
+          fontSize: 10,
+          fill: 'yellow',
+          stroke: 'red',
+          preBtnStyle: {
+            fill: 'purple',
+            stroke: 'blue'
+          },
+          nextBtnStyle: {
+            fill: 'red',
+            stroke: 'blue'
+          },
+          playBtnStyle: {
+            stroke: 'teal'
+          },
+          speedControllerStyle: {
+            pointer: {
+              fill:`red`,
+              fillOpacity:1,
+              stroke: 'red',
+            },
+            scroller: {
+              fill: `white`,
+              fillOpacity:0,
+              stroke: 'blue',
+            },
+            text: {
+              fill: `red`,
+              fillOpacity:0,
+              stroke: 'black',
+            }, 
+          },
+          /** whether hide the 'time type controller' on the right-bottom */
+          hideTimeTypeController: true,
+          timeTypeControllerStyle: {
+            text:{
+              fillOpacity:0.0, 
+              stroke: 'purple',
+              fontFamily:'Arial',
+            },
+            box: {
+              fillOpacity:0.0,
+              stroke: 'gray',
+            }
+          },
+          timePointControllerText:'time point',
+          timeRangeControllerText:'time range',
         }
       });
 
@@ -164,6 +265,7 @@ const TimeBarTrendMins = () => {
         });
       };
       
+      console.log(G6.Graph);
       const newGraph = new G6.Graph({
         container: ref.current,
         width: width,
@@ -186,24 +288,18 @@ const TimeBarTrendMins = () => {
           onTick,
           
         },
-        /* layout: {
-          center: [700,500],
-          type: 'mds',
-          linkDistance: 200,
-          workerEnabled: true,
-          onTick,
-        }, */
+
         defaultNode: {
           size: nodeSize,
           type: 'circle',
           style: {
             stroke: '#4fdcff',
-            fill: '#DEE9FF',
-            lineWidth: 6
+            fill: 'transparent',
+            lineWidth: 4,
           },
           labelCfg: {
             position: 'bottom',
-            offset: 6,
+            //offset: 6,
             style: {
               fill: '#000000A6',
               fontFamily: 'Arial',
@@ -214,18 +310,37 @@ const TimeBarTrendMins = () => {
         defaultEdge: {
           type: 'quadratic',
           style: {
-            stroke: '#5f6466',
-            lineWidth: 2.67,
-            endArrow: {
-            path: G6.Arrow.triangle(5, 6, 6), // (width, length, offset (wrt d))
-            fill: '#5f6466',
-            d: 6 // offset
+            stroke: '#5f6266',
+            lineWidth: 2.2,
+              endArrow: {
+              path: G6.Arrow.triangle(6.5, 7, 6), // (width, length, offset (wrt d))
+              fill: '#5f6466',
+              d: 6 // offset
+            },
           },
+          labelCfg: {
+            autoRotate: false, 
+            position: 'top',
+            style: {
+              fill: '#000000A6',
+              fontFamily: 'Arial',
+              fontSize: 11
+            }
           },
           
         },
         modes: {
-          default: ['drag-node'],
+          default: [
+            'drag-node',
+            {
+              type: 'drag-canvas',
+              enableOptimize: false, // enable the optimize to hide the shapes beside nodes' keyShape
+            },
+            {
+              type: 'zoom-canvas',
+              enableOptimize: false, // enable the optimize to hide the shapes beside nodes' keyShape
+            },
+          ],
         },
         labelCfg: {
           position: 'bottom',
@@ -233,7 +348,7 @@ const TimeBarTrendMins = () => {
           style: {
             fill: '#000000A6',
             fontFamily: 'Arial',
-            fontSize: 12
+            fontSize: 50
           }
         },
         nodeStateStyles: {
@@ -251,6 +366,23 @@ const TimeBarTrendMins = () => {
       });
       newGraph.data(nodeEdgeData);
       newGraph.render();
+      newGraph.on('node:mouseenter', evt => {
+        console.log(`evt on mouse enter node = ${evt}`);
+        newGraph.setItemState(evt.item, 'hover', true)
+      })
+  
+      newGraph.on('node:mouseleave', evt => {
+        console.log(`evt on mouse leave node = ${evt}`);
+        newGraph.setItemState(evt.item, 'hover', false)
+      })
+  
+      newGraph.on('edge:mouseenter', evt => {
+        newGraph.setItemState(evt.item, 'hover', true)
+      })
+  
+      newGraph.on('edge:mouseleave', evt => {
+        newGraph.setItemState(evt.item, 'hover', false)
+      })
       
       /* if (typeof window !== 'undefined')
         window.onresize = () => {
@@ -266,5 +398,5 @@ const TimeBarTrendMins = () => {
     return <div ref={ref}></div>
   }
   
-  export default TimeBarTrendMins
+  export default TimeBarTrendSecs
   
