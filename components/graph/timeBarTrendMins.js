@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { data as jsonData } from './source';
+import { data as jsonData } from '../source';
 
 function toUTCTimeString(logSourceTime){
   const actualTime = new Date(0);
