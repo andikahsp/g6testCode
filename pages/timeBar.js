@@ -2,7 +2,7 @@
 //import TimeBarTrendDays from "components/graph/timeBarTrendDays";
 //import TimeBarTrendHours from "components/graph/TimeBarTrendHours";
 //import TimeBarTrendMins from "components/graph/TimeBarTrendMins";
-import TimeBarTrendSecs from "components/graph/TimeBarTrendSecs";
+import TimeBarTrendSecs2 from "components/graph/TimeBarTrendSecs2";
 import React from "react";
 
 export default function timeBar() {
@@ -11,6 +11,6 @@ export default function timeBar() {
         //<TimeBarTrendDays />
         //<TimeBarTrendMins />
         //<TimeBarTrendHours /> //--> Errors
-        <TimeBarTrendSecs />
+        <TimeBarTrendSecs2 />
     )
 }
