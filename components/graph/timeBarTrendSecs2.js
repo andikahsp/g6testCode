@@ -507,10 +507,10 @@ const TimeBarTrendSecs2 = () => {
               y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
               r: 10,
               symbol: collapseIcon,
-              fill: 'transparent',
-              stroke: 'orange',
-              strokeWidth: 2.5,
-              lineWidth: 2.5,
+              fill: 'orange',
+              stroke: 'black',
+              strokeWidth: 3.5,
+              lineWidth: 1.5,
             },
             draggable: true,
             // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
@@ -526,7 +526,7 @@ const TimeBarTrendSecs2 = () => {
               fontSize: 14,
               textAlign: 'left',
               textBaseline: 'middle',
-              fill: '#000000D9',
+              fill: 'white',
             },
             // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
             name: 'text-shape-frequency',
@@ -547,6 +547,8 @@ const TimeBarTrendSecs2 = () => {
             // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
             name: 'text-shape-date',
           });
+          const edgeLabel = group.find((ele) => ele.get('name') === 'text-shape-frequency')
+          edgeLabel.toFront();
                
           return line;
         },
