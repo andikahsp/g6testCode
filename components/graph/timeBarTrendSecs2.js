@@ -421,15 +421,6 @@ const TimeBarTrendSecs2 = () => {
       );
 
       /* ******* CUSTOM EDGE ******* */
-      /**
-       * Fund Transfer Demo
-       * by 十吾
-       */
-      const colorMap = {
-        A: '#72CC4A',
-        B: '#1A91FF',
-        C: '#FFAA15',
-      };
 
       G6.registerEdge('fund-polyline', {
         itemType: 'edge',
@@ -468,24 +459,24 @@ const TimeBarTrendSecs2 = () => {
       
           let path = [
             ['M', startPoint.x, startPoint.y],
-            ['L', line1EndPoint.x, line1EndPoint.y],
-            ['Q', controlPoint.x, controlPoint.y, line2StartPoint.x, line2StartPoint.y],
+/*             ['L', line1EndPoint.x, line1EndPoint.y],
+            ['Q', controlPoint.x, controlPoint.y, line2StartPoint.x, line2StartPoint.y], */
             ['L', endPoint.x, endPoint.y],
           ];
       
-          if (Math.abs(Ydiff) <= 5) {
+          /* if (Math.abs(Ydiff) <= 5) {
             path = [
               ['M', startPoint.x, startPoint.y],
               ['L', endPoint.x, endPoint.y],
             ];
-          }
+          } */
       
           const endArrow = cfg?.style && cfg.style.endArrow ? cfg.style.endArrow : false;
           if (isObject(endArrow)) endArrow.fill = stroke;
           const line = group.addShape('path', {
             attrs: {
               path,
-              stroke: colorMap[cfg.data && cfg.data.type],
+              stroke: 'black',
               lineWidth: 1.2,
               endArrow,
             },
@@ -496,60 +487,24 @@ const TimeBarTrendSecs2 = () => {
           const labelLeftOffset = 0;
           const labelTopOffset = 8;
 
-          
-          // freqency
-          const frequency = group.addShape('text', {
-            attrs: {
-              text: cfg.data && cfg.data.frequency,
-              x: line2StartPoint.x + labelLeftOffset,
-              y: endPoint.y - labelTopOffset - 7,
-              fontSize: 14,
-              textAlign: 'left',
-              textBaseline: 'middle',
-              fill: '#000000D9',
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'text-shape-frequency',
-          });
-          
-          // type
-/*           group.addShape('text', {
-            attrs: {
-              //text: cfg.data && cfg.data.type,
-              x: line2StartPoint.x + labelLeftOffset,
-              y: endPoint.y - labelTopOffset - frequency.getBBox().height - 2,
-              fontSize: 10,
-              textAlign: 'left',
-              textBaseline: 'middle',
-              fill: '#000000D9',
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'text-shape-type',
-          });  */
 
-          // event
-          group.addShape('text', {
-            attrs: {
-              text: cfg.data && cfg.data.event,
-              x: line2StartPoint.x + labelLeftOffset + 20,
-              y: endPoint.y - labelTopOffset - 7,
-              fontSize: 12,
-              fontWeight: 300,
-              textAlign: 'left',
-              textBaseline: 'middle',
-              fill: '#000000D9',
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'text-shape-date',
-          });
-          
-          // Add the marker on the bottom
+          const midPointXY = {       
+            x: (endPoint.x - startPoint.x) / 2,
+            y: (endPoint.y - startPoint.y) / 2
+
+          }
+
+          const markerXOffset = 10;
+          const markerYOffset = -15;
+          const labelXOffset = 15;
+
+          // Add the circular marker on the bottom
           group.addShape('marker', {
             attrs: {
               ...style,
               opacity: 1,
-              x: line2StartPoint.x + labelLeftOffset + 3.5,
-              y: endPoint.y - labelTopOffset - 7,
+              x: startPoint.x + midPointXY.x + markerXOffset,
+              y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
               r: 10,
               symbol: collapseIcon,
               fill: 'transparent',
@@ -560,11 +515,42 @@ const TimeBarTrendSecs2 = () => {
             draggable: true,
             // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
             name: 'combo-marker-shape',
-          });        
+          });   
+
+          // freqency
+          group.addShape('text', {
+            attrs: {
+              text: cfg.data && cfg.data.frequency,
+              x: startPoint.x + midPointXY.x + markerXOffset - 3.5,
+              y: startPoint.y + midPointXY.y + markerYOffset,
+              fontSize: 14,
+              textAlign: 'left',
+              textBaseline: 'middle',
+              fill: '#000000D9',
+            },
+            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+            name: 'text-shape-frequency',
+          });
+          
+          // event
+          group.addShape('text', {
+            attrs: {
+              text: cfg.data && cfg.data.event,
+              x: startPoint.x + midPointXY.x + markerXOffset + labelXOffset,
+              y: startPoint.y + midPointXY.y + markerYOffset,
+              fontSize: 12,
+              fontWeight: 300,
+              textAlign: 'left',
+              textBaseline: 'middle',
+              fill: '#000000D9',
+            },
+            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+            name: 'text-shape-date',
+          });
+               
           return line;
         },
       });
-
 
 
       /* *************************************************** */
@@ -732,7 +718,6 @@ const TimeBarTrendSecs2 = () => {
           }
         }
       });
-      console.log('hello');
 
       newGraph.on('node:dragend', (e) => {
         newGraph.getCombos().forEach((combo) => {
