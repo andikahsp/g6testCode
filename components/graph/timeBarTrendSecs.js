@@ -31,10 +31,15 @@ function getUTCHrMinSec(logsourceTime){
 }
 
 function populateNodesEdges (jsonData){
+  let edgeOccurence = 1;
   const displayedTime = toUTCTimeString(jsonData.logsourceTime);
  
   // This format if we want to customise shapes and sizes according
   // to data
+  
+  const image = { type: 'image', 
+                   size: 48 };
+  
   const circle = { type: 'circle', 
                    size: 48 };
   
@@ -45,19 +50,27 @@ function populateNodesEdges (jsonData){
    // node and edge definition will be based on backend logic                  
    const data = {
       nodes:[
-       { id: 'node0', ...circle, label: jsonData.computerName, date: jsonData.logsourceTime },
-       { id: 'node1', ...circle, label: jsonData.originatingComputer, date: jsonData.logsourceTime },
+       { id: 'node0', ...image, label: jsonData.computerName, date: jsonData.logsourceTime },
+       { id: 'node1', ...image, label: jsonData.originatingComputer, date: jsonData.logsourceTime },
        { id: 'node2', ...triangle, label: jsonData.logonProcess, date: 1636095550 },    
-       { id: 'node3', ...triangle, label: `vector`, date: 1636095554 },    
+       { id: 'node3', ...image, label: `vector`, date: 1636095554 },    
       ], 
      edges: [
        { source: 'node0', 
          target: 'node1', 
          label: `${jsonData.message}\n ${displayedTime} `, 
+         data: {
+          frequency: '3', 
+          date: 'SUMIT-BIRTHDAY'
+         }
       },
       { source: 'node2', 
          target: 'node3', 
-         label: `sent 3 files to \n ${toUTCTimeString(1636095555)} `, 
+         label: `(${edgeOccurence}) times\nsent 3 files to`, 
+         data: {
+          frequency: '7', 
+          date: 'HAZWAn-BIRTHDAY'
+         }
       },
      ],
    } 
@@ -70,6 +83,9 @@ let nodeB = "";
 let comboNumber = 0;
 let selectedComboId = "";
 let callBackComboHas1NodeOrLess = "";
+let nodesInCombo = 0;
+let callBackNodesInCombo = 0;
+
 
 const TimeBarTrendSecs = () => {
     const ref = React.useRef(null)
@@ -81,6 +97,38 @@ const TimeBarTrendSecs = () => {
       
       
       const nodeEdgeData = populateNodesEdges(jsonData);
+      nodeEdgeData.nodes[0].img = `https://cdn.pixabay.com/photo/2013/07/13/11/47/computer-158675_960_720.png`;
+      nodeEdgeData.nodes[0].clipCfg = {
+        show: false,
+        type: 'circle',
+        // circle
+        r: 25,
+        // Coordinates
+        x: 0,
+        y: 0,
+      };
+
+      nodeEdgeData.nodes[1].img = `https://cdn.pixabay.com/photo/2017/07/07/02/06/symbol-2480165_960_720.png`;
+      nodeEdgeData.nodes[1].clipCfg = {
+        show: false,
+        type: 'circle',
+        // circle
+        r: 25,
+        // Coordinates
+        x: 0,
+        y: 0,
+      };
+
+      nodeEdgeData.nodes[3].img = `https://cdn.pixabay.com/photo/2018/01/26/15/41/the-horse-3108969_960_720.png`;
+      nodeEdgeData.nodes[3].clipCfg = {
+        show: true,
+        type: 'circle',
+        // circle
+        r: 25,
+        // Coordinates
+        x: 0,
+        y: 0,
+      };
 
       const container = ref.current;
       const width = container.scrollWidth;
@@ -266,6 +314,135 @@ const TimeBarTrendSecs = () => {
           node.y = (node.y - miny) * scaley + constrainBox.y;
         });
       };
+
+      // The symbols for the marker inside the combo
+      const collapseIcon = (x, y, r) => {
+        return [
+          ['M', x - r, y],
+          ['a', r, r, 0, 1, 0, r * 2, 0],
+          ['a', r, r, 0, 1, 0, -r * 2, 0],
+          ['M', x - r + 4, y],
+        ];
+      };
+      const expandIcon = (x, y, r) => {
+        return [
+          ['M', x - r, y],
+          ['a', r, r, 0, 1, 0, r * 2, 0],
+          ['a', r, r, 0, 1, 0, -r * 2, 0],
+          ['M', x - r + 4, y],
+          ['M', x - r + r, y - r + 4],
+        ];
+      };
+
+      /*  *********** CUSTOM COMBO  ***********   */
+      G6.registerCombo(
+        'cCircle',
+        {
+          drawShape: function draw(cfg, group) {
+            const self = this;
+            // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
+            const style = self.getShapeStyle(cfg);
+            // Add a circle shape as keyShape which is the same as the extended 'circle' type Combo
+            const circle = group.addShape('circle', {
+              attrs: {
+                ...style,
+                x: 0,
+                y: 0,
+                r: style.r,
+              },
+              draggable: true,
+              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+              name: 'combo-keyShape',
+            });
+            // Add the marker on the bottom
+            const marker = group.addShape('marker', {
+              attrs: {
+                ...style,
+                fill: '#fff',
+                opacity: 1,
+                x: 0,
+                y: style.r,
+                r: 15,
+                //symbol: collapseIcon,
+                fill: '#1890FF',
+                stroke: 'grey',
+              },
+              draggable: true,
+              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+              name: 'combo-marker-shape',
+            });
+            // text that goes into the marker/badge
+            const textLabel = group.addShape('text', {
+              attrs: {
+                  x: style.r,
+                  y: style.r,
+                  fontFamily: 'PingFang SC',
+                  text: `${nodesInCombo}`,
+                  fontSize: 19,
+                  fill: 'yellow',
+                  stroke: 'black',
+              },
+              draggable: true, 
+              name: 'text-Label-for-combo-marker-shape'
+            });
+            return circle;
+          },
+          // Define the updating logic for the marker
+          afterUpdate: function afterUpdate(cfg, combo) {
+            const self = this;
+            // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
+            const style = self.getShapeStyle(cfg);
+            const group = combo.get('group');
+            // Find the marker shape in the graphics group of the Combo
+            const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
+            //Find textLabel shape in the graphics group of the Combo
+            const textLabel = group.find((ele) => ele.get('name') === 'text-Label-for-combo-marker-shape');
+
+            // Update the marker shape
+            marker.attr({
+              x: style.r * 0.50,
+              y: (style.r - 10) * -1,
+              // The property 'collapsed' in the combo data represents the collapsing state of the Combo
+              // Update the symbol according to 'collapsed'
+              symbol: cfg.collapsed ? expandIcon : collapseIcon,
+            });
+            //Update the textlabel
+            textLabel.attr({
+              x: style.r * 0.50 - 4, 
+              y: (style.r - 20) * - 1,
+            });
+          },
+        },
+        'circle',
+      );
+
+      /* ******* CUSTOM EDGE ******* */
+      // Extend a new type of edge by extending line edge
+      G6.registerEdge(
+        'custom-edge',
+        {
+          // Response the states change
+          setState(name, value, item) {
+            const group = item.getContainer();
+            const shape = group.get('children')[0]; // The order is determined by the ordering of been draw
+            if (name === 'active') {
+              if (value) {
+                shape.attr('stroke', 'red');
+              } else {
+                shape.attr('stroke', '#333');
+              }
+            }
+            if (name === 'selected') {
+              if (value) {
+                shape.attr('lineWidth', 3);
+              } else {
+                shape.attr('lineWidth', 2);
+              }
+            }
+          },
+        },
+        'line',
+      );
       
       //console.log(G6.Graph);
       const newGraph = new G6.Graph({
@@ -312,7 +489,7 @@ const TimeBarTrendSecs = () => {
         // Set groupByTypes to false to get rendering result with reasonable visual zIndex for combos
         groupByTypes: false,
         defaultCombo: {
-          type: 'circle',
+          type: 'cCircle',
           size: [16], // The minimum size of the Combo
           padding: [16, 10, 3, 10],
           style: {
@@ -322,12 +499,13 @@ const TimeBarTrendSecs = () => {
             lineWidth: 1,
           },
           labelCfg: {
-            refY: 15,
-            position: 'bottom',
+            x: 25,
+            refY: 5, 
             style: {
+              position: 'top',
               fill: '#000000A6',
               fontFamily: 'Arial',
-              fontSize: 11
+              fontSize: 25
             }
           },
         },
@@ -338,7 +516,7 @@ const TimeBarTrendSecs = () => {
           },
         },
         defaultEdge: {
-          type: 'line',
+          type: 'custom-edge',
           style: {
             stroke: '#5f6266',
             lineWidth: 2.2,
@@ -350,7 +528,7 @@ const TimeBarTrendSecs = () => {
           },
           labelCfg: {
             autoRotate: false, 
-            position: 'top',
+            position: 'top-right',
             style: {
               fill: '#000000A6',
               fontFamily: 'Arial',
@@ -399,15 +577,14 @@ const TimeBarTrendSecs = () => {
       newGraph.data(nodeEdgeData);
       newGraph.render();
 
-      newGraph.on('node:mouseenter', (evt, e) => {
+      newGraph.on('node:mouseenter', (evt, ) => {
         newGraph.setItemState(evt.item, 'hover', true)
       })
       
       newGraph.on('node:mouseenter', (e) => {
         console.log('node:mouseenter e =', e);
-        console.log(`mouseenter node ID = ${e.item._cfg.id}`)
+        //console.log(`mouseenter node ID = ${e.item._cfg.id}`)
           nodeA = e.item._cfg.id;
-        //console.log(`mouseentered\n x: ${e.x}, y: ${e.y}`)
       })
       
       newGraph.on('node:mouseleave', evt => {
@@ -416,26 +593,36 @@ const TimeBarTrendSecs = () => {
 
       // check that the node that is being dragged, does not have a  comboId,  
       newGraph.on('node:dragenter', (e) => {
-        console.log(`dragEnter node ID = ${e.item._cfg.id}`);
+        //console.log(`dragEnter node ID = ${e.item._cfg.id}`);
+        
         if ( !('comboId' in e.item._cfg.model) || e.item._cfg.model.comboId === undefined ) { // if it has a comboId, do not create combo
           if(nodeA !== "" && e.item._cfg.id !== nodeA ){ 
+            nodesInCombo = 2;
             nodeB = e.item._cfg.id;
             newGraph.createCombo({
-              id: `combo${comboNumber}`,   
+              id: `combo${comboNumber}`, 
+              label:`${nodesInCombo}`,  
             }, [`${nodeA}`, `${nodeB}`]);
-            comboNumber += 1; // <=== this is causing uncontrolled propagation.
+            comboNumber += 1;
           }
         }
       });
+      console.log('hello');
 
       newGraph.on('node:dragend', (e) => {
         newGraph.getCombos().forEach((combo) => {
           newGraph.setItemState(combo, 'dragenter', false);
         });
-        console.log(`node dragend ID = ${e.item._cfg.id}`);
-        //console.log(`x: ${e.x}, y: ${e.y}`)
+        //console.log(`node dragend ID = ${e.item._cfg.id}`);  
+        callBackNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
+        for(let i = 0; i < e.currentTarget.cfg.combos.length; i++ ){
+            if(e.currentTarget.cfg.combos[i].comboId === selectedComboId){
+              e.currentTarget.cfg.combos[i].label = callBackNodesInCombo; 
+            }
+            e.currentTarget.cfg.combos[i].label = "";
+        }
+        newGraph.refresh();
       });
-
 
       newGraph.on('edge:mouseenter', evt => {
         newGraph.setItemState(evt.item, 'hover', true)
@@ -451,32 +638,54 @@ const TimeBarTrendSecs = () => {
         console.log(`selectedComboId = ${selectedComboId}`);
         callBackComboHas1NodeOrLess = comboHas1NodeOrLess(evt.currentTarget.cfg.nodes, selectedComboId);
         newGraph.setItemState(item, 'active', true);
+        
+/*         nodesInCombo = countNodesInCombo(evt.currentTarget.cfg.nodes, selectedComboId);
+        console.log(`combo:mouseenter nodesInCombo == ${nodesInCombo}`);
+        item._cfg.model.label = nodesInCombo;
+        console.log(`item._cfg.model.label => ${item._cfg.model.label}`)
+        newGraph.refresh(); */
       });
       
       newGraph.on('combo:mouseleave', (evt) => {
         const { item } = evt;
         newGraph.setItemState(item, 'active', false);
+        newGraph.refresh();
       });
       
       newGraph.on('combo:dragenter', (e) => {
         newGraph.setItemState(e.item, 'dragenter', true);
       });
+
+      newGraph.on('combo:dragenter', evt => {
+        nodesInCombo = countNodesInCombo(evt.currentTarget.cfg.nodes, selectedComboId);
+        console.log(`combodragenter evt.item._cfg.model.id = ${evt.item._cfg.model.id}`);
+        evt.item._cfg.model.label = nodesInCombo;
+        newGraph.refresh();
+      });
       
       
       newGraph.on('combo:dragleave', (e) => {
         console.log(`dragleave combo id = ${e.item._cfg.id}`)
+        comboHas1NodeOrLess(e.currentTarget.cfg.nodes, selectedComboId);
         newGraph.setItemState(e.item, 'dragenter', false);
       });
 
+/*       newGraph.on(`combo:mouseup`, (e) => {
+       nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
+       console.log(`combomouseup e.item._cfg.model.id = ${e.item._cfg.model.id}`);
+       e.item._cfg.model.label = nodesInCombo;
+       newGraph.refresh();
+      });
+ */
       newGraph.on(`combo:mousedown`, (e) => {
-        console.log(`...MOUSE UP`);
         // there is only 1 node left in the array, then we can uncombo
         if(callBackComboHas1NodeOrLess === true) {
           console.log(`selectedComboId on node:mouseup = ${selectedComboId}`);
           newGraph.uncombo(`${selectedComboId}`);
           selectedComboId = "";
-        } 
+        }
       });
+
       // this function fails whenever there are no combo assignments
       // we  allow uncombo, if selected combo has only 1 node
       const comboHas1NodeOrLess = (nodesArray, selectedComboId) => {
@@ -488,22 +697,55 @@ const TimeBarTrendSecs = () => {
             }
           }
         }
-        console.log(`${selectedComboId} counter = ${counter}`);
+        //nodesInCombo = counter;
         if(counter == 0){
           return true
         }
         return false
       }
-
-  
+      const countNodesInCombo = (nodesArray, selectedComboId) => {
+        let counter = 0;
+        for(let i = 0; i < nodesArray.length; i += 1){
+          if('comboId' in nodesArray[i]._cfg.model){
+            if(nodesArray[i]._cfg.model.comboId === selectedComboId && nodesArray[i]._cfg.model.comboId !== undefined){
+              counter += 1
+            }
+          }
+        }
+        console.log(`${selectedComboId} counter = ${counter}`);
+        return counter;
+      }
 
 /*       newGraph.on('combo:dblclick', (e) => {
         console.log(`combo double click e = ${e}`);
         
       }); */
+
+
+      /* FOR CUSTOM EDGES */
+      // Select by clicking, cancel by clicking again
+      newGraph.on('edge:click', ev => {
+        const edge = ev.item;
+        newGraph.setItemState(edge, 'selected', !edge.hasState('selected')); // Switch the 'selected' state
+      });
+
+      newGraph.on('edge:mouseenter', ev => {
+        const edge = ev.item;
+        newGraph.setItemState(edge, 'active', true);
+      });
+
+      newGraph.on('edge:mouseleave', ev => {
+        const edge = ev.item;
+        newGraph.setItemState(edge, 'active', false);
+      });
+
       
       
-      /* if (typeof window !== 'undefined')
+
+
+      /* 
+      // RESIZING
+      if (typeof window !== 'undefined')
         window.onresize = () => {
           if (!newGraph || newGraph.get('destroyed')) return;
           if (!container || !container.scrollWidth || !container.scrollHeight) return;
