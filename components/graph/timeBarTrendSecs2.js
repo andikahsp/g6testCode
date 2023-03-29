@@ -447,45 +447,11 @@ const TimeBarTrendSecs2 = () => {
 
           const startPoint = cfg.startPoint;
           const endPoint = cfg.endPoint;
-      
-          const Ydiff = endPoint.y - startPoint.y;
-      
-          const slope = Ydiff !== 0 ? Math.min(500 / Math.abs(Ydiff), 20) : 0;
-      
-          const cpOffset = slope > 15 ? 0 : 16;
-          const offset = Ydiff < 0 ? cpOffset : -cpOffset;
-      
-          const line1EndPoint = {
-            x: startPoint.x + slope,
-            y: endPoint.y + offset,
-          };
-          const line2StartPoint = {
-            x: line1EndPoint.x + cpOffset,
-            y: endPoint.y,
-          };
-      
-          // 控制点坐标
-          const controlPoint = {
-            x:
-              ((line1EndPoint.x - startPoint.x) * (endPoint.y - startPoint.y)) /
-                (line1EndPoint.y - startPoint.y) +
-              startPoint.x,
-            y: endPoint.y,
-          };
-      
+          
           let path = [
             ['M', startPoint.x, startPoint.y],
-/*             ['L', line1EndPoint.x, line1EndPoint.y],
-            ['Q', controlPoint.x, controlPoint.y, line2StartPoint.x, line2StartPoint.y], */
             ['L', endPoint.x, endPoint.y],
           ];
-      
-          /* if (Math.abs(Ydiff) <= 5) {
-            path = [
-              ['M', startPoint.x, startPoint.y],
-              ['L', endPoint.x, endPoint.y],
-            ];
-          } */
       
           const endArrow = cfg?.style && cfg.style.endArrow ? cfg.style.endArrow : false;
           if (isObject(endArrow)) endArrow.fill = stroke;
@@ -500,9 +466,6 @@ const TimeBarTrendSecs2 = () => {
             name: 'path-shape',
           });
       
-          const labelLeftOffset = 0;
-          const labelTopOffset = 8;
-
 
           const midPointXY = {       
             x: (endPoint.x - startPoint.x) / 2,
