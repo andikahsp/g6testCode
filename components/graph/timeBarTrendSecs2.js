@@ -53,28 +53,31 @@ function populateNodesEdges (jsonData){
       nodes:[
        { id: 'node0', ...image, label: jsonData.computerName, date: jsonData.logsourceTime },
        { id: 'node1', ...image, label: jsonData.originatingComputer, date: jsonData.logsourceTime },
-       { id: 'node2', ...triangle, label: jsonData.logonProcess, date: 1636095550 },    
+       { id: 'node2', ...image, label: jsonData.logonProcess, date: 1636095550 },    
        { id: 'node3', ...image, label: `vector`, date: 1636095554 },    
       ], 
      edges: [
        { source: 'node0', 
          target: 'node1', 
-         label: `${jsonData.message}\n ${displayedTime} `, 
          data: {
-          type: 'A',
           frequency: '3', 
           event: `${jsonData.message}`
          }
       },
       { source: 'node2', 
          target: 'node3', 
-         label: `(${edgeOccurence}) times\nsent 3 files to`, 
          data: {
-          type: 'B',
           frequency: '7', 
           event: `Event B`
          }
       },
+/*       { source: 'node0', 
+         target: 'node2',
+         data: {
+          frequency: '', 
+          event: `LabelZ`
+         }
+      }, */
      ],
    } 
    return data;
@@ -85,11 +88,12 @@ let nodeA = "";
 let nodeB = "";
 let comboNumber = 0;
 let selectedComboId = "";
-let callBackComboHas1NodeOrLess = "";
 let nodesInCombo = 0;
-let callBackNodesInCombo = 0;
+let callBackNodesInCombo = false;
 let style = {};
 
+let nodeMouseDown = false;
+let comboDragLeave = false;
 
 const TimeBarTrendSecs2 = () => {
     const ref = React.useRef(null)
@@ -114,6 +118,17 @@ const TimeBarTrendSecs2 = () => {
 
       nodeEdgeData.nodes[1].img = `https://cdn.pixabay.com/photo/2017/07/07/02/06/symbol-2480165_960_720.png`;
       nodeEdgeData.nodes[1].clipCfg = {
+        show: false,
+        type: 'circle',
+        // circle
+        r: 25,
+        // Coordinates
+        x: 0,
+        y: 0,
+      };
+
+      nodeEdgeData.nodes[2].img = `https://cdn.pixabay.com/photo/2013/07/13/12/33/computer-159837_960_720.png`;
+      nodeEdgeData.nodes[2].clipCfg = {
         show: false,
         type: 'circle',
         // circle
@@ -376,18 +391,18 @@ const TimeBarTrendSecs2 = () => {
               name: 'combo-marker-shape',
             });
             // text that goes into the marker/badge
-            const textLabel = group.addShape('text', {
+            group.addShape('text', {
               attrs: {
+                  text:cfg.label,
                   x: style.r,
                   y: style.r,
-                  fontFamily: 'PingFang SC',
-                  text: `${nodesInCombo}`,
+                  fontFamily: 'Arial',
                   fontSize: 19,
                   fill: 'red',
                   stroke: 'black',
               },
               draggable: true, 
-              name: 'text-Label-for-combo-marker-shape'
+              name: 'combo-marker-label'
             });
             return circle;
           },
@@ -400,7 +415,7 @@ const TimeBarTrendSecs2 = () => {
             // Find the marker shape in the graphics group of the Combo
             const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
             //Find textLabel shape in the graphics group of the Combo
-            const textLabel = group.find((ele) => ele.get('name') === 'text-Label-for-combo-marker-shape');
+            const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-label');
 
             // Update the marker shape
             marker.attr({
@@ -412,6 +427,7 @@ const TimeBarTrendSecs2 = () => {
             });
             //Update the textlabel
             textLabel.attr({
+              text: (nodesInCombo === 0) ? `${2}` : `${nodesInCombo}`,
               x: style.r * 0.50 - 4, 
               y: (style.r - 20) * - 1,
             });
@@ -554,7 +570,6 @@ const TimeBarTrendSecs2 = () => {
         },
       });
 
-
       /* *************************************************** */
       
       //console.log(G6.Graph);
@@ -612,13 +627,11 @@ const TimeBarTrendSecs2 = () => {
             lineWidth: 1,
           },
           labelCfg: {
-            x: 25,
-            refY: 5, 
             style: {
-              position: 'top',
+              position: 'bottom',
               fill: '#000000A6',
               fontFamily: 'Arial',
-              fontSize: 25
+              fontSize: 11
             }
           },
         },
@@ -690,31 +703,25 @@ const TimeBarTrendSecs2 = () => {
       newGraph.data(nodeEdgeData);
       newGraph.render();
 
-      newGraph.on('node:mouseenter', (evt, ) => {
-        newGraph.setItemState(evt.item, 'hover', true)
-      })
-      
       newGraph.on('node:mouseenter', (e) => {
+        newGraph.setItemState(e.item, 'hover', true)
         console.log('node:mouseenter e =', e);
-        //console.log(`mouseenter node ID = ${e.item._cfg.id}`)
-          nodeA = e.item._cfg.id;
+        nodeA = e.item._cfg.id;
       })
       
-      newGraph.on('node:mouseleave', evt => {
-        newGraph.setItemState(evt.item, 'hover', false)
+      
+      newGraph.on('node:mouseleave', (e) => {
+        newGraph.setItemState(e.item, 'hover', false)
       })
 
       // check that the node that is being dragged, does not have a  comboId,  
       newGraph.on('node:dragenter', (e) => {
-        //console.log(`dragEnter node ID = ${e.item._cfg.id}`);
-        
         if ( !('comboId' in e.item._cfg.model) || e.item._cfg.model.comboId === undefined ) { // if it has a comboId, do not create combo
           if(nodeA !== "" && e.item._cfg.id !== nodeA ){ 
-            nodesInCombo = 2;
             nodeB = e.item._cfg.id;
             newGraph.createCombo({
               id: `combo${comboNumber}`, 
-              label:`${nodesInCombo}`,  
+              label:`Combo${comboNumber}`,  
             }, [`${nodeA}`, `${nodeB}`]);
             comboNumber += 1;
           }
@@ -725,96 +732,78 @@ const TimeBarTrendSecs2 = () => {
         newGraph.getCombos().forEach((combo) => {
           newGraph.setItemState(combo, 'dragenter', false);
         });
-        //console.log(`node dragend ID = ${e.item._cfg.id}`);  
-        callBackNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
-        for(let i = 0; i < e.currentTarget.cfg.combos.length; i++ ){
-            if(e.currentTarget.cfg.combos[i].comboId === selectedComboId){
-              e.currentTarget.cfg.combos[i].label = callBackNodesInCombo; 
-            }
-            e.currentTarget.cfg.combos[i].label = "";
-        }
         newGraph.refresh();
       });
 
-      newGraph.on('edge:mouseenter', evt => {
-        newGraph.setItemState(evt.item, 'hover', true)
-      })
-  
-      newGraph.on('edge:mouseleave', evt => {
-        newGraph.setItemState(evt.item, 'hover', false)
+      newGraph.on('node:mousedown', (e) => {
+        nodeMouseDown = true;
+        console.log(`nodeMouseDown = ${nodeMouseDown}`);
       })
 
-      newGraph.on('combo:mouseenter', (evt) => {
-        const { item } = evt;
+      newGraph.on('node:mouseup', (e) => {
+        nodeMouseDown = false;
+        comboDragLeave === false
+        console.log(`nodeMouseDown = ${nodeMouseDown}`);
+      })
+
+      newGraph.on('edge:mouseenter', (e) => {
+        newGraph.setItemState(e.item, 'hover', true)
+      })
+  
+      newGraph.on('edge:mouseleave', (e) => {
+        newGraph.setItemState(e.item, 'hover', false)
+      })
+
+      newGraph.on('combo:mouseenter', (e) => {
+        const { item } = e;
         selectedComboId = item._cfg.id;
         console.log(`selectedComboId = ${selectedComboId}`);
-        callBackComboHas1NodeOrLess = comboHas1NodeOrLess(evt.currentTarget.cfg.nodes, selectedComboId);
         newGraph.setItemState(item, 'active', true);
         
-/*         nodesInCombo = countNodesInCombo(evt.currentTarget.cfg.nodes, selectedComboId);
+        nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         console.log(`combo:mouseenter nodesInCombo == ${nodesInCombo}`);
-        item._cfg.model.label = nodesInCombo;
-        console.log(`item._cfg.model.label => ${item._cfg.model.label}`)
-        newGraph.refresh(); */
+        newGraph.refresh();
       });
       
-      newGraph.on('combo:mouseleave', (evt) => {
-        const { item } = evt;
+      newGraph.on('combo:mouseleave', (e) => {
+        const { item } = e;
         newGraph.setItemState(item, 'active', false);
+        nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         newGraph.refresh();
       });
       
       newGraph.on('combo:dragenter', (e) => {
+        console.log(`combo:dragenter nodeCount = ${nodesInCombo}`);
+        nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         newGraph.setItemState(e.item, 'dragenter', true);
-      });
-
-      newGraph.on('combo:dragenter', evt => {
-        nodesInCombo = countNodesInCombo(evt.currentTarget.cfg.nodes, selectedComboId);
-        console.log(`combodragenter evt.item._cfg.model.id = ${evt.item._cfg.model.id}`);
-        evt.item._cfg.model.label = nodesInCombo;
-        newGraph.refresh();
+/*         if(nodeMouseDown === false) {
+          newGraph.setItemState(e.item, 'dragenter', true);
+          newGraph.refresh();
+        } */
       });
       
       
       newGraph.on('combo:dragleave', (e) => {
-        console.log(`dragleave combo id = ${e.item._cfg.id}`)
-        comboHas1NodeOrLess(e.currentTarget.cfg.nodes, selectedComboId);
+        comboDragLeave = true;
+        console.log(`combo:dragleave combo${e.item._cfg.id}`)
         newGraph.setItemState(e.item, 'dragenter', false);
-      });
 
-/*       newGraph.on(`combo:mouseup`, (e) => {
-       nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
-       console.log(`combomouseup e.item._cfg.model.id = ${e.item._cfg.model.id}`);
-       e.item._cfg.model.label = nodesInCombo;
-       newGraph.refresh();
-      });
- */
-      newGraph.on(`combo:mousedown`, (e) => {
+        console.log(`nodeMouseDown = ${nodeMouseDown}`)
         // there is only 1 node left in the array, then we can uncombo
-        if(callBackComboHas1NodeOrLess === true) {
-          console.log(`selectedComboId on node:mouseup = ${selectedComboId}`);
-          newGraph.uncombo(`${selectedComboId}`);
-          selectedComboId = "";
-        }
-      });
-
-      // this function fails whenever there are no combo assignments
-      // we  allow uncombo, if selected combo has only 1 node
-      const comboHas1NodeOrLess = (nodesArray, selectedComboId) => {
-        let counter = 0;
-        for(let i = 0; i < nodesArray.length; i += 1){
-          if('comboId' in nodesArray[i]._cfg.model){
-            if(nodesArray[i]._cfg.model.comboId === selectedComboId && nodesArray[i]._cfg.model.comboId !== undefined){
-              counter += 1
-            }
+        // needs more conditions to ensure that we are sure the user wants to remove combo
+        if(nodeMouseDown === true && comboDragLeave === true){
+          if( nodesInCombo === 1 ){
+              console.log(`selectedComboId on node:mouseup = ${selectedComboId}`);
+              newGraph.uncombo(`${selectedComboId}`);
+              selectedComboId = "";
+          } else {
+            nodesInCombo =  nodesInCombo - 1;
+            newGraph.refresh();
           }
         }
-        //nodesInCombo = counter;
-        if(counter == 0){
-          return true
-        }
-        return false
-      }
+      });
+
+
       const countNodesInCombo = (nodesArray, selectedComboId) => {
         let counter = 0;
         for(let i = 0; i < nodesArray.length; i += 1){
@@ -827,12 +816,6 @@ const TimeBarTrendSecs2 = () => {
         console.log(`${selectedComboId} counter = ${counter}`);
         return counter;
       }
-
-/*       newGraph.on('combo:dblclick', (e) => {
-        console.log(`combo double click e = ${e}`);
-        
-      }); */
-
 
     
       /* 
