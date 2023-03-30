@@ -720,7 +720,13 @@ const TimeBarTrendSecs2 = () => {
         const nodesArray = newGraph.getNodes();
         newGraph.getCombos().forEach((combo)=> {
           if(combo._cfg.id === selectedComboId){
+            if( e.item._cfg.model.label === 1 /* && currentNodesInComboArray[0] <= 1 */){
+              console.log(`UNCOMBO TRIGGERED`);
+              newGraph.uncombo(`${selectedComboId}`);
+              selectedComboId = "";
+          } else {
             combo._cfg.model.label = countNodesInCombo(nodesArray, selectedComboId);
+          }
           }
         });
       });
@@ -794,6 +800,7 @@ const TimeBarTrendSecs2 = () => {
       newGraph.on('combo:dragleave', (e) => {
         console.log(`combo:dragleave`);
         comboDragLeave = true;
+        selectedComboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragenter', false);
         const currentNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         const currentNodesInComboArray = [];
@@ -801,11 +808,7 @@ const TimeBarTrendSecs2 = () => {
 
         // there is only 1 node left in the array, then we can uncombo
         if(nodeMouseDown === true){
-          if( e.item._cfg.model.label <= 1 && currentNodesInComboArray[0] <= 1){
-              console.log(`UNCOMBO TRIGGERED`);
-              newGraph.uncombo(`${selectedComboId}`);
-              selectedComboId = "";
-          } else if(currentNodesInComboArray[0] > 1){ // comboDragEnter CAnnot be a condition, by default when mouse button held down and inside a combo comboDragEnter is true
+          if(currentNodesInComboArray[0] > 1){ // comboDragEnter CAnnot be a condition, by default when mouse button held down and inside a combo comboDragEnter is true
             console.log(`SUBTRACTING COUNT`)
             e.item._cfg.model.label = currentNodesInComboArray[0] - 1 ; // more conditions required. this happens too easily
             newGraph.refresh();
