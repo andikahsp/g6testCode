@@ -586,7 +586,7 @@ const TimeBarTrendSecs2 = () => {
           style: {
             position:'bottom',
             stroke: 'gray',
-            fill: 'transparent',
+            fill: 'white',
             lineWidth: 1.5,
           },
           labelCfg: {
@@ -691,18 +691,21 @@ const TimeBarTrendSecs2 = () => {
         newGraph.getNodes().forEach((node) => {
           if(node._cfg.id === nodeA){
             nodeAModel = node._cfg.model
+            console.log(`nodeAModel ID = ${nodeAModel.id}`);
           }
         });
-        console.log(`nodeAModel ID = ${nodeAModel.id}`);
+        console.log(nodeAModel);
+        console.log(nodeBModel);
 
-        if ( (('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
+        if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if(nodeA !== "" && nodeB !== nodeA ){ 
             console.log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
             console.log(`nodeA = ${nodeA}`);
             console.log(`nodeB = ${nodeB}`);
-            newGraph.createCombo({
-              id: `combo${comboNumber}`, 
-              label:2,  
+            const newComboId = `combo${comboNumber}`
+            newGraph.createCombo({         // more conditions required. this happens too easily
+              id: newComboId,   
+              label: ""
             }, [`${nodeA}`, `${nodeB}`]);
             comboNumber += 1;
           }
@@ -754,13 +757,11 @@ const TimeBarTrendSecs2 = () => {
       })
 
       newGraph.on('combo:mouseenter', (e) => {
-        console.log('combo:mouseenter');
         const { item } = e;
         
         //console.log(`combo:mouseenter\n selectedComboId = ${selectedComboId}`);
         newGraph.setItemState(item, 'active', true);
 
-        newGraph.refresh();
       });
       
       newGraph.on('combo:mouseleave', (e) => {
@@ -775,33 +776,38 @@ const TimeBarTrendSecs2 = () => {
         console.log(`combo:dragenter`);
         comboDragEnter = true;
         selectedComboId = e.item._cfg.id;
-        //nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         newGraph.setItemState(e.item, 'dragenter', true);
+        const currentNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
+        const currentNodesInComboArray = [];
+        currentNodesInComboArray.push(currentNodesInCombo);
 
+        if(nodeMouseDown === true){
+          if(e.item._cfg.model.label === "") {
+            e.item._cfg.model.label =  currentNodesInComboArray[0];
+          } else {
+            e.item._cfg.model.label =  currentNodesInComboArray[0] + 1;
+          }
+        }
       });
       
       
       newGraph.on('combo:dragleave', (e) => {
-        console.log(`combo:dragleave\n ===============> ${e.item._cfg.model.id}`);
+        console.log(`combo:dragleave`);
         comboDragLeave = true;
-        //console.log(`combo:dragleave ${e.item._cfg.id}`)
         newGraph.setItemState(e.item, 'dragenter', false);
+        const currentNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
+        const currentNodesInComboArray = [];
+        currentNodesInComboArray.push(currentNodesInCombo)
 
-        //console.log(`nodeMouseDown = ${nodeMouseDown}`)
         // there is only 1 node left in the array, then we can uncombo
-        // needs more conditions to ensure that we are sure the user wants to remove combo
-        if(nodeMouseDown === true && comboDragLeave === true){
-          if( parseInt(e.item._cfg.model.label) <= 1 && countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId) <= 1){
-              //console.log(`selectedComboId on node:mouseup = ${selectedComboId}`); <========= ERROR
+        if(nodeMouseDown === true){
+          if( e.item._cfg.model.label <= 1 && currentNodesInComboArray[0] <= 1){
+              console.log(`UNCOMBO TRIGGERED`);
               newGraph.uncombo(`${selectedComboId}`);
               selectedComboId = "";
-          } 
-          if(countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId) > 1){ // comboDragEnter CAnnot be a condition, by default when mouse button held down and inside a combo comboDragEnter is true
-            console.log(`subtracting count`)
-            /* const newNodeCount = e.item._cfg.model.label - 1;
-            e.item._cfg.model.label = `${newNodeCount}`; */
-            const nodesInComboBeforeAction = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId)
-            e.item._cfg.model.label = nodesInComboBeforeAction - 1 ;
+          } else if(currentNodesInComboArray[0] > 1){ // comboDragEnter CAnnot be a condition, by default when mouse button held down and inside a combo comboDragEnter is true
+            console.log(`SUBTRACTING COUNT`)
+            e.item._cfg.model.label = currentNodesInComboArray[0] - 1 ; // more conditions required. this happens too easily
             newGraph.refresh();
           }
         }
@@ -828,9 +834,10 @@ const TimeBarTrendSecs2 = () => {
               }
             }
           }
-          console.log(`selectedComboId = ${selectedComboId}/n  counter = ${counter}`);
+          console.log(` ${selectedComboId}\n has ${counter} nodes`);
           return counter;
         }
+        console.log(`ERROR: selectedComboId is undefined when counting nodes in combo`)
       }
 
 
