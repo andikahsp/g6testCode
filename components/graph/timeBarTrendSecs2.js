@@ -720,8 +720,13 @@ const TimeBarTrendSecs2 = () => {
 
       newGraph.on('node:dragend', (e) => {
         console.log('node:dragend');
+        let latestNodeCount;
         newGraph.getCombos().forEach((combo) => {
           newGraph.setItemState(combo, 'dragenter', false);
+          if(combo._cfg.id === selectedComboId){
+            latestNodeCount = countNodesInCombo(combo._cfg.id)
+            console.log(`node:dragend nodeCount =${latestNodeCount}`);
+          }
         });       
 /*      const nodesArray = newGraph.getNodes();
         console.log(`${selectedComboId} label = ${e.item._cfg.model.label}`);
@@ -779,11 +784,11 @@ const TimeBarTrendSecs2 = () => {
         //console.log(`combo:mouseup`);
         newGraph.setItemState(e.item, 'mousedown', false);
         selectedComboId = e.item._cfg.id;
-        const currentNodesInCombo = countNodesInCombo(selectedComboId);
+/*         const currentNodesInCombo = countNodesInCombo(selectedComboId);
         const currentNodesInComboArray = [];
         currentNodesInComboArray.push(currentNodesInCombo);
         console.log(`# OF NODES = ${currentNodesInComboArray[0]}`)
-        e.item._cfg.model.label = currentNodesInComboArray[0];
+        e.item._cfg.model.label = currentNodesInComboArray[0]; */
       });
 
 /*       newGraph.on('combo:mouseover', (e) => {
@@ -800,7 +805,7 @@ const TimeBarTrendSecs2 = () => {
         console.log(`combo:dragenter`);
         selectedComboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragenter', true);
-        const currentNodesInCombo = countNodesInCombo(selectedComboId);
+ /*        const currentNodesInCombo = countNodesInCombo(selectedComboId);
         console.log(`## OF NODES = ${currentNodesInCombo}`);
         const currentNodesInComboArray = [];
         currentNodesInComboArray.push(currentNodesInCombo);
@@ -815,18 +820,20 @@ const TimeBarTrendSecs2 = () => {
               } else if(e.item._cfg.model.label  < currentNodesInComboArray[0]){
                   console.log(`>>ADDING COUNT`)
                   e.item._cfg.model.label =  currentNodesInComboArray[0];
-              } /* else {
-                  console.log(`>>MAINTAINING COUNT`)
-                  e.item._cfg.model.label =  currentNodesInComboArray[0];
-              }  */
+              } 
+              // else {
+              //    console.log(`>>MAINTAINING COUNT`)
+              //    e.item._cfg.model.label =  currentNodesInComboArray[0];
+              // }  
         }
+  */
       });
 
-/*       newGraph.on('combo:dragover', (e) => {
+      newGraph.on('combo:dragover', (e) => {
         console.log(`combo:dragover`);
         selectedComboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragenter', true);
-        const currentNodesInCombo = countNodesInCombo(selectedComboId);
+/*         const currentNodesInCombo = countNodesInCombo(selectedComboId);
         console.log(`## OF NODES = ${currentNodesInCombo}`);
         const currentNodesInComboArray = [];
         currentNodesInComboArray.push(currentNodesInCombo);
@@ -836,14 +843,16 @@ const TimeBarTrendSecs2 = () => {
         } 
         else if(e.item._cfg.model.label !== ""){
                 if( e.item._cfg.model.label  > currentNodesInComboArray[0] && nodeDrag === true ){
+                  console.log(`>>ADDING COUNT`)
+                  //console.log(`>>SUBTRACTING COUNT`);
+                  e.item._cfg.model.label =  currentNodesInComboArray[0];
+              } else if(e.item._cfg.model.label  < currentNodesInComboArray[0]){
+                  //console.log(`>>ADDING COUNT`)
                   console.log(`>>SUBTRACTING COUNT`);
                   e.item._cfg.model.label =  currentNodesInComboArray[0] - 1;
-              } else if(e.item._cfg.model.label  < currentNodesInComboArray[0]){
-                  console.log(`>>ADDING COUNT`)
-                  e.item._cfg.model.label =  currentNodesInComboArray[0];
               } 
-        }
-      }); */
+        } */
+      });
 
       // NB! WE DON'T USE combo:mouseenter to assign selected item id to selectedComboId:
       // it will cause the decrement of node count after adding node into the combo.
