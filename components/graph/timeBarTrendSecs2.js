@@ -92,8 +92,12 @@ let callBackNodesInCombo = false;
 let style = {};
 
 let nodeMouseDown = false;
+let nodeDrag = false;
+
 let comboDragLeave = false;
 let comboDragEnter = false;
+
+let comboMouseEnter = false;
 
 const TimeBarTrendSecs2 = () => {
     const ref = React.useRef(null)
@@ -624,7 +628,6 @@ const TimeBarTrendSecs2 = () => {
               fontSize: 11
             }
           },
-          
         },
         modes: {
           default: [
@@ -682,6 +685,12 @@ const TimeBarTrendSecs2 = () => {
       })
 
 
+      newGraph.on('node:drag', (e) => {
+        console.log(`node:drag`);
+        nodeDrag = true;
+      });
+
+
       // check that the node that is being dragged, does not have a  comboId,  
       newGraph.on('node:dragenter', (e) => {
         console.log('node:dragenter');
@@ -717,10 +726,11 @@ const TimeBarTrendSecs2 = () => {
         newGraph.getCombos().forEach((combo) => {
           newGraph.setItemState(combo, 'dragenter', false);
         });       
-        const nodesArray = newGraph.getNodes();
-        newGraph.getCombos().forEach((combo)=> {
+/*      const nodesArray = newGraph.getNodes();
+        console.log(`${selectedComboId} label = ${e.item._cfg.model.label}`);
+         newGraph.getCombos().forEach((combo)=> {
           if(combo._cfg.id === selectedComboId){
-            if( e.item._cfg.model.label === 1 /* && currentNodesInComboArray[0] <= 1 */){
+            if( combo._cfg.model.label === 1 ){
               console.log(`UNCOMBO TRIGGERED`);
               newGraph.uncombo(`${selectedComboId}`);
               selectedComboId = "";
@@ -728,15 +738,13 @@ const TimeBarTrendSecs2 = () => {
             combo._cfg.model.label = countNodesInCombo(nodesArray, selectedComboId);
           }
           }
-        });
+        }); */
       });
 
 
       newGraph.on('node:mousedown', (e) => {
         console.log('node:mousedown')
         nodeMouseDown = true;
-
-
       })
 
       newGraph.on('node:mouseup', (e) => {
@@ -744,6 +752,7 @@ const TimeBarTrendSecs2 = () => {
         nodeMouseDown = false;
         comboDragLeave = false;
         comboDragEnter = false;
+        nodeDrag = false;
 
         /* const nodesArray = newGraph.getNodes();
         newGraph.getCombos().forEach((combo)=> {
@@ -753,31 +762,42 @@ const TimeBarTrendSecs2 = () => {
         }); */
         newGraph.refresh();
       })
-
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
       })
   
       newGraph.on('edge:mouseleave', (e) => {
+        comboMouseEnter = false
         newGraph.setItemState(e.item, 'hover', false)
       })
 
       newGraph.on('combo:mouseenter', (e) => {
+        comboMouseEnter = true;
         const { item } = e;
-        
-        //console.log(`combo:mouseenter\n selectedComboId = ${selectedComboId}`);
         newGraph.setItemState(item, 'active', true);
 
       });
       
       newGraph.on('combo:mouseleave', (e) => {
+        comboMouseEnter = false
         selectedComboId = undefined;
         const { item } = e;
         newGraph.setItemState(item, 'active', false);
         //nodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         newGraph.refresh();
       });
-      
+    
+      newGraph.on('combo:mouseup', (e) => {
+        console.log(`combo:mouseup`);
+        newGraph.setItemState(e.item, 'mousedown', false);
+        selectedComboId = e.item._cfg.id;
+        const currentNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
+        const currentNodesInComboArray = [];
+        currentNodesInComboArray.push(currentNodesInCombo);
+        //e.item._cfg.model.label =  currentNodesInComboArray[0];
+      });
+
+
       newGraph.on('combo:dragenter', (e) => {
         console.log(`combo:dragenter`);
         comboDragEnter = true;
@@ -786,17 +806,24 @@ const TimeBarTrendSecs2 = () => {
         const currentNodesInCombo = countNodesInCombo(e.currentTarget.cfg.nodes, selectedComboId);
         const currentNodesInComboArray = [];
         currentNodesInComboArray.push(currentNodesInCombo);
+        console.log(`${e.item._cfg.model.id}'s label: ${e.item._cfg.model.label }`)
 
-        if(nodeMouseDown === true){
-          if(e.item._cfg.model.label === "") {
-            e.item._cfg.model.label =  currentNodesInComboArray[0];
-          } else {
-            e.item._cfg.model.label =  currentNodesInComboArray[0] + 1;
-          }
+        if(e.item._cfg.model.label === "") {
+          console.log(`INITIALISING COUNT`)
+          e.item._cfg.model.label =  currentNodesInComboArray[0];
+        } 
+        else if(e.item._cfg.model.label !== ""){
+                if( e.item._cfg.model.label  !== currentNodesInComboArray[0] && nodeDrag === true ){
+                  console.log(`ADDING COUNT`)
+                  e.item._cfg.model.label =  currentNodesInComboArray[0] + 1;
+              } else {
+                  e.item._cfg.model.label =  currentNodesInComboArray[0];
+              }
         }
       });
-      
-      
+
+      // NB! WE DON'T USE combo:mouseenter to assign selected item id to selectedComboId:
+      // it will cause the decrement of node count after adding node into the combo.
       newGraph.on('combo:dragleave', (e) => {
         console.log(`combo:dragleave`);
         comboDragLeave = true;
@@ -806,13 +833,11 @@ const TimeBarTrendSecs2 = () => {
         const currentNodesInComboArray = [];
         currentNodesInComboArray.push(currentNodesInCombo)
 
-        // there is only 1 node left in the array, then we can uncombo
-        if(nodeMouseDown === true){
-          if(currentNodesInComboArray[0] > 1){ // comboDragEnter CAnnot be a condition, by default when mouse button held down and inside a combo comboDragEnter is true
+        // if > 1 nodes WAS in combo, on drag leave, SUBTRACT COUNT
+        if(nodeDrag === true){
             console.log(`SUBTRACTING COUNT`)
             e.item._cfg.model.label = currentNodesInComboArray[0] - 1 ; // more conditions required. this happens too easily
             newGraph.refresh();
-          }
         }
       });
 
