@@ -753,7 +753,7 @@ const TimeBarTrendSecs2 = () => {
         newGraph.setItemState(e.item, 'hover', false)
       });
 
-      newGraph.on('combo:dragenter', (e) => {
+/*       newGraph.on('combo:dragenter', (e) => {
         comboDragEnter = true;
         console.log(`combo:dragenter`);
         selectedComboId = e.item._cfg.id;
@@ -767,13 +767,38 @@ const TimeBarTrendSecs2 = () => {
           e.item._cfg.model.label =  currentNodesInComboArray[0];
         } else {
           if(comboDragLeave === false){
-            if(/* comboDragEnter === true   && */ nodeDrag === true ){
+            if(nodeDrag === true ){
               console.log(`ADDING COUNT`);
               e.item._cfg.model.label = currentNodesInComboArray[0] + 1;
             }
           }
         }
-        
+      });
+ */
+      newGraph.on("node:mouseup", (e) => {
+        if (e.item.getModel().comboId != undefined) {
+          selectedComboId = e.item.getModel().comboId;
+          newGraph.setItemState(e.item, "dragenter", true);
+          const currentNodesInCombo = countNodesInCombo(selectedComboId);
+          const currentNodesInComboArray = [];
+          currentNodesInComboArray.push(currentNodesInCombo);
+          if (e.item._cfg.model.label === "") {
+            e.item._cfg.model.label = currentNodesInCombo;
+          } else {
+            if (comboDragLeave === false) {
+              if (nodeDrag === true) {
+                const combos = newGraph.getCombos();
+                for (let i = 0; i < combos.length; i++) {
+                  // console.log(combos[i].getID());
+                  if (combos[i].getID() == selectedComboId) {
+                    combos[i]._cfg.model.label = currentNodesInCombo;
+                    newGraph.updateCombo(combos[i]);
+                  }
+                }
+              }
+            }
+          }
+        }
       });
 
       newGraph.on('combo:dragover', (e) => {
