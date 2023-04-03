@@ -32,9 +32,7 @@ function getUTCHrMinSec(logsourceTime){
 }
 
 function populateNodesEdges (jsonData){
-  let edgeOccurence = 1;
-  const displayedTime = toUTCTimeString(jsonData.logsourceTime);
- 
+
   // This format if we want to customise shapes and sizes according
   // to data
   
@@ -88,9 +86,11 @@ let nodeA = "";
 let nodeB = "";
 let comboNumber = 0;
 let selectedComboId = undefined;
-let callBackNodesInCombo = false;
 let style = {};
-let latestNodeCount;
+
+let nodeDrag = false;
+let comboDragEnter = false; 
+let comboDragLeave = false;
 
 
 const TimeBarTrendSecs2 = () => {
@@ -381,7 +381,7 @@ const TimeBarTrendSecs2 = () => {
                 y: style.r,
                 r: 15,
                 //symbol: collapseIcon,
-                fill: '#1890FF',
+                fill: '#FDFD96',
                 stroke: 'grey',
               },
               draggable: true,
@@ -392,12 +392,12 @@ const TimeBarTrendSecs2 = () => {
             group.addShape('text', {
               attrs: {
                   text:cfg.label,
-                  x: style.r,
+                  x: style.r - 1,
                   y: style.r,
                   fontFamily: 'Arial',
                   fontSize: 19,
-                  fill: 'red',
-                  stroke: 'black',
+                  fill: 'black',
+                  stroke: 'grey',
               },
               draggable: true, 
               name: 'combo-marker-label'
@@ -426,7 +426,7 @@ const TimeBarTrendSecs2 = () => {
             //Update the textlabel
             textLabel.attr({
               text: cfg.label,
-              x: style.r * 0.50 - 4, 
+              x: style.r * 0.50 - 5, 
               y: (style.r - 20) * - 1,
             });
           },
@@ -543,23 +543,22 @@ const TimeBarTrendSecs2 = () => {
         layout: {
           type: 'force',
           center: [200, 200],
-          nodeSize: nodeSize, 
           preventOverlap: true,
-          nodeSpacing: 50, 
+          nodeSpacing: 5, 
           linkDistance: d => {
             if (d.source.id === 'node0') {
               return 200;
             }
             return 150;
           },
-          nodeStrength: 30,
+          nodeStrength: 0.5,
           edgeStrength: 0.1,
           collideStrength: 1,
           onTick,
           
         },
         defaultNode: {
-          //size: nodeSize,
+          size: nodeSize,
           type: 'circle',
           style: {
             position: 'top',
@@ -581,8 +580,8 @@ const TimeBarTrendSecs2 = () => {
         groupByTypes: false,
         defaultCombo: {
           type: 'cCircle',
-          size: [10], // The minimum size of the Combo
-          padding: 60,
+          size: [100], // The minimum size of the Combo
+          padding: 20,
           style: {
             position:'bottom',
             stroke: 'gray',
@@ -601,7 +600,12 @@ const TimeBarTrendSecs2 = () => {
         comboStateStyles: {
           dragenter: {
             lineWidth: 4,
-            stroke: '#FE9797',
+            stroke: '#FF5349',
+          },
+          dragleave: {
+            lineWidth: 4,
+            stroke: '#FF5349',
+            lineDash: [6, 18]
           },
         },
         defaultEdge: {
@@ -683,6 +687,15 @@ const TimeBarTrendSecs2 = () => {
         newGraph.setItemState(e.item, 'hover', false)
       })
 
+      newGraph.on('node:mouseup', (e) => {
+        comboDragEnter = false;
+        comboDragLeave = false;
+        newGraph.setItemState(e.item, 'hover', false)
+      })
+
+      newGraph.on('node:drag', (e) => {
+        nodeDrag = true; 
+      })
 
       // check that the node that is being dragged, does not have a  comboId,  
       newGraph.on('node:dragenter', (e) => {
@@ -699,7 +712,8 @@ const TimeBarTrendSecs2 = () => {
         //console.log(nodeAModel);
         //console.log(nodeBModel);
 
-        if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
+        if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
+        (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if(nodeA !== "" && nodeB !== nodeA ){ 
             console.log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
             console.log(`nodeA = ${nodeA}`);
@@ -715,145 +729,80 @@ const TimeBarTrendSecs2 = () => {
       });
 
 
-
       newGraph.on('node:dragend', (e) => {
         console.log('node:dragend');
+        nodeDrag = false;
         newGraph.getCombos().forEach((combo) => {
-          newGraph.setItemState(combo, 'dragenter', false);
           if(combo._cfg.id === selectedComboId){
-            latestNodeCount = countNodesInCombo(combo._cfg.id)
-            console.log(`node:dragend nodeCount =${latestNodeCount}`);
+            const newestCount = countNodesInCombo(selectedComboId)
+            if(newestCount === 0){
+              newGraph.uncombo(selectedComboId);
+            } else {
+              newGraph.setItemState(combo, 'dragenter', false);
+              newGraph.setItemState(combo, 'dragleave', false);
+            }
           }
-        });       
-        
-        /*      const nodesArray = newGraph.getNodes();
-        console.log(`${selectedComboId} label = ${e.item._cfg.model.label}`);
-         newGraph.getCombos().forEach((combo)=> {
-          if(combo._cfg.id === selectedComboId){
-            if( combo._cfg.model.label === 1 ){
-              console.log(`UNCOMBO TRIGGERED`);
-              newGraph.uncombo(`${selectedComboId}`);
-              selectedComboId = "";
-          } else {
-            combo._cfg.model.label = countNodesInCombo(nodesArray, selectedComboId);
-          }
-          }
-        }); */
+        });      
       });
 
-
-
-      newGraph.on('node:mouseup', (e) => {
-        console.log('node:mouseup')
-      })
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
-      })
+      });
   
       newGraph.on('edge:mouseleave', (e) => {
         newGraph.setItemState(e.item, 'hover', false)
-      })
-
-      newGraph.on('combo:mouseenter', (e) => {
-        console.log('combo:mouseenter');
-        selectedComboId = e.item._cfg.id;
-        const { item } = e;
-        newGraph.setItemState(item, 'active', true);
-/*         const currentNodeCount = countNodesInCombo(e.item._cfg.id);
-        console.log(`# OF NODES = ${currentNodeCount}`)
-        e.item._cfg.model.label = currentNodeCount; */
       });
-      
-
-      newGraph.on('combo:mouseleave', (e) => {
-        console.log(`combo:mouseleave`);
-        const { item } = e;
-        newGraph.setItemState(item, 'active', false);
-      });
-    
-      newGraph.on('combo:mouseup', (e) => {
-        console.log(`combo:mouseup`);
-        newGraph.setItemState(e.item, 'mousedown', false);
-/*         const currentNodesInCombo = countNodesInCombo(selectedComboId);
-        const currentNodesInComboArray = [];
-        currentNodesInComboArray.push(currentNodesInCombo);
-        console.log(`# OF NODES = ${currentNodesInComboArray[0]}`)
-        e.item._cfg.model.label = currentNodesInComboArray[0]; */
-      });
-
-/*       newGraph.on('combo:mouseover', (e) => {
-        selectedComboId = e.item._cfg.id;
-        const currentNodesInCombo = countNodesInCombo(selectedComboId);
-        const currentNodesInComboArray = [];
-        currentNodesInComboArray.push(currentNodesInCombo);
-        console.log(`# OF NODES = ${currentNodesInComboArray[0]}`)
-        e.item._cfg.model.label = currentNodesInComboArray[0]; 
-        
-      }) */ 
 
       newGraph.on('combo:dragenter', (e) => {
+        comboDragEnter = true;
         console.log(`combo:dragenter`);
         selectedComboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragenter', true);
         const currentNodesInCombo = countNodesInCombo(selectedComboId);
-        console.log(`## OF NODES = ${currentNodesInCombo}`);
-        const currentNodesInComboArray = [];
-        currentNodesInComboArray.push(currentNodesInCombo);
-        if(e.item._cfg.model.label === "") {
-          console.log(`INITIALISING COUNT`)
-        } 
-        e.item._cfg.model.label =  currentNodesInComboArray[0];
-       /*  else if(e.item._cfg.model.label !== "" && comboDragLeave !== true){
-                if( e.item._cfg.model.label  > currentNodesInComboArray[0] && nodeDrag === true){
-                  console.log(`>>SUBTRACTING COUNT`);
-                  e.item._cfg.model.label =  currentNodesInComboArray[0] - 1;
-              } else if(e.item._cfg.model.label  < currentNodesInComboArray[0]){
-                  console.log(`>>ADDING COUNT`)
-                  e.item._cfg.model.label =  currentNodesInComboArray[0];
-              } 
-              // else {
-              //    console.log(`>>MAINTAINING COUNT`)
-              //    e.item._cfg.model.label =  currentNodesInComboArray[0];
-              // }  
-        } */
- 
-      });
-
-      newGraph.on('combo:dragover', (e) => {
-        console.log(`combo:dragover`);
-        selectedComboId = e.item._cfg.id;
-        latestNodeCount = countNodesInCombo(selectedComboId);
-        console.log(`combo:dragover: nodeCount =${latestNodeCount}`);
-        newGraph.setItemState(e.item, 'dragenter', true);
-      
-/*         const currentNodesInCombo = countNodesInCombo(selectedComboId);
-        console.log(`## OF NODES = ${currentNodesInCombo}`);
+        console.log(`combo:dragenter # OF NODES = ${currentNodesInCombo}`);
         const currentNodesInComboArray = [];
         currentNodesInComboArray.push(currentNodesInCombo);
         if(e.item._cfg.model.label === "") {
           console.log(`INITIALISING COUNT`)
           e.item._cfg.model.label =  currentNodesInComboArray[0];
-        } 
-        else if(e.item._cfg.model.label !== ""){
-                if( e.item._cfg.model.label  > currentNodesInComboArray[0] && nodeDrag === true ){
-                  console.log(`>>ADDING COUNT`)
-                  //console.log(`>>SUBTRACTING COUNT`);
-                  e.item._cfg.model.label =  currentNodesInComboArray[0];
-              } else if(e.item._cfg.model.label  < currentNodesInComboArray[0]){
-                  //console.log(`>>ADDING COUNT`)
-                  console.log(`>>SUBTRACTING COUNT`);
-                  e.item._cfg.model.label =  currentNodesInComboArray[0] - 1;
-              } 
-        } */
+        } else {
+          if(comboDragLeave === false){
+            if(/* comboDragEnter === true   && */ nodeDrag === true ){
+              console.log(`ADDING COUNT`);
+              e.item._cfg.model.label = currentNodesInComboArray[0] + 1;
+            }
+          }
+        }
+        
+      });
+
+      newGraph.on('combo:dragover', (e) => {
+        //console.log(`combo:dragover`);
+        selectedComboId = e.item._cfg.id;
+        newGraph.setItemState(e.item, 'dragenter', true);
+      
+      });
+
+      newGraph.on(`combo:drag`,(e) => {
+        // prevents dotted red border from showing when dragging combo
+        newGraph.setItemState(e.item, 'dragleave', false);
       });
 
       // NB! WE DON'T USE combo:mouseenter to assign selected item id to selectedComboId:
       // it will cause the decrement of node count after adding node into the combo.
       newGraph.on('combo:dragleave', (e) => {
+        comboDragLeave = true;
         console.log(`combo:dragleave`);
         selectedComboId = e.item._cfg.id;
-        newGraph.setItemState(e.item, 'dragenter', false);
-
+        newGraph.setItemState(e.item, 'dragleave', true);
+        const currentNodesInCombo = countNodesInCombo(selectedComboId);
+        console.log(`combo:dragleave, # of  NODES = ${currentNodesInCombo}`);
+        const currentNodesInComboArray = [];
+        currentNodesInComboArray.push(currentNodesInCombo);
+        console.log(`SUBTRACTING COUNT`);
+        if(nodeDrag === true){
+          e.item._cfg.model.label = currentNodesInComboArray[0] - 1;
+        }
 
         // if > 1 nodes WAS in combo, on drag leave, SUBTRACT COUNT
 /*         if(nodeDrag === true && comboDragLeave !== true){   
@@ -861,6 +810,11 @@ const TimeBarTrendSecs2 = () => {
             e.item._cfg.model.label = currentNodesInComboArray[0] - 1 ; // more conditions required. this happens too easily
         } */
       });
+
+      newGraph.on("combo:contextmenu", (e) => {
+        selectedComboId = e.item._cfg.id;
+        newGraph.uncombo(selectedComboId);
+        });
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
       newGraph.on("node:dblclick", function (event) {
