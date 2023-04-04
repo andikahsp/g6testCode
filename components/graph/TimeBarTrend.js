@@ -55,14 +55,16 @@ function populateNodesEdges (jsonData){
        { id: 'node3', ...image, label: `vector`, date: 1636095554 },    
       ], 
      edges: [
-       { source: 'node0', 
+       { id: 'edge0',
+         source: 'node0', 
          target: 'node1', 
          data: {
           frequency: '3', 
           event: `${jsonData.message}`
          }
       },
-      { source: 'node2', 
+      {  id: 'edge1',
+         source: 'node2', 
          target: 'node3', 
          data: {
           frequency: '7', 
@@ -84,12 +86,8 @@ function populateNodesEdges (jsonData){
 
 let nodeA = "";
 let nodeB = "";
-let comboNumber = 0;
-let selectedComboId = undefined;
 let style = {};
-
 let nodeDrag = false;
-let comboDragEnter = false; 
 let comboDragLeave = false;
 
 
@@ -99,8 +97,7 @@ const TimeBarTrend = () => {
     const [timeBar, setTimeBar] = useState(null);
 
     useEffect(() => {
-      const G6 = require('@antv/g6');
-      
+      const G6 = require('graphG6/packages/g6/src/index');
       
       const nodeEdgeData = populateNodesEdges(jsonData);
       nodeEdgeData.nodes[0].img = `https://cdn.pixabay.com/photo/2013/07/13/11/47/computer-158675_960_720.png`;
@@ -580,7 +577,7 @@ const TimeBarTrend = () => {
         groupByTypes: false,
         defaultCombo: {
           type: 'cCircle',
-          size: [100], // The minimum size of the Combo
+          size: [130], // The minimum size of the Combo
           padding: 20,
           style: {
             position:'bottom',
@@ -678,7 +675,7 @@ const TimeBarTrend = () => {
       newGraph.on('node:mouseenter', (e) => {
         //console.log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
-        nodeA = e.item._cfg.id; // have to find some other way to assign this
+        nodeA = e.item._cfg.id;
       })
 
 
@@ -688,26 +685,31 @@ const TimeBarTrend = () => {
       })
 
       newGraph.on('node:mouseup', (e) => {
-        comboDragEnter = false;
         comboDragLeave = false;
         newGraph.setItemState(e.item, 'hover', false)
       })
 
       newGraph.on('node:drag', (e) => {
+        // we need this check when dragging nodes in or out of combo 
+        // to differentiate when combo is moved (dragged)
         nodeDrag = true; 
-        console.log('nodePlus')
       })
+
+      newGraph.on('node:dragend', (e) => {
+        // nodeDrag status variable needs to be reset
+        nodeDrag = false;
+      });
 
       // check that the node that is being dragged, does not have a  comboId,  
       newGraph.on('node:dragenter', (e) => {
-        console.log('node:dragenter');
+        //console.log('node:dragenter');
         const nodeBModel = e.item._cfg.model;
         nodeB = e.item._cfg.id;
         let nodeAModel = {};
         newGraph.getNodes().forEach((node) => {
           if(node._cfg.id === nodeA){
             nodeAModel = node._cfg.model
-            console.log(`nodeAModel ID = ${nodeAModel.id}`);
+            //console.log(`nodeAModel ID = ${nodeAModel.id}`);
           }
         });
         //console.log(nodeAModel);
@@ -716,35 +718,21 @@ const TimeBarTrend = () => {
         if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
         (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if(nodeA !== "" && nodeB !== nodeA ){ 
-            console.log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
-            console.log(`nodeA = ${nodeA}`);
-            console.log(`nodeB = ${nodeB}`);
-            const newComboId = `combo${comboNumber}`
+            //console.log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
+            //console.log(`nodeA = ${nodeA}`);
+            //console.log(`nodeB = ${nodeB}`);
+            const comboCount = newGraph.getCombos().length;
+            const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
+            const newComboId = `combo${parseInt(last) + 1}`
             newGraph.createCombo({
               id: newComboId,   
               label: ""
             }, [`${nodeA}`, `${nodeB}`]);
-            comboNumber += 1;
           }
         }
       });
 
 
-      newGraph.on('node:dragend', (e) => {
-        console.log('node:dragend');
-        nodeDrag = false;
-        newGraph.getCombos().forEach((combo) => {
-          if(combo._cfg.id === selectedComboId){
-            const newestCount = countNodesInCombo(selectedComboId)
-            if(newestCount === 0){
-              newGraph.uncombo(selectedComboId);
-            } else {
-              newGraph.setItemState(combo, 'dragenter', false);
-              newGraph.setItemState(combo, 'dragleave', false);
-            }
-          }
-        });      
-      });
 
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
@@ -754,92 +742,73 @@ const TimeBarTrend = () => {
         newGraph.setItemState(e.item, 'hover', false)
       });
 
-/*       newGraph.on('combo:dragenter', (e) => {
-        comboDragEnter = true;
-        console.log(`combo:dragenter`);
-        selectedComboId = e.item._cfg.id;
-        newGraph.setItemState(e.item, 'dragenter', true);
-        const currentNodesInCombo = countNodesInCombo(selectedComboId);
-        console.log(`combo:dragenter # OF NODES = ${currentNodesInCombo}`);
-        const currentNodesInComboArray = [];
-        currentNodesInComboArray.push(currentNodesInCombo);
-        if(e.item._cfg.model.label === "") {
-          console.log(`INITIALISING COUNT`)
-          e.item._cfg.model.label =  currentNodesInComboArray[0];
-        } else {
-          if(comboDragLeave === false){
-            if(nodeDrag === true ){
-              console.log(`ADDING COUNT`);
-              e.item._cfg.model.label = currentNodesInComboArray[0] + 1;
-            }
-          }
-        }
-      });
- */
       newGraph.on("node:mouseup", (e) => {
         if (e.item.getModel().comboId != undefined) {
-          selectedComboId = e.item.getModel().comboId;
+          const comboIdOfNode = e.item.getModel().comboId;
           newGraph.setItemState(e.item, "dragenter", true);
-          const currentNodesInCombo = countNodesInCombo(selectedComboId);
-          const currentNodesInComboArray = [];
-          currentNodesInComboArray.push(currentNodesInCombo);
+          const currentNodeCount = countNodesInCombo(comboIdOfNode);
           if (e.item._cfg.model.label === "") {
-            e.item._cfg.model.label = currentNodesInCombo;
+            e.item._cfg.model.label = currentNodeCount;
           } else {
-            if (comboDragLeave === false) {
-              if (nodeDrag === true) {
-                const combos = newGraph.getCombos();
-                for (let i = 0; i < combos.length; i++) {
+            if (nodeDrag === true) {
+              const combo = newGraph.findById(comboIdOfNode);
+              combo.getModel().label = currentNodeCount;
+              newGraph.updateCombo(combo);
+              /* const combos = newGraph.getCombos();
+              for (let i = 0; i < combos.length; i++) {
                   // console.log(combos[i].getID());
-                  if (combos[i].getID() == selectedComboId) {
-                    combos[i]._cfg.model.label = currentNodesInCombo;
+                  if (combos[i].getID() == comboIdOfNode) {
+                    combos[i]._cfg.model.label = currentNodeCount;
                     newGraph.updateCombo(combos[i]);
                   }
-                }
-              }
-            }
+                } */
+              } 
           }
         }
+        const updatedCombos = newGraph.getCombos();
+          updatedCombos.forEach((combo) => {
+            newGraph.setItemState(combo, 'dragleave', false);
+            newGraph.setItemState(combo, 'dragenter', false);
+          })
       });
-
-      newGraph.on('combo:dragover', (e) => {
-        //console.log(`combo:dragover`);
-        selectedComboId = e.item._cfg.id;
-        newGraph.setItemState(e.item, 'dragenter', true);
       
-      });
-
       newGraph.on(`combo:drag`,(e) => {
         // prevents dotted red border from showing when dragging combo
         newGraph.setItemState(e.item, 'dragleave', false);
       });
 
-      // NB! WE DON'T USE combo:mouseenter to assign selected item id to selectedComboId:
+      newGraph.on('combo:dragover', (e) => {
+        newGraph.setItemState(e.item, 'dragenter', true);
+        //console.log(`combo:dragover`);
+      });
+
+      // NB! WE DON'T USE combo:mouseenter to assign selected item id to comboId:
       // it will cause the decrement of node count after adding node into the combo.
       newGraph.on('combo:dragleave', (e) => {
         comboDragLeave = true;
-        console.log(`combo:dragleave`);
-        selectedComboId = e.item._cfg.id;
+        //console.log(`combo:dragleave`);
+        const comboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragleave', true);
-        const currentNodesInCombo = countNodesInCombo(selectedComboId);
-        console.log(`combo:dragleave, # of  NODES = ${currentNodesInCombo}`);
-        const currentNodesInComboArray = [];
-        currentNodesInComboArray.push(currentNodesInCombo);
-        console.log(`SUBTRACTING COUNT`);
+        const oldNodesCount = countNodesInCombo(comboId);
+        //console.log(`combo:dragleave, # of  NODES #$#= ${oldNodesCount}`);
+      
+        //console.log(`SUBTRACTING COUNT`);
         if(nodeDrag === true){
-          e.item._cfg.model.label = currentNodesInComboArray[0] - 1;
+          e.item._cfg.model.label = oldNodesCount - 1;
+          if(e.item._cfg.model.label === 0){
+            newGraph.uncombo(comboId);
+          }
         }
+      });
 
-        // if > 1 nodes WAS in combo, on drag leave, SUBTRACT COUNT
-/*         if(nodeDrag === true && comboDragLeave !== true){   
-            console.log(`SUBTRACTING COUNT`)
-            e.item._cfg.model.label = currentNodesInComboArray[0] - 1 ; // more conditions required. this happens too easily
-        } */
+      newGraph.on('combo:mouseup', (e) =>{
+        newGraph.setItemState(e.item, 'dragleave', false);
+        newGraph.setItemState(e.item, 'dragenter', false);
       });
 
       newGraph.on("combo:contextmenu", (e) => {
-        selectedComboId = e.item._cfg.id;
-        newGraph.uncombo(selectedComboId);
+        const comboId = e.item._cfg.id;
+        newGraph.uncombo(comboId);
         });
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
@@ -853,18 +822,18 @@ const TimeBarTrend = () => {
         });
 
 
-      const countNodesInCombo = (selectedComboId) => {
-        let selectedCombo = {};
-        if(selectedComboId !== undefined){
+      const countNodesInCombo = (comboId) => {
+        let comboDetails = {};
+        if(comboId !== undefined){
           const combos = newGraph.getCombos();
           combos.forEach((combo) => {
-            if(combo._cfg.id === selectedComboId){
-              selectedCombo = combo;
+            if(combo._cfg.id === comboId){
+              comboDetails = combo;
             }
           });
-         return selectedCombo._cfg.nodes.length;
+         return comboDetails._cfg.nodes.length;
         } 
-        console.log(`ERROR: selectedComboId is undefined when counting nodes in combo`)
+        console.log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
     
       /* 
