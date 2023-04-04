@@ -58,18 +58,15 @@ function populateNodesEdges (jsonData){
        { id: 'edge0',
          source: 'node0', 
          target: 'node1', 
-         data: {
-          frequency: '3', 
-          event: `${jsonData.message}`
-         }
+         frequency: '3', 
+         event: `${jsonData.message}`
+        
       },
       {  id: 'edge1',
          source: 'node2', 
          target: 'node3', 
-         data: {
-          frequency: '7', 
-          event: `Event B`
-         }
+         frequency: '7', 
+         event: `Event B`
       },
 /*       { source: 'node0', 
          target: 'node2',
@@ -97,7 +94,8 @@ const TimeBarTrend = () => {
     const [timeBar, setTimeBar] = useState(null);
 
     useEffect(() => {
-      const G6 = require('graphG6/packages/g6/src/index');
+      const G6 = require('@antv/g6');
+      //const G6 = require('graphG6/packages/g6/src/index');
       
       const nodeEdgeData = populateNodesEdges(jsonData);
       nodeEdgeData.nodes[0].img = `https://cdn.pixabay.com/photo/2013/07/13/11/47/computer-158675_960_720.png`;
@@ -494,7 +492,7 @@ const TimeBarTrend = () => {
           // freqency
           group.addShape('text', {
             attrs: {
-              text: cfg.data && cfg.data.frequency,
+              text: cfg && cfg.frequency,
               x: startPoint.x + midPointXY.x + markerXOffset - 3.5,
               y: startPoint.y + midPointXY.y + markerYOffset,
               fontSize: 14,
@@ -509,7 +507,7 @@ const TimeBarTrend = () => {
           // event
           group.addShape('text', {
             attrs: {
-              text: cfg.data && cfg.data.event,
+              text: cfg && cfg.event,
               x: startPoint.x + midPointXY.x + markerXOffset + labelXOffset,
               y: startPoint.y + midPointXY.y + markerYOffset,
               fontSize: 12,
@@ -673,7 +671,7 @@ const TimeBarTrend = () => {
 
       /* *************** MOUSE EVENTS ************** */
       newGraph.on('node:mouseenter', (e) => {
-        //console.log('node:mouseenter e =', e);
+        console.log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
         nodeA = e.item._cfg.id;
       })
@@ -754,14 +752,6 @@ const TimeBarTrend = () => {
               const combo = newGraph.findById(comboIdOfNode);
               combo.getModel().label = currentNodeCount;
               newGraph.updateCombo(combo);
-              /* const combos = newGraph.getCombos();
-              for (let i = 0; i < combos.length; i++) {
-                  // console.log(combos[i].getID());
-                  if (combos[i].getID() == comboIdOfNode) {
-                    combos[i]._cfg.model.label = currentNodeCount;
-                    newGraph.updateCombo(combos[i]);
-                  }
-                } */
               } 
           }
         }
@@ -810,6 +800,23 @@ const TimeBarTrend = () => {
         const comboId = e.item._cfg.id;
         newGraph.uncombo(comboId);
         });
+      
+      newGraph.on("combo:click", (e) => {
+      // 1. grab combo
+      // 2. from combo check collapsed state
+      // 3. if state = collapsed
+      // 4. get all the children (nodes & combos) inside the combo
+      // 5. grab all the standard edges, if source or target of the edges are these children, 
+      // 6. grab all the virtual edges from inside this combo, if source or target that is not equals to this comboId 
+      //    is found inside the standard edges array, add frequency and event details from standard edge model into this virtual edge model
+
+      const comboModel = e.item.getModel()
+      let comboChildren;
+      if(comboModel?.collapsed !== undefined && comboModel?.collapsed === true){
+        comboChildren = comboModel.children
+      }
+      });
+
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
       newGraph.on("node:dblclick", function (event) {
@@ -835,7 +842,8 @@ const TimeBarTrend = () => {
         } 
         console.log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
-    
+      
+     
       /* 
       // RESIZING
       if (typeof window !== 'undefined')
