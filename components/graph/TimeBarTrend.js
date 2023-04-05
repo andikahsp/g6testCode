@@ -56,6 +56,7 @@ function populateNodesEdges (jsonData){
       ], 
      edges: [
        { id: 'edge0',
+         ttp: true, 
          source: 'node0', 
          target: 'node1', 
          frequency: '3', 
@@ -68,19 +69,18 @@ function populateNodesEdges (jsonData){
          frequency: '7', 
          event: `Event B`
       },
-/*       { source: 'node0', 
-         target: 'node2',
-         data: {
-          frequency: '', 
-          event: `LabelZ`
-         }
-      }, */
+      {  id: 'edge2',
+      source: 'node1', 
+      target: 'node0', 
+      frequency: '7', 
+      event: `some other Event`
+   },
      ],
    } 
    return data;
  }
 
-
+let log = console.log; 
 let nodeA = "";
 let nodeB = "";
 let style = {};
@@ -156,17 +156,17 @@ const TimeBarTrend = () => {
       // time = 6:59.08 am
       // window: 6:58.59am  - 6:59.17 am (60seconds)
       for (let i = axisMin; i < axisMax; i++) {
-        //console.log(`i = ${i}`);
+        //log(`i = ${i}`);
         timeBarData.push({
           date: i,
           value: Math.round(Math.random() * 200),
         });
-        //console.log(`${i}seconds, timeString=${timeString}`)
+        //log(`${i}seconds, timeString=${timeString}`)
       }
 
 
       const nodeSize = 24;
-      //console.log(G6.TimeBar);
+      //log(G6.TimeBar);
       const newTimebar = new G6.TimeBar({
         x: 0,
         y: 0,
@@ -177,7 +177,7 @@ const TimeBarTrend = () => {
         tick: {
           tickLabelFormatter: (d) => {
             // convert the data accordingly
-           // console.log(`d => ${JSON.stringify(d, null, 3)}`);
+           // log(`d => ${JSON.stringify(d, null, 3)}`);
             return getUTCHrMinSec(d.date);
         },
           tickLabelStyle:{ 
@@ -466,49 +466,102 @@ const TimeBarTrend = () => {
 
           }
 
+
           const markerXOffset = 10;
           const markerYOffset = -15;
           const labelXOffset = 15;
+          let ttpMarkerOffset = 0;
 
-          // Add the circular marker on the bottom
-          group.addShape('marker', {
-            attrs: {
-              ...style,
-              opacity: 1,
-              x: startPoint.x + midPointXY.x + markerXOffset,
-              y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
-              r: 10,
-              symbol: collapseIcon,
-              fill: 'orange',
-              stroke: 'black',
-              strokeWidth: 3.5,
-              lineWidth: 1.5,
-            },
-            draggable: true,
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'combo-marker-shape',
-          });   
 
-          // freqency
-          group.addShape('text', {
-            attrs: {
-              text: cfg && cfg.frequency,
-              x: startPoint.x + midPointXY.x + markerXOffset - 3.5,
-              y: startPoint.y + midPointXY.y + markerYOffset,
-              fontSize: 14,
-              textAlign: 'left',
-              textBaseline: 'middle',
-              fill: 'white',
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'text-shape-frequency',
-          });
-          
+          if(cfg.ttp === true) {
+
+            // distance in pixels that edge frequency marker and message label needs to move to the right
+            ttpMarkerOffset = 23;
+
+            // TTP: Add the circular marker on the bottom
+            group.addShape('marker', {
+              attrs: {
+                ...style,
+                opacity: 1,
+                x: startPoint.x + midPointXY.x + markerXOffset,
+                y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
+                r: 10,
+                symbol: collapseIcon,
+                fill: 'orange',
+                stroke: 'black',
+                strokeWidth: 3.5,
+                lineWidth: 1.5,
+              },
+              draggable: true,
+              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+              name: 'edge-ttp-shape',
+            });   
+
+            // TTP -text
+            group.addShape('text', {
+              attrs: {
+                text: 'T',
+                x: startPoint.x + midPointXY.x + markerXOffset - 4.85,
+                y: startPoint.y + midPointXY.y + markerYOffset,
+                fontFamily: 'Arial',
+                fontWeight: "bold",
+                fontSize: 14.5,
+                textAlign: 'left',
+                textBaseline: 'middle',
+                fill: 'white',
+              },
+              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+              name: 'edge-ttp-text',
+            });
+
+            const ttpLabel = group.find((ele) => ele.get('name') === 'edge-ttp-text')
+          ttpLabel.toFront();
+          }
+         
+          if(cfg.frequency !== undefined){
+            // FREQUENCY Add the circular marker on the bottom
+            group.addShape('marker', {
+              attrs: {
+                ...style,
+                opacity: 1,
+                x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset,
+                y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
+                r: 10,
+                symbol: collapseIcon,
+                fill: '#63666A',
+                stroke: 'black',
+                strokeWidth: 3.5,
+                lineWidth: 1.5,
+              },
+              draggable: true,
+              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+              name: 'edge-frequency-shape',
+            });   
+
+            // freqency -text 
+            group.addShape('text', {
+              attrs: {
+                text: cfg && cfg.frequency,
+                x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5,
+                y: startPoint.y + midPointXY.y + markerYOffset,
+                fontSize: 14,
+                textAlign: 'left',
+                textBaseline: 'middle',
+                fill: 'white',
+              },
+              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+              name: 'edge-frequency-text',
+            });
+            const frequencyLabel = group.find((ele) => ele.get('name') === 'edge-frequency-text')
+            frequencyLabel.toFront();
+          }
+
+
           // event
           group.addShape('text', {
             attrs: {
               text: cfg && cfg.event,
-              x: startPoint.x + midPointXY.x + markerXOffset + labelXOffset,
+              x: startPoint.x + midPointXY.x + markerXOffset + labelXOffset + ttpMarkerOffset,
               y: startPoint.y + midPointXY.y + markerYOffset,
               fontSize: 12,
               fontWeight: 300,
@@ -519,8 +572,6 @@ const TimeBarTrend = () => {
             // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
             name: 'text-shape-date',
           });
-          const edgeLabel = group.find((ele) => ele.get('name') === 'text-shape-frequency')
-          edgeLabel.toFront();
                
           return line;
         },
@@ -528,7 +579,7 @@ const TimeBarTrend = () => {
 
       /* *************************************************** */
       
-      //console.log(G6.Graph);
+      //log(G6.Graph);
       const newGraph = new G6.Graph({
         container: ref.current,
         width: width,
@@ -671,7 +722,7 @@ const TimeBarTrend = () => {
 
       /* *************** MOUSE EVENTS ************** */
       newGraph.on('node:mouseenter', (e) => {
-        console.log('node:mouseenter e =', e);
+        log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
         nodeA = e.item._cfg.id;
       })
@@ -700,25 +751,25 @@ const TimeBarTrend = () => {
 
       // check that the node that is being dragged, does not have a  comboId,  
       newGraph.on('node:dragenter', (e) => {
-        //console.log('node:dragenter');
+        //log('node:dragenter');
         const nodeBModel = e.item._cfg.model;
         nodeB = e.item._cfg.id;
         let nodeAModel = {};
         newGraph.getNodes().forEach((node) => {
           if(node._cfg.id === nodeA){
             nodeAModel = node._cfg.model
-            //console.log(`nodeAModel ID = ${nodeAModel.id}`);
+            //log(`nodeAModel ID = ${nodeAModel.id}`);
           }
         });
-        //console.log(nodeAModel);
-        //console.log(nodeBModel);
+        //log(nodeAModel);
+        //log(nodeBModel);
 
         if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
         (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if(nodeA !== "" && nodeB !== nodeA ){ 
-            //console.log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
-            //console.log(`nodeA = ${nodeA}`);
-            //console.log(`nodeB = ${nodeB}`);
+            //log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
+            //log(`nodeA = ${nodeA}`);
+            //log(`nodeB = ${nodeB}`);
             const comboCount = newGraph.getCombos().length;
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
             const newComboId = `combo${parseInt(last) + 1}`
@@ -769,20 +820,19 @@ const TimeBarTrend = () => {
 
       newGraph.on('combo:dragover', (e) => {
         newGraph.setItemState(e.item, 'dragenter', true);
-        //console.log(`combo:dragover`);
+        //log(`combo:dragover`);
       });
 
-      // NB! WE DON'T USE combo:mouseenter to assign selected item id to comboId:
-      // it will cause the decrement of node count after adding node into the combo.
+
       newGraph.on('combo:dragleave', (e) => {
         comboDragLeave = true;
-        //console.log(`combo:dragleave`);
+        //log(`combo:dragleave`);
         const comboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragleave', true);
         const oldNodesCount = countNodesInCombo(comboId);
-        //console.log(`combo:dragleave, # of  NODES #$#= ${oldNodesCount}`);
+        //log(`combo:dragleave, # of  NODES #$#= ${oldNodesCount}`);
       
-        //console.log(`SUBTRACTING COUNT`);
+        //log(`SUBTRACTING COUNT`);
         if(nodeDrag === true){
           e.item._cfg.model.label = oldNodesCount - 1;
           if(e.item._cfg.model.label === 0){
@@ -810,24 +860,71 @@ const TimeBarTrend = () => {
       // 6. grab all the virtual edges from inside this combo, if source or target that is not equals to this comboId 
       //    is found inside the standard edges array, add frequency and event details from standard edge model into this virtual edge model
 
+      const comboId = e.item.getID();
       const comboModel = e.item.getModel()
-      let comboChildren;
-      if(comboModel?.collapsed !== undefined && comboModel?.collapsed === true){
-        comboChildren = comboModel.children
-      }
+      const childrenIds = [];
+      const edgesThruCombo = []
+      
+      const allNodeEdges = newGraph.getEdges();
+
+      // all actions to take when combo is collapsed. 
+      if(comboModel?.collapsed === true){
+        comboModel.children.forEach((child) => {
+          childrenIds.push(child.id)
+        });
+        // populate edgesThruCombo Array
+        allNodeEdges.forEach((edge) => {
+          const edgeModel = edge.getModel();
+          childrenIds.forEach((childId) => {
+            if(childId === edgeModel.source || childId === edgeModel.target){
+              const edgeOfChild = {
+                id: edgeModel.id,
+                ttp: edgeModel.ttp,
+                source: edgeModel.source, 
+                target:edgeModel.target
+              }
+              edgesThruCombo.push(edgeOfChild)
+            }
+          })
+          //log(`edgesThruCombo = ${edgesThruCombo}`)
+        })
+
+        const combo = newGraph.findById(comboId);
+        //log(combo.get('edges'));
+        const comboVEdges = combo.get('edges');
+
+        //log(comboVEdges[0].getModel());
+        comboVEdges.forEach((vedge) => {
+          const vedgeModel = vedge.getModel();
+          log(`vedgeModel = ${vedgeModel}`)
+          log(`vedgeModel.source = ${vedgeModel.source}`)
+          log(`vedgeModel.target = ${vedgeModel.target}`)
+          //grab Id of OutsideItem
+          const IdOfOutsideItem = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source
+          log(`IdOfOutsideItem = ${IdOfOutsideItem}`)
+          edgesThruCombo.forEach((edgeOfChild) => {
+            log(`edgeOfChild.source = ${edgeOfChild.source} | edgeOfChild.target = ${edgeOfChild.target}`)
+            if(edgeOfChild.source === IdOfOutsideItem || edgeOfChild.target === IdOfOutsideItem){
+              log(`vedgeModel.id = ${vedgeModel.id}`);
+              const editedVEdge = newGraph.findById(vedgeModel.id);
+              // TTP
+              editedVEdge._cfg.model['ttp'] = edgeOfChild.ttp;
+            }
+          });
+         })
+        }
       });
 
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
       newGraph.on("node:dblclick", function (event) {
         const nodes = newGraph.getNodes();
-        console.log(nodes);
+        log(nodes);
         const edges = newGraph.getEdges();
-        console.log(edges);
+        log(edges);
         const combos = newGraph.getCombos();
-        console.log(combos);
+        log(combos);
         });
-
 
       const countNodesInCombo = (comboId) => {
         let comboDetails = {};
@@ -840,10 +937,9 @@ const TimeBarTrend = () => {
           });
          return comboDetails._cfg.nodes.length;
         } 
-        console.log(`ERROR: comboId is undefined when counting nodes in combo`)
+        log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
       
-     
       /* 
       // RESIZING
       if (typeof window !== 'undefined')
@@ -855,7 +951,7 @@ const TimeBarTrend = () => {
       
       setGraph(newGraph);
       setTimeBar(newTimebar);
-      //console.log(newGraph);
+      //log(newGraph);
     }, [])
   
     return <div ref={ref}></div>
