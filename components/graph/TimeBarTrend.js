@@ -63,18 +63,19 @@ function populateNodesEdges (jsonData){
          event: `${jsonData.message}`
         
       },
+      {  id: 'edge2',
+         source: 'node1', 
+         target: 'node0', 
+         frequency: '7', 
+         event: `some other Event`
+      },
       {  id: 'edge1',
+         ttp: true, 
          source: 'node2', 
          target: 'node3', 
          frequency: '7', 
          event: `Event B`
       },
-      {  id: 'edge2',
-      source: 'node1', 
-      target: 'node0', 
-      frequency: '7', 
-      event: `some other Event`
-   },
      ],
    } 
    return data;
@@ -97,7 +98,14 @@ const TimeBarTrend = () => {
       const G6 = require('@antv/g6');
       //const G6 = require('graphG6/packages/g6/src/index');
       
+      //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData = populateNodesEdges(jsonData);
+      // for the edges inside nodeEdgeData provide for dual edges:
+      const edges2 = Array.from(nodeEdgeData.edges);
+      edges2.pop();
+      G6.Util.processParallelEdges(edges2);
+
+
       nodeEdgeData.nodes[0].img = `https://cdn.pixabay.com/photo/2013/07/13/11/47/computer-158675_960_720.png`;
       nodeEdgeData.nodes[0].clipCfg = {
         show: false,
@@ -660,9 +668,9 @@ const TimeBarTrend = () => {
             stroke: '#5f6266',
             lineWidth: 2.2,
               endArrow: {
-              path: G6.Arrow.triangle(6.5, 7, 6), // (width, length, offset (wrt d))
+              path: G6.Arrow.triangle(6.5, 7, 0), // (width, length, offset (wrt d))
               fill: '#5f6466',
-              d: 6 // offset
+              d: 0 // offset
             },
           },
           labelCfg: {
@@ -716,7 +724,9 @@ const TimeBarTrend = () => {
           }
         }
       });
+      // load graph data
       newGraph.data(nodeEdgeData);
+
       newGraph.render();
 
 
