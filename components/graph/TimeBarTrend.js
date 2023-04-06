@@ -103,7 +103,8 @@ const TimeBarTrend = () => {
       // for the edges inside nodeEdgeData provide for dual edges:
       const edges2 = Array.from(nodeEdgeData.edges);
       edges2.pop();
-      G6.Util.processParallelEdges(edges2);
+      // G6.Util.processParallelEdges(edges2);
+      G6.Util.processParallelEdges(nodeEdgeData.edges, 25, 'quadratic', 'fund-polyline', undefined);
 
 
       nodeEdgeData.nodes[0].img = `https://cdn.pixabay.com/photo/2013/07/13/11/47/computer-158675_960_720.png`;
@@ -443,12 +444,11 @@ const TimeBarTrend = () => {
         itemType: 'edge',
         draw: function draw(cfg, group) {
 
-          // custom edge 
-          const stroke = cfg.style.stroke;
-
           const startPoint = cfg.startPoint;
-          const endPoint = cfg.endPoint;
-          
+          const endPoint = cfg.endPoint;          
+          const stroke = cfg.style.stroke;
+          //const stroke = (cfg.style && cfg.style.stroke) || this.options.style.stroke;
+
           let path = [
             ['M', startPoint.x, startPoint.y],
             ['L', endPoint.x, endPoint.y],
@@ -458,9 +458,8 @@ const TimeBarTrend = () => {
           if (isObject(endArrow)) endArrow.fill = stroke;
           const line = group.addShape('path', {
             attrs: {
+              stroke,
               path,
-              stroke: 'black',
-              lineWidth: 1.2,
               endArrow,
             },
             // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
@@ -471,7 +470,6 @@ const TimeBarTrend = () => {
           const midPointXY = {       
             x: (endPoint.x - startPoint.x) / 2,
             y: (endPoint.y - startPoint.y) / 2
-
           }
 
 
@@ -666,11 +664,17 @@ const TimeBarTrend = () => {
           type: 'fund-polyline',
           style: {
             stroke: '#5f6266',
-            lineWidth: 2.2,
-              endArrow: {
-              path: G6.Arrow.triangle(6.5, 7, 0), // (width, length, offset (wrt d))
+            lineWidth: 1.2,
+            endArrow: {
+              path: G6.Arrow.triangle(6.0, 6.0, 20), // (width, length, offset (wrt d))
               fill: '#5f6466',
-              d: 0 // offset
+              d: 20 // offset
+            },
+            // startArrow style used for dual edges 
+            startArrow: {
+              path: G6.Arrow.triangle(0, 0, 20), // (width, length, offset (wrt d))
+              fill: 'transparent',
+              d: 30 // offset
             },
           },
           labelCfg: {
@@ -732,7 +736,7 @@ const TimeBarTrend = () => {
 
       /* *************** MOUSE EVENTS ************** */
       newGraph.on('node:mouseenter', (e) => {
-        log('node:mouseenter e =', e);
+        //log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
         nodeA = e.item._cfg.id;
       })
