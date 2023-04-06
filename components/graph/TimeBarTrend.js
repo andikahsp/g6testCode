@@ -52,29 +52,30 @@ function populateNodesEdges (jsonData){
        { id: 'node0', ...image, label: jsonData.computerName, date: jsonData.logsourceTime },
        { id: 'node1', ...image, label: jsonData.originatingComputer, date: jsonData.logsourceTime },
        { id: 'node2', ...image, label: jsonData.logonProcess, date: 1636095550 },    
-       { id: 'node3', ...image, label: `vector`, date: 1636095554 },    
+       { id: 'node3', ...image, label: `vector`, date: 1636095551 },    
       ], 
      edges: [
        { id: 'edge0',
-         ttp: true, 
          source: 'node0', 
          target: 'node1', 
+         ttp: true,
          frequency: '3', 
          event: `${jsonData.message}`       
       },
       {  id: 'edge2',
-         source: 'node1', 
+         source: 'node1',
          target: 'node0', 
+         ttp: false, 
          frequency: '7', 
          event: `some other Event`
       },
       {  id: 'edge1',
-         ttp: true, 
          source: 'node2', 
          target: 'node3', 
-         frequency: '7', 
+         frequency: '9', 
          event: `Event B`
       },
+
      ],
    } 
    return data;
@@ -474,13 +475,13 @@ const TimeBarTrend = () => {
           const markerXOffset = 10;
           const markerYOffset = -15;
           const freqMarkerOffset = 15;
-          let ttpMarkerOffset = 0;
+          let ttpMarkerOffset = 30;
 
 
           if(cfg.ttp === true) {
 
             // distance in pixels that edge frequency marker and message label needs to move to the right
-            ttpMarkerOffset = 23;
+            ttpMarkerOffset = 18;
 
             // TTP: Add the circular marker on the bottom
             group.addShape('marker', {
@@ -1000,7 +1001,10 @@ const TimeBarTrend = () => {
       // 4. get all the children (nodes & combos) inside the combo
       // 5. grab all the standard edges, if source or target of the edges are these children, 
       // 6. grab all the virtual edges from inside this combo, if source or target that is not equals to this comboId 
-      //    is found inside the standard edges array, add frequency and event details from standard edge model into this virtual edge model
+      //    is found inside the standard edges array, add ttp details from standard edge model into this virtual edge model
+      // 7. grab vedges again, (models should show updated ttp values)
+      //  - check if any pair of virtual edges are parallel!
+      //  - if parallel, check if there at least one side with ttp value = true, and set the other side to true!
 
       const comboId = e.item.getID();
       const comboModel = e.item.getModel()
@@ -1028,30 +1032,40 @@ const TimeBarTrend = () => {
               edgesThruCombo.push(edgeOfChild)
             }
           })
-          //log(`edgesThruCombo = ${edgesThruCombo}`)
         })
+
+        log(`edgesThruCombo, first 3 edges: [ ${edgesThruCombo[0].id}, ${edgesThruCombo[1].id}, ${edgesThruCombo[2].id}, ... ]`)
 
         const combo = newGraph.findById(comboId);
         //log(combo.get('edges'));
         const comboVEdges = combo.get('edges');
 
         //log(comboVEdges[0].getModel());
+        //log(comboVEdges[1].getModel());
+        //log(comboVEdges[2].getModel());
         comboVEdges.forEach((vedge) => {
           const vedgeModel = vedge.getModel();
           //grab Id of OutsideItem
           const IdOfOutsideItem = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source
           //log(`IdOfOutsideItem = ${IdOfOutsideItem}`)
+          let check = false;
           edgesThruCombo.forEach((edgeOfChild) => {
             //log(`edgeOfChild.source = ${edgeOfChild.source} | edgeOfChild.target = ${edgeOfChild.target}`)
             if(edgeOfChild.source === IdOfOutsideItem || edgeOfChild.target === IdOfOutsideItem){
               //log(`vedgeModel.id = ${vedgeModel.id}`);
-              const editedVEdge = newGraph.findById(vedgeModel.id);
               // TTP
-              editedVEdge._cfg.model['ttp'] = edgeOfChild.ttp;
+              //editedVEdge._cfg.model['ttp'] = edgeOfChild.ttp;
+              if(edgeOfChild.ttp === true) {
+                check = true;
+              }
+              log(newGraph.get('vedges'));
+              log('end')
             }
-            
           });
+          const editedVEdge = newGraph.findById(vedgeModel.id);
+          editedVEdge._cfg.model['ttp'] = check;
          })
+         comboVEdges.forEach((VEdge) => {log(VEdge)});
         }
       });
 
