@@ -49,10 +49,10 @@ function populateNodesEdges (jsonData){
    // node and edge definition will be based on backend logic                  
    const data = {
       nodes:[
-       { id: 'node0', ...image, label: jsonData.computerName, date: jsonData.logsourceTime },
-       { id: 'node1', ...image, label: jsonData.originatingComputer, date: jsonData.logsourceTime },
-       { id: 'node2', ...image, label: jsonData.logonProcess, date: 1636095550 },    
-       { id: 'node3', ...image, label: `vector`, date: 1636095551 },    
+       { id: 'node0', ...image, label: 'node0'/* jsonData.computerName */, date: jsonData.logsourceTime },
+       { id: 'node1', ...image, label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime },
+       { id: 'node2', ...image, label: 'node2'/* jsonData.logonProcess */, date: 1636095550 },    
+       { id: 'node3', ...image, label: 'node3'/* `vector` */, date: 1636095551 },    
       ], 
      edges: [
        { id: 'edge0',
@@ -62,13 +62,13 @@ function populateNodesEdges (jsonData){
          frequency: '3', 
          event: `${jsonData.message}`       
       },
-      {  id: 'edge2',
+/*       {  id: 'edge2',
          source: 'node1',
          target: 'node0', 
          ttp: false, 
          frequency: '7', 
          event: `some other Event`
-      },
+      }, */
       {  id: 'edge1',
          source: 'node2', 
          target: 'node3', 
@@ -646,7 +646,7 @@ const TimeBarTrend = () => {
             });
 
             const ttpLabel = group.find((ele) => ele.get('name') === 'quadcurve-ttp-text')
-          ttpLabel.toFront();
+            ttpLabel.toFront();
           }
          
           if(cfg.frequency !== undefined){
@@ -870,8 +870,6 @@ const TimeBarTrend = () => {
         nodeA = e.item._cfg.id;
       })
 
-
-      
       newGraph.on('node:mouseleave', (e) => {
         newGraph.setItemState(e.item, 'hover', false)
       })
@@ -901,18 +899,12 @@ const TimeBarTrend = () => {
         newGraph.getNodes().forEach((node) => {
           if(node._cfg.id === nodeA){
             nodeAModel = node._cfg.model
-            //log(`nodeAModel ID = ${nodeAModel.id}`);
           }
         });
-        //log(nodeAModel);
-        //log(nodeBModel);
 
         if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
         (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if(nodeA !== "" && nodeB !== nodeA ){ 
-            //log(`CREATING NEW COMBO (selected item = ${e.item._cfg.id})`);
-            //log(`nodeA = ${nodeA}`);
-            //log(`nodeB = ${nodeB}`);
             const comboCount = newGraph.getCombos().length;
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
             const newComboId = `combo${parseInt(last) + 1}`
@@ -963,17 +955,14 @@ const TimeBarTrend = () => {
 
       newGraph.on('combo:dragover', (e) => {
         newGraph.setItemState(e.item, 'dragenter', true);
-        //log(`combo:dragover`);
       });
 
 
       newGraph.on('combo:dragleave', (e) => {
         comboDragLeave = true;
-        //log(`combo:dragleave`);
         const comboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragleave', true);
         const oldNodesCount = countNodesInCombo(comboId);
-        //log(`combo:dragleave, # of  NODES #$#= ${oldNodesCount}`);
       
         //log(`SUBTRACTING COUNT`);
         if(nodeDrag === true){
@@ -995,77 +984,63 @@ const TimeBarTrend = () => {
         });
       
       newGraph.on("combo:click", (e) => {
-      // 1. grab combo
-      // 2. from combo check collapsed state
-      // 3. if state = collapsed
-      // 4. get all the children (nodes & combos) inside the combo
-      // 5. grab all the standard edges, if source or target of the edges are these children, 
-      // 6. grab all the virtual edges from inside this combo, if source or target that is not equals to this comboId 
-      //    is found inside the standard edges array, add ttp details from standard edge model into this virtual edge model
-      // 7. grab vedges again, (models should show updated ttp values)
-      //  - check if any pair of virtual edges are parallel!
-      //  - if parallel, check if there at least one side with ttp value = true, and set the other side to true!
 
       const comboId = e.item.getID();
       const comboModel = e.item.getModel()
       const childrenIds = [];
-      const edgesThruCombo = []
-      
+      const edgesThruCombo = [] 
       const allNodeEdges = newGraph.getEdges();
-
+      //const allVEdges = newGraph.get('vedges');//<====== 
       // all actions to take when combo is collapsed. 
       if(comboModel?.collapsed === true){
         comboModel.children.forEach((child) => {
           childrenIds.push(child.id)
         });
+
+        const combo = newGraph.findById(comboId);
+        log(comboId);
+        const comboVEdges = combo.get('edges'); //< === trying to grab only from the combo instead of every VE on the graph.
+        //log('comboVEdges =', comboVEdges);
+
+        const allEdges = [...allNodeEdges, ...comboVEdges];
+        log('allEdges =\n', allEdges);
         // populate edgesThruCombo Array
-        allNodeEdges.forEach((edge) => {
+        allEdges.forEach((edge) => {
           const edgeModel = edge.getModel();
+          log('edgeModel =', edgeModel);
           childrenIds.forEach((childId) => {
             if(childId === edgeModel.source || childId === edgeModel.target){
               const edgeOfChild = {
                 id: edgeModel.id,
-                ttp: edgeModel.ttp,
+                ttp: edgeModel?.ttp,
                 source: edgeModel.source, 
                 target:edgeModel.target
               }
               edgesThruCombo.push(edgeOfChild)
             }
-          })
-        })
+          });
+        });
 
-        log(`edgesThruCombo, first 3 edges: [ ${edgesThruCombo[0].id}, ${edgesThruCombo[1].id}, ${edgesThruCombo[2].id}, ... ]`)
 
-        const combo = newGraph.findById(comboId);
-        //log(combo.get('edges'));
-        const comboVEdges = combo.get('edges');
-
-        //log(comboVEdges[0].getModel());
-        //log(comboVEdges[1].getModel());
-        //log(comboVEdges[2].getModel());
         comboVEdges.forEach((vedge) => {
           const vedgeModel = vedge.getModel();
-          //grab Id of OutsideItem
-          const IdOfOutsideItem = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source
-          //log(`IdOfOutsideItem = ${IdOfOutsideItem}`)
-          let check = false;
+          const IdOfOutsideItem = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source 
+          log(IdOfOutsideItem);
+          let ttpCheck = false;
           edgesThruCombo.forEach((edgeOfChild) => {
-            //log(`edgeOfChild.source = ${edgeOfChild.source} | edgeOfChild.target = ${edgeOfChild.target}`)
             if(edgeOfChild.source === IdOfOutsideItem || edgeOfChild.target === IdOfOutsideItem){
-              //log(`vedgeModel.id = ${vedgeModel.id}`);
-              // TTP
-              //editedVEdge._cfg.model['ttp'] = edgeOfChild.ttp;
               if(edgeOfChild.ttp === true) {
-                check = true;
+                ttpCheck = true;
               }
-              log(newGraph.get('vedges'));
-              log('end')
             }
           });
           const editedVEdge = newGraph.findById(vedgeModel.id);
-          editedVEdge._cfg.model['ttp'] = check;
+          editedVEdge._cfg.model['ttp'] = ttpCheck;
          })
-         comboVEdges.forEach((VEdge) => {log(VEdge)});
+
+         comboVEdges.forEach((vedge) => {
+          log(vedge.getModel());
+         });
         }
       });
 
@@ -1092,7 +1067,12 @@ const TimeBarTrend = () => {
         const combos = newGraph.getCombos();
         log(combos);
         });
-
+      newGraph.on("canvas:dblclick", function (event) {
+          const vedges = newGraph.get("vedges");
+          log('vedges =\n', vedges)   
+          const edges = newGraph.getEdges();
+          log('edges = \n', edges);
+          });
       // for Diagnosis
       newGraph.on('edge:dblclick', (e) => {
         log(`edge, event =${e}`)
