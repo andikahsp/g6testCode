@@ -50,33 +50,41 @@ function populateNodesEdges (jsonData){
    const data = {
       nodes:[
        { id: 'node0', ...image, label: 'node0'/* jsonData.computerName */, date: jsonData.logsourceTime },
-       { id: 'node1', ...image, label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime },
-       { id: 'node2', ...image, label: 'node2'/* jsonData.logonProcess */, date: 1636095550 },    
-       { id: 'node3', ...image, label: 'node3'/* `vector` */, date: 1636095551 },    
+       { id: 'node1', ...image, label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime/* , comboId: 'combo1' */ },
+       { id: 'node2', ...image, label: 'node2'/* jsonData.logonProcess */, date: 1636095550/* , comboId: 'combo1' */ },    
+       { id: 'node3', ...image, label: 'node3'/* `vector` */, date: 1636095551 },  
+       { id: 'node4', ...image, label: 'node4'/* `vector` */, date: 1636095552 },  
+       { id: 'node5', ...image, label: 'node5'/* `vector` */, date: 1636095553 }, 
       ], 
      edges: [
        { id: 'edge0',
          source: 'node0', 
          target: 'node1', 
-         ttp: true,
+         //ttp: true,
          frequency: '3', 
          event: `${jsonData.message}`       
       },
-/*       {  id: 'edge2',
-         source: 'node1',
-         target: 'node0', 
-         ttp: false, 
+      {  id: 'edge2',
+         source: 'node4',
+         target: 'node5', 
+         ttp: true, 
          frequency: '7', 
          event: `some other Event`
-      }, */
+      },
       {  id: 'edge1',
          source: 'node2', 
          target: 'node3', 
-         frequency: '9', 
+         frequency: '9',
+         ttp: true, 
          event: `Event B`
       },
-
      ],
+/*      combos: [
+      {
+        id: 'combo1',
+        label: 2,
+      }
+     ] */
    } 
    return data;
  }
@@ -475,7 +483,7 @@ const TimeBarTrend = () => {
           const markerXOffset = 10;
           const markerYOffset = -15;
           const freqMarkerOffset = 15;
-          let ttpMarkerOffset = 30;
+          let ttpMarkerOffset = 0 /* 30 */;
 
 
           if(cfg.ttp === true) {
@@ -987,60 +995,95 @@ const TimeBarTrend = () => {
 
       const comboId = e.item.getID();
       const comboModel = e.item.getModel()
-      const childrenIds = [];
+
       const edgesThruCombo = [] 
       const allNodeEdges = newGraph.getEdges();
-      //const allVEdges = newGraph.get('vedges');//<====== 
+      const neighborComboIds = [];
+      
+      const combo = newGraph.findById(comboId);
+      log('>>>>> SELECTED COMBO:',comboId);
+      log('neighbors(): ', combo.getNeighbors());
+      
+      const comboNeighbors = combo.getNeighbors();
+      comboNeighbors.forEach((neighbor, i) => {
+        log(`${comboId} neighbor${ i + 1 }: `,neighbor.getID());
+        if(neighbor.getID().includes('combo')){
+          neighborComboIds.push(neighbor.getID());
+        }
+      });
+      
+      
+      log('children of Combo: ', combo.getChildren());
       // all actions to take when combo is collapsed. 
-      if(comboModel?.collapsed === true){
-        comboModel.children.forEach((child) => {
-          childrenIds.push(child.id)
-        });
+      if(comboModel.collapsed === true){
 
-        const combo = newGraph.findById(comboId);
-        log('SELECTED COMBO =',comboId);
-        const comboVEdges = combo.get('edges'); //< === trying to grab only from the combo instead of every VE on the graph.
-        //log('comboVEdges =', comboVEdges);
-
-        const allEdges = [...allNodeEdges, ...comboVEdges];
-        log('allEdges =\n', allEdges);
+  
+        //log('allNodeEdges =\n', allNodeEdges);
         // populate edgesThruCombo Array
-        allEdges.forEach((edge) => {
+        allNodeEdges.forEach((edge, i) => {
           const edgeModel = edge.getModel();
-          childrenIds.forEach((childId, i) => {
-            if(childId === edgeModel.source || childId === edgeModel.target){
+          log(`allNodeEdges[${i}]: `, edgeModel);
+          comboModel.children.forEach((child, i) => {
+            if(child.id === edgeModel.source || child.id === edgeModel.target){
               const comboChildEdge = {
                 id: edgeModel.id,
                 ttp: edgeModel?.ttp,
                 source: edgeModel.source, 
                 target:edgeModel.target
               }
-              edgesThruCombo.push(comboChildEdge)
               log(`comboChildEdge ${i + 1}: `,comboChildEdge );
+              edgesThruCombo.push(comboChildEdge)
             }
           });
         });
 
 
-        comboVEdges.forEach((vedge, i) => {
+        const comboVEdges = combo.get('edges'); //< === trying to grab only from the combo instead of every VE on the graph.
+        //log('comboVEdges =', comboVEdges);
+
+        comboVEdges.forEach((vedge) => {
           const vedgeModel = vedge.getModel();
           const ItemOutsideCombo = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source 
           log(`ItemOutsideCombo:`, ItemOutsideCombo);
+
           let ttpCheck = false;
-          edgesThruCombo.forEach((comboChildEdge) => {
-            if(comboChildEdge.source === ItemOutsideCombo || comboChildEdge.target === ItemOutsideCombo){
-              if(comboChildEdge.ttp === true) {
-                ttpCheck = true;
+
+          if(ItemOutsideCombo.includes('node')){
+            edgesThruCombo.forEach((edgeThruCombo) => {
+              // IF line fails when ItemOutsideCombo IS A COMBO! standard edges do not connect to combos
+              // edgeThruCombo.source or .target will never be a comboId!
+              if(edgeThruCombo.source === ItemOutsideCombo || edgeThruCombo.target === ItemOutsideCombo){
+                if(edgeThruCombo.ttp === true) {
+                  ttpCheck = true;
+                }
               }
-            }
-          });
-          const editedVEdge = newGraph.findById(vedgeModel.id);
-          editedVEdge._cfg.model['ttp'] = ttpCheck;
+            });
+          } else if(ItemOutsideCombo.includes('combo')){
+              const neighborCombo = newGraph.findById(ItemOutsideCombo);
+              const neighborComboChildren = neighborCombo.getChildren();
+              log(`${ItemOutsideCombo}'s children:`, neighborComboChildren);
+              neighborComboChildren.nodes.forEach((comboChild) => {
+                const comboChildId = comboChild.getID();
+                log('comboChildId =', comboChildId);
+                edgesThruCombo.forEach((edgeThruCombo) => {
+                  if((edgeThruCombo.source === comboChildId || edgeThruCombo.target === comboChildId)){
+                    if(edgeThruCombo.ttp) {
+                      ttpCheck = true;
+                    }
+                  }
+                })
+              })
+          }
+          if(ttpCheck){
+            const editedVEdge = newGraph.findById(vedgeModel.id);
+            editedVEdge.getModel()['ttp'] = ttpCheck;
+          }
          })
 
          comboVEdges.forEach((vedge, i) => {
           log(`updated VE:`, vedge.getModel());
          });
+
         }
         log('=======END OF CLICK=======')
       });
@@ -1060,7 +1103,7 @@ const TimeBarTrend = () => {
       }
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
-      newGraph.on("node:dblclick", function (event) {
+      newGraph.on("canvas:click", function (event) {
         const nodes = newGraph.getNodes();
         log(nodes);
         const edges = newGraph.getEdges();
