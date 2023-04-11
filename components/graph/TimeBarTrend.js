@@ -998,7 +998,7 @@ const TimeBarTrend = () => {
         });
 
         const combo = newGraph.findById(comboId);
-        log(comboId);
+        log('SELECTED COMBO =',comboId);
         const comboVEdges = combo.get('edges'); //< === trying to grab only from the combo instead of every VE on the graph.
         //log('comboVEdges =', comboVEdges);
 
@@ -1007,29 +1007,29 @@ const TimeBarTrend = () => {
         // populate edgesThruCombo Array
         allEdges.forEach((edge) => {
           const edgeModel = edge.getModel();
-          log('edgeModel =', edgeModel);
-          childrenIds.forEach((childId) => {
+          childrenIds.forEach((childId, i) => {
             if(childId === edgeModel.source || childId === edgeModel.target){
-              const edgeOfChild = {
+              const comboChildEdge = {
                 id: edgeModel.id,
                 ttp: edgeModel?.ttp,
                 source: edgeModel.source, 
                 target:edgeModel.target
               }
-              edgesThruCombo.push(edgeOfChild)
+              edgesThruCombo.push(comboChildEdge)
+              log(`comboChildEdge ${i + 1}: `,comboChildEdge );
             }
           });
         });
 
 
-        comboVEdges.forEach((vedge) => {
+        comboVEdges.forEach((vedge, i) => {
           const vedgeModel = vedge.getModel();
-          const IdOfOutsideItem = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source 
-          log(IdOfOutsideItem);
+          const ItemOutsideCombo = vedgeModel.source === comboId ? vedgeModel.target : vedgeModel.source 
+          log(`ItemOutsideCombo:`, ItemOutsideCombo);
           let ttpCheck = false;
-          edgesThruCombo.forEach((edgeOfChild) => {
-            if(edgeOfChild.source === IdOfOutsideItem || edgeOfChild.target === IdOfOutsideItem){
-              if(edgeOfChild.ttp === true) {
+          edgesThruCombo.forEach((comboChildEdge) => {
+            if(comboChildEdge.source === ItemOutsideCombo || comboChildEdge.target === ItemOutsideCombo){
+              if(comboChildEdge.ttp === true) {
                 ttpCheck = true;
               }
             }
@@ -1038,10 +1038,11 @@ const TimeBarTrend = () => {
           editedVEdge._cfg.model['ttp'] = ttpCheck;
          })
 
-         comboVEdges.forEach((vedge) => {
-          log(vedge.getModel());
+         comboVEdges.forEach((vedge, i) => {
+          log(`updated VE:`, vedge.getModel());
          });
         }
+        log('=======END OF CLICK=======')
       });
 
       const countNodesInCombo = (comboId) => {
