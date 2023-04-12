@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { data as jsonData } from './source';
 import { isObject } from '@antv/util';
+import { circleIcon, cCircleComboShape} from "./parts/elements";
 
 
-function getUTCDateObject(logsourceTime){
+function getUTCDateObject(logsourceTime) {
   const actualTime = new Date(0);
   actualTime.setUTCSeconds(logsourceTime);
   return actualTime;
 }
 
 
-function toUTCTimeString(logsourceTime){
+function toUTCTimeString(logsourceTime) {
   const dateObjUTC = getUTCDateObject(logsourceTime);
  return dateObjUTC.toUTCString();
 }
 
-function toTimeString(number){
+function toTimeString(number) {
   return number < 10 ? `0${number.toString()}` : `${number.toString()}`;
 }
-function getUTCHrMinSec(logsourceTime){
+function getUTCHrMinSec(logsourceTime) {
   const dateObjUTC = getUTCDateObject(logsourceTime);
   const hours = dateObjUTC.getUTCHours();
   const minutes = dateObjUTC.getUTCMinutes();
@@ -31,7 +32,7 @@ function getUTCHrMinSec(logsourceTime){
   return hoursString + `:` + minutesString + `.` + secondsString;
 }
 
-function populateNodesEdges (jsonData){
+function populateNodesEdges (jsonData) {
 
   // This format if we want to customise shapes and sizes according
   // to data
@@ -39,12 +40,12 @@ function populateNodesEdges (jsonData){
   const image = { type: 'image', 
                    size: 36};
   
-  const circle = { type: 'circle', 
+/*   const circle = { type: 'circle', 
                    size: 48 };
   
   const triangle = { type: 'triangle',
                      size: 20, 
-                     direction: 'up'};
+                     direction: 'up'}; */
    
    // node and edge definition will be based on backend logic                  
    const data = {
@@ -94,7 +95,6 @@ let nodeA = "";
 let nodeB = "";
 let style = {};
 let nodeDrag = false;
-let comboDragLeave = false;
 
 
 const TimeBarTrend = () => {
@@ -108,10 +108,6 @@ const TimeBarTrend = () => {
       
       //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData = populateNodesEdges(jsonData);
-      // for the edges inside nodeEdgeData provide for dual edges:
-      const edges2 = Array.from(nodeEdgeData.edges);
-      edges2.pop();
-      // G6.Util.processParallelEdges(edges2);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 32, 'quadratic-custom', 'fund-polyline', undefined);
 
 
@@ -321,7 +317,7 @@ const TimeBarTrend = () => {
         let maxx = -99999999;
         let miny = 99999999;
         let maxy = -99999999;
-        let maxsize = -9999999; //<---- need to follow up
+        let maxsize = -9999999; //<---- need to follow up, usage unknown
         nodeEdgeData.nodes.forEach((node) => {
           if (minx > node.x) {
             minx = node.x;
@@ -346,104 +342,10 @@ const TimeBarTrend = () => {
 
       /*  *********** CUSTOM COMBO  ***********   */
       
-      // The symbols for the marker inside the combo
-      const collapseIcon = (x, y, r) => {
-        return [
-          ['M', x - r, y],
-          ['a', r, r, 0, 1, 0, r * 2, 0],
-          ['a', r, r, 0, 1, 0, -r * 2, 0],
-          ['M', x - r + 4, y],
-        ];
-      };
-      const expandIcon = (x, y, r) => {
-        return [
-          ['M', x - r, y],
-          ['a', r, r, 0, 1, 0, r * 2, 0],
-          ['a', r, r, 0, 1, 0, -r * 2, 0],
-          ['M', x - r + 4, y],
-          ['M', x - r + r, y - r + 4],
-        ];
-      };
-
       G6.registerCombo(
         'cCircle',
-        {
-          drawShape: function draw(cfg, group) {
-            const self = this;
-            // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
-            style = self.getShapeStyle(cfg);
-            // Add a circle shape as keyShape which is the same as the extended 'circle' type Combo
-            const circle = group.addShape('circle', {
-              attrs: {
-                ...style,
-                x: 0,
-                y: 0,
-                r: style.r,
-              },
-              draggable: true,
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'combo-keyShape',
-            });
-            // Add the marker
-            const marker = group.addShape('marker', {
-              attrs: {
-                ...style,
-                opacity: 1,
-                x: 0,
-                y: style.r,
-                r: 15,
-                //symbol: collapseIcon,
-                fill: '#FDFD96',
-                stroke: 'grey',
-              },
-              draggable: true,
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'combo-marker-shape',
-            });
-            // text that goes into the marker/badge
-            group.addShape('text', {
-              attrs: {
-                  text:cfg.label,
-                  x: style.r - 1,
-                  y: style.r,
-                  fontFamily: 'Arial',
-                  fontSize: 19,
-                  fill: 'black',
-                  stroke: 'grey',
-              },
-              draggable: true, 
-              name: 'combo-marker-label'
-            });
-            return circle;
-          },
-          // Define the updating logic for the marker
-          afterUpdate: function afterUpdate(cfg, combo) {
-            const self = this;
-            // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
-            const style = self.getShapeStyle(cfg);
-            const group = combo.get('group');
-            // Find the marker shape in the graphics group of the Combo
-            const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
-            //Find textLabel shape in the graphics group of the Combo
-            const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-label');
-
-            // Update the marker shape
-            marker.attr({
-              x: style.r * 0.50,
-              y: (style.r - 10) * - 1,
-              // The property 'collapsed' in the combo data represents the collapsing state of the Combo
-              // Update the symbol according to 'collapsed'
-              symbol: cfg.collapsed ? expandIcon : collapseIcon,
-            });
-            //Update the textlabel
-            textLabel.attr({
-              text: cfg.label,
-              x: style.r * 0.50 - 5, 
-              y: (style.r - 20) * - 1,
-            });
-          },
-        },
-        'circle',
+        cCircleComboShape,
+        'circle', //<< built-in combo to extend from
       );
 
       /* ******* CUSTOM EDGES ******* */
@@ -463,7 +365,7 @@ const TimeBarTrend = () => {
           ];
       
           const endArrow = cfg?.style && cfg.style.endArrow ? cfg.style.endArrow : false;
-          if (isObject(endArrow)) endArrow.fill = stroke;
+          //if (isObject(endArrow)) endArrow.fill = stroke;
           
           const line = group.addShape('path', {
             attrs: {
@@ -486,7 +388,7 @@ const TimeBarTrend = () => {
           let ttpMarkerOffset = 0 /* 30 */;
 
 
-          if(cfg.ttp === true) {
+          if (cfg.ttp === true) {
 
             // distance in pixels that edge frequency marker and message label needs to move to the right
             ttpMarkerOffset = 18;
@@ -499,7 +401,7 @@ const TimeBarTrend = () => {
                 x: startPoint.x + midPointXY.x + markerXOffset,
                 y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
                 r: 10,
-                symbol: collapseIcon,
+                symbol: circleIcon,
                 fill: 'orange',
                 stroke: 'black',
                 strokeWidth: 3.5,
@@ -531,7 +433,7 @@ const TimeBarTrend = () => {
           ttpLabel.toFront();
           }
          
-          if(cfg.frequency !== undefined){
+          if (cfg.frequency !== undefined) {
             // FREQUENCY Add the circular marker on the bottom
             group.addShape('marker', {
               attrs: {
@@ -540,7 +442,7 @@ const TimeBarTrend = () => {
                 x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset,
                 y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
                 r: 10,
-                symbol: collapseIcon,
+                symbol: circleIcon,
                 fill: '#63666A',
                 stroke: 'black',
                 strokeWidth: 3.5,
@@ -593,26 +495,19 @@ const TimeBarTrend = () => {
       G6.registerEdge(
         'quadratic-custom',
         {
-          afterDraw(cfg, group) {
-            const startPoint = cfg.startPoint;
-            const endPoint = cfg.endPoint;  
+          afterDraw(cfg, group) { 
 
             // get the first shape in the graphics group of this edge, it is the path of the edge here
             const shape = group.get('children')[0];
             // get the coordinate of the mid point on the path
             const midPointXY = shape.getPoint(0.5);
-            /* const midPointXY = {       
-              x: (endPoint.x - startPoint.x) / 2,
-              y: (endPoint.y - startPoint.y) / 2
-            } */
             
             const markerXOffset = 0;
             const markerYOffset = 0;
             const labelXOffset = 15;
             let ttpMarkerOffset = 0;
 
-
-          if(cfg.ttp === true) {
+          if (cfg.ttp === true) {
 
             // distance in pixels that edge frequency marker and message label needs to move to the right
             ttpMarkerOffset = 18;
@@ -625,7 +520,7 @@ const TimeBarTrend = () => {
                 x: midPointXY.x + markerXOffset,
                 y: midPointXY.y + markerYOffset - 1.5,
                 r: 10,
-                symbol: collapseIcon,
+                symbol: circleIcon,
                 fill: 'orange',
                 stroke: 'black',
                 strokeWidth: 3.5,
@@ -657,7 +552,7 @@ const TimeBarTrend = () => {
             ttpLabel.toFront();
           }
          
-          if(cfg.frequency !== undefined){
+          if (cfg.frequency !== undefined) {
             // FREQUENCY Add the circular marker on the bottom
             group.addShape('marker', {
               attrs: {
@@ -666,7 +561,7 @@ const TimeBarTrend = () => {
                 x: midPointXY.x + markerXOffset + ttpMarkerOffset,
                 y: midPointXY.y + markerYOffset - 1.5,
                 r: 10,
-                symbol: collapseIcon,
+                symbol: circleIcon,
                 fill: '#63666A',
                 stroke: 'black',
                 strokeWidth: 3.5,
@@ -771,12 +666,12 @@ const TimeBarTrend = () => {
           type: 'cCircle',
           size: [130], // The minimum size of the Combo
           padding: 20,
-          style: {
+          /* style: {
             position:'bottom',
             stroke: 'gray',
             fill: 'transparent',
             lineWidth: 1.5,
-          },
+          }, */
           labelCfg: {
             style: {
               position: 'bottom',
@@ -883,7 +778,6 @@ const TimeBarTrend = () => {
       })
 
       newGraph.on('node:mouseup', (e) => {
-        comboDragLeave = false;
         newGraph.setItemState(e.item, 'hover', false)
       })
 
@@ -905,14 +799,14 @@ const TimeBarTrend = () => {
         nodeB = e.item._cfg.id;
         let nodeAModel = {};
         newGraph.getNodes().forEach((node) => {
-          if(node._cfg.id === nodeA){
+          if (node._cfg.id === nodeA) {
             nodeAModel = node._cfg.model
           }
         });
 
         if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
         (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
-          if(nodeA !== "" && nodeB !== nodeA ){ 
+          if (nodeA !== "" && nodeB !== nodeA ) { 
             const comboCount = newGraph.getCombos().length;
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
             const newComboId = `combo${parseInt(last) + 1}`
@@ -967,15 +861,14 @@ const TimeBarTrend = () => {
 
 
       newGraph.on('combo:dragleave', (e) => {
-        comboDragLeave = true;
         const comboId = e.item._cfg.id;
         newGraph.setItemState(e.item, 'dragleave', true);
         const oldNodesCount = countChildrenInCombo(comboId);
       
         //log(`SUBTRACTING COUNT`);
-        if(nodeDrag === true){
+        if (nodeDrag === true) {
           e.item._cfg.model.label = oldNodesCount - 1;
-          if(e.item._cfg.model.label === 0){
+          if (e.item._cfg.model.label === 0) {
             newGraph.uncombo(comboId);
           }
         }
@@ -1010,7 +903,7 @@ const TimeBarTrend = () => {
       
       
       // all actions to take when combo is collapsed. 
-      if(comboModel.collapsed === true){
+      if (comboModel.collapsed === true) {
 
         // populate edgesThruCombo Array
         allNodeEdges.forEach((edge, i) => {
@@ -1020,13 +913,7 @@ const TimeBarTrend = () => {
   
             childNodes.forEach((childNode, i) => {
               const childNodeModel = childNode.getModel();
-              if(childNodeModel.id === edgeModel.source || childNodeModel.id === edgeModel.target){
-                /* const childNodeEdge = {
-                  id: edgeModel.id,
-                  ttp: edgeModel?.ttp,
-                  source: edgeModel.source, 
-                  target:edgeModel.target
-                } */
+              if (childNodeModel.id === edgeModel.source || childNodeModel.id === edgeModel.target) {
                 log(`childNodeEdge ${i + 1}: `, edgeModel );
                 edgesThruCombo.push(edgeModel)
               }
@@ -1037,19 +924,19 @@ const TimeBarTrend = () => {
         const comboVEdges = combo.getEdges(); 
         log('neighborIds =', neighborIds)
 
-        for(let i = 0; i < neighborIds.length; i++) {
+        for (let i = 0; i < neighborIds.length; i++) {
 
           let ttpCheck = false;
           let matchedNeighborId;
-          if(neighborIds[i].includes('node')){
-            for(let t = 0; t < edgesThruCombo.length; t++)
+          if (neighborIds[i].includes('node')) {
+            for (let t = 0; t < edgesThruCombo.length; t++)
             {
               // each edgeThruCombo.source or .target will never be a comboId!
               log(`Loop ${t}: edgesThruCombo[t]`, edgesThruCombo[t] );
               log(neighborIds[i]);
-              if(edgesThruCombo[t].source === neighborIds[i] || edgesThruCombo[t].target === neighborIds[i])
+              if (edgesThruCombo[t].source === neighborIds[i] || edgesThruCombo[t].target === neighborIds[i])
               {
-                if(edgesThruCombo[t].ttp)
+                if (edgesThruCombo[t].ttp)
                 {
                   ttpCheck = true;
                   matchedNeighborId = neighborIds[i]
@@ -1057,18 +944,18 @@ const TimeBarTrend = () => {
                 }
               }
             };
-          } else if(neighborIds[i].includes('combo')){
+          } else if (neighborIds[i].includes('combo')) {
               const neighborComboChildren = newGraph.findById(neighborIds[i]).getChildren();
               log(`${neighborIds[i]}'s children:`, neighborComboChildren);
               const nodesOfNeighbors = neighborComboChildren.nodes;
-              for(let j = 0; j < nodesOfNeighbors.length; j++) 
+              for (let j = 0; j < nodesOfNeighbors.length; j++) 
               {
                 const comboChildId = nodesOfNeighbors[j].getID();
                 log('comboChildId =', comboChildId);
-                for(let k = 0 ; k < edgesThruCombo.length; k++)
+                for (let k = 0 ; k < edgesThruCombo.length; k++)
                 {
-                  if((edgesThruCombo[k].source === comboChildId || edgesThruCombo[k].target === comboChildId)){
-                    if(edgesThruCombo[k].ttp) {
+                  if ((edgesThruCombo[k].source === comboChildId || edgesThruCombo[k].target === comboChildId)) {
+                    if (edgesThruCombo[k].ttp) {
                       ttpCheck = true;
                       matchedNeighborId = newGraph.findById(comboChildId).getModel().comboId;
                       break;
@@ -1077,13 +964,13 @@ const TimeBarTrend = () => {
                 }
               }
           }
-          if(ttpCheck){
+          if (ttpCheck) {
             log('comboVEdges =', comboVEdges);
             let vedgeId;
-            for(let m = 0; m < comboVEdges.length; m++){
+            for (let m = 0; m < comboVEdges.length; m++) {
               log(comboVEdges[m].getID(), comboVEdges[m].getSource().getID(), comboVEdges[m].getTarget().getID())
               log(matchedNeighborId)
-              if(comboVEdges[m].getSource().getID() === matchedNeighborId || comboVEdges[m].getTarget().getID() === matchedNeighborId){
+              if (comboVEdges[m].getSource().getID() === matchedNeighborId || comboVEdges[m].getTarget().getID() === matchedNeighborId) {
                 vedgeId = comboVEdges[m].getID();
               }
             }
@@ -1092,7 +979,7 @@ const TimeBarTrend = () => {
           }
          };
 
-         comboVEdges.forEach((vedge, i) => {
+         comboVEdges.forEach((vedge) => {
           log(`updated VE:`, vedge.getModel());
          });
         }
@@ -1100,7 +987,7 @@ const TimeBarTrend = () => {
       });
 
       const countChildrenInCombo = (comboId) => {
-        if(comboId !== undefined){
+        if (comboId !== undefined) {
           const combo = newGraph.findById(comboId);
           const nodesInCombo = combo.getChildren().nodes;
           const combosInCombo = combo.getChildren().combos;
@@ -1140,14 +1027,14 @@ const TimeBarTrend = () => {
 
 
       
-      /* 
+      
       // RESIZING
       if (typeof window !== 'undefined')
         window.onresize = () => {
           if (!newGraph || newGraph.get('destroyed')) return;
           if (!container || !container.scrollWidth || !container.scrollHeight) return;
           newGraph.changeSize(container.scrollWidth, container.scrollHeight - 100);
-        }; */
+        };
       
       setGraph(newGraph);
       setTimeBar(newTimebar);
