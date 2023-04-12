@@ -97,7 +97,7 @@ let nodeDrag = false;
 let comboDragLeave = false;
 
 
-const TimeBarTrend = () => {
+const TimeBarTrend2 = () => {
     const ref = React.useRef(null)
     const [newGraph, setGraph] = useState(null);
     const [timeBar, setTimeBar] = useState(null);
@@ -1033,33 +1033,34 @@ const TimeBarTrend = () => {
           });
         });
 
-        log('edgesThruCombo =', edgesThruCombo);
-        const comboVEdges = combo.getEdges(); 
-        log('neighborIds =', neighborIds)
 
-        for(let i = 0; i < neighborIds.length; i++) {
+        const comboVEdges = combo.getEdges(); //< === trying to grab only from the combo instead of every VE on the graph.
+        //log('comboVEdges =', comboVEdges);
+        log('neighborIds =', neighborIds)
+        for(let i = 0; i < comboVEdges.length; i++) {
+          const vedgeModel = comboVEdges[i].getModel();
+          const neighborOnVEdge = neighborIds.filter(neighborId => (vedgeModel.source === neighborId || vedgeModel.target === neighborId))[0];
+          log(`neighborOnVEdge:`, neighborOnVEdge);
 
           let ttpCheck = false;
-          let matchedNeighborId;
-          if(neighborIds[i].includes('node')){
-            for(let t = 0; t < edgesThruCombo.length; t++)
+
+          if(neighborOnVEdge.includes('node')){
+            for(let j = 0; j < edgesThruCombo.length; j++)
             {
               // each edgeThruCombo.source or .target will never be a comboId!
-              log(`Loop ${t}: edgesThruCombo[t]`, edgesThruCombo[t] );
-              log(neighborIds[i]);
-              if(edgesThruCombo[t].source === neighborIds[i] || edgesThruCombo[t].target === neighborIds[i])
+              if(edgesThruCombo[i].source === neighborOnVEdge || edgesThruCombo[i].target === neighborOnVEdge)
               {
-                if(edgesThruCombo[t].ttp)
+                if(edgesThruCombo[i].ttp)
                 {
                   ttpCheck = true;
-                  matchedNeighborId = neighborIds[i]
                   break;
                 }
               }
             };
-          } else if(neighborIds[i].includes('combo')){
-              const neighborComboChildren = newGraph.findById(neighborIds[i]).getChildren();
-              log(`${neighborIds[i]}'s children:`, neighborComboChildren);
+          } else if(neighborOnVEdge.includes('combo')){
+              const neighborCombo = newGraph.findById(neighborOnVEdge);
+              const neighborComboChildren = neighborCombo.getChildren();
+              log(`${neighborOnVEdge}'s children:`, neighborComboChildren);
               const nodesOfNeighbors = neighborComboChildren.nodes;
               for(let j = 0; j < nodesOfNeighbors.length; j++) 
               {
@@ -1070,7 +1071,6 @@ const TimeBarTrend = () => {
                   if((edgesThruCombo[k].source === comboChildId || edgesThruCombo[k].target === comboChildId)){
                     if(edgesThruCombo[k].ttp) {
                       ttpCheck = true;
-                      matchedNeighborId = newGraph.findById(comboChildId).getModel().comboId;
                       break;
                     }
                   }
@@ -1078,17 +1078,7 @@ const TimeBarTrend = () => {
               }
           }
           if(ttpCheck){
-            log('comboVEdges =', comboVEdges);
-            let vedgeId;
-            for(let m = 0; m < comboVEdges.length; m++){
-              log(comboVEdges[m].getID(), comboVEdges[m].getSource().getID(), comboVEdges[m].getTarget().getID())
-              log(matchedNeighborId)
-              if(comboVEdges[m].getSource().getID() === matchedNeighborId || comboVEdges[m].getTarget().getID() === matchedNeighborId){
-                vedgeId = comboVEdges[m].getID();
-              }
-            }
-            log('vedgeId:', vedgeId )
-            newGraph.findById(vedgeId).getModel()['ttp'] = true;
+            newGraph.findById(vedgeModel.id).getModel()['ttp'] = true;
           }
          };
 
@@ -1157,6 +1147,6 @@ const TimeBarTrend = () => {
     return <div ref={ref}></div>
   }
   
-  export default TimeBarTrend
+  export default TimeBarTrend2
   
 
