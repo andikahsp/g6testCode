@@ -1,100 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { data as jsonData } from './source';
-import { isObject } from '@antv/util';
-import { circleIcon, cCircleComboShape} from "./parts/elements";
-
-
-function getUTCDateObject(logsourceTime) {
-  const actualTime = new Date(0);
-  actualTime.setUTCSeconds(logsourceTime);
-  return actualTime;
-}
-
-
-function toUTCTimeString(logsourceTime) {
-  const dateObjUTC = getUTCDateObject(logsourceTime);
- return dateObjUTC.toUTCString();
-}
-
-function toTimeString(number) {
-  return number < 10 ? `0${number.toString()}` : `${number.toString()}`;
-}
-function getUTCHrMinSec(logsourceTime) {
-  const dateObjUTC = getUTCDateObject(logsourceTime);
-  const hours = dateObjUTC.getUTCHours();
-  const minutes = dateObjUTC.getUTCMinutes();
-  const seconds = dateObjUTC.getUTCSeconds();
-
-  const hoursString = toTimeString(hours);
-  const minutesString = toTimeString(minutes);
-  const secondsString = toTimeString(seconds); 
-
-  return hoursString + `:` + minutesString + `.` + secondsString;
-}
-
-function populateNodesEdges (jsonData) {
-
-  // This format if we want to customise shapes and sizes according
-  // to data
-  
-  const image = { type: 'image', 
-                   size: 36};
-  
-/*   const circle = { type: 'circle', 
-                   size: 48 };
-  
-  const triangle = { type: 'triangle',
-                     size: 20, 
-                     direction: 'up'}; */
-   
-   // node and edge definition will be based on backend logic                  
-   const data = {
-      nodes:[
-       { id: 'node0', ...image, label: 'node0'/* jsonData.computerName */, date: jsonData.logsourceTime },
-       { id: 'node1', ...image, label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime/* , comboId: 'combo1' */ },
-       { id: 'node2', ...image, label: 'node2'/* jsonData.logonProcess */, date: 1636095550/* , comboId: 'combo1' */ },    
-       { id: 'node3', ...image, label: 'node3'/* `vector` */, date: 1636095551 },  
-       { id: 'node4', ...image, label: 'node4'/* `vector` */, date: 1636095552 },  
-       { id: 'node5', ...image, label: 'node5'/* `vector` */, date: 1636095553 }, 
-      ], 
-     edges: [
-       { id: 'edge0',
-         source: 'node0', 
-         target: 'node1', 
-         //ttp: true,
-         frequency: '3', 
-         event: `${jsonData.message}`       
-      },
-      {  id: 'edge2',
-         source: 'node4',
-         target: 'node5', 
-         ttp: true, 
-         frequency: '7', 
-         event: `some other Event`
-      },
-      {  id: 'edge1',
-         source: 'node2', 
-         target: 'node3', 
-         frequency: '9',
-         ttp: true, 
-         event: `Event B`
-      },
-     ],
-/*      combos: [
-      {
-        id: 'combo1',
-        label: 2,
-      }
-     ] */
-   } 
-   return data;
- }
+import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
+import { getUTCHrMinSec } from "./utilities/convertUTC";
+import { populateNodesEdges } from "./parts/graphDataConfig";
 
 let log = console.log; 
 let nodeA = "";
 let nodeB = "";
-let style = {};
 let nodeDrag = false;
+let allNodesCount = [];
 
 
 const TimeBarTrend = () => {
@@ -109,51 +23,6 @@ const TimeBarTrend = () => {
       //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData = populateNodesEdges(jsonData);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 32, 'quadratic-custom', 'fund-polyline', undefined);
-
-
-      nodeEdgeData.nodes[0].img = `https://cdn.pixabay.com/photo/2013/07/13/11/47/computer-158675_960_720.png`;
-      nodeEdgeData.nodes[0].clipCfg = {
-        show: false,
-        type: 'circle',
-        // circle
-        r: 25,
-        // Coordinates
-        x: 0,
-        y: 0,
-      };
-
-      nodeEdgeData.nodes[1].img = `https://cdn.pixabay.com/photo/2017/07/07/02/06/symbol-2480165_960_720.png`;
-      nodeEdgeData.nodes[1].clipCfg = {
-        show: false,
-        type: 'circle',
-        // circle
-        r: 25,
-        // Coordinates
-        x: 0,
-        y: 0,
-      };
-
-      nodeEdgeData.nodes[2].img = `https://cdn.pixabay.com/photo/2013/07/13/12/33/computer-159837_960_720.png`;
-      nodeEdgeData.nodes[2].clipCfg = {
-        show: false,
-        type: 'circle',
-        // circle
-        r: 25,
-        // Coordinates
-        x: 0,
-        y: 0,
-      };
-
-      nodeEdgeData.nodes[3].img = `https://cdn.pixabay.com/photo/2018/01/26/15/41/the-horse-3108969_960_720.png`;
-      nodeEdgeData.nodes[3].clipCfg = {
-        show: false,
-        type: 'circle',
-        // circle
-        r: 25,
-        // Coordinates
-        x: 0,
-        y: 0,
-      };
 
       const container = ref.current;
       const width = container.scrollWidth;
@@ -211,7 +80,6 @@ const TimeBarTrend = () => {
       },
         trend: {
           height: 60,
-
           data: timeBarData,
           smooth: false,
           lineStyle: {
@@ -345,275 +213,18 @@ const TimeBarTrend = () => {
       G6.registerCombo(
         'cCircle',
         cCircleComboShape,
-        'circle', //<< built-in combo to extend from
+        'circle', // built-in combo to extend from
       );
 
       /* ******* CUSTOM EDGES ******* */
 
-      G6.registerEdge('fund-polyline', {
-        itemType: 'edge',
-        draw: function draw(cfg, group) {
-
-          const startPoint = cfg.startPoint;
-          const endPoint = cfg.endPoint;          
-          const stroke = cfg.style.stroke;
-          //const stroke = (cfg.style && cfg.style.stroke) || this.options.style.stroke;
-
-          let path = [
-            ['M', startPoint.x, startPoint.y],
-            ['L', endPoint.x, endPoint.y],
-          ];
-      
-          const endArrow = cfg?.style && cfg.style.endArrow ? cfg.style.endArrow : false;
-          //if (isObject(endArrow)) endArrow.fill = stroke;
-          
-          const line = group.addShape('path', {
-            attrs: {
-              stroke,
-              path,
-              endArrow,
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'path-shape',
-          });
-
-          const midPointXY = {       
-            x: (endPoint.x - startPoint.x) / 2,
-            y: (endPoint.y - startPoint.y) / 2
-          }
-
-          const markerXOffset = 10;
-          const markerYOffset = -15;
-          const freqMarkerOffset = 15;
-          let ttpMarkerOffset = 0 /* 30 */;
-
-
-          if (cfg.ttp === true) {
-
-            // distance in pixels that edge frequency marker and message label needs to move to the right
-            ttpMarkerOffset = 18;
-
-            // TTP: Add the circular marker on the bottom
-            group.addShape('marker', {
-              attrs: {
-                ...style,
-                opacity: 1,
-                x: startPoint.x + midPointXY.x + markerXOffset,
-                y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
-                r: 10,
-                symbol: circleIcon,
-                fill: 'orange',
-                stroke: 'black',
-                strokeWidth: 3.5,
-                lineWidth: 1.5,
-              },
-              draggable: true,
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'edge-ttp-shape',
-            });   
-
-            // TTP -text
-            group.addShape('text', {
-              attrs: {
-                text: 'T',
-                x: startPoint.x + midPointXY.x + markerXOffset - 4.85,
-                y: startPoint.y + midPointXY.y + markerYOffset,
-                fontFamily: 'Arial',
-                fontWeight: "bold",
-                fontSize: 14.5,
-                textAlign: 'left',
-                textBaseline: 'middle',
-                fill: 'white',
-              },
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'edge-ttp-text',
-            });
-
-            const ttpLabel = group.find((ele) => ele.get('name') === 'edge-ttp-text')
-          ttpLabel.toFront();
-          }
-         
-          if (cfg.frequency !== undefined) {
-            // FREQUENCY Add the circular marker on the bottom
-            group.addShape('marker', {
-              attrs: {
-                ...style,
-                opacity: 1,
-                x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset,
-                y: startPoint.y + midPointXY.y + markerYOffset - 1.5,
-                r: 10,
-                symbol: circleIcon,
-                fill: '#63666A',
-                stroke: 'black',
-                strokeWidth: 3.5,
-                lineWidth: 1.5,
-              },
-              draggable: true,
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'edge-frequency-shape',
-            });   
-
-            // freqency -text 
-            group.addShape('text', {
-              attrs: {
-                text: cfg && cfg.frequency,
-                x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5,
-                y: startPoint.y + midPointXY.y + markerYOffset,
-                fontSize: 14,
-                textAlign: 'left',
-                textBaseline: 'middle',
-                fill: 'white',
-              },
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'edge-frequency-text',
-            });
-            const frequencyLabel = group.find((ele) => ele.get('name') === 'edge-frequency-text')
-            frequencyLabel.toFront();
-          }
-
-
-          // event
-          group.addShape('text', {
-            attrs: {
-              text: cfg && cfg.event,
-              x: startPoint.x + midPointXY.x + markerXOffset + freqMarkerOffset + ttpMarkerOffset,
-              y: startPoint.y + midPointXY.y + markerYOffset,
-              fontSize: 12,
-              fontWeight: 300,
-              textAlign: 'left',
-              textBaseline: 'middle',
-              fill: '#000000D9',
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'edge-event-text',
-          });
-               
-          return line;
-        },
-      });
+      G6.registerEdge('fund-polyline', fundPolyline );
 
       G6.registerEdge(
         'quadratic-custom',
-        {
-          afterDraw(cfg, group) { 
-
-            // get the first shape in the graphics group of this edge, it is the path of the edge here
-            const shape = group.get('children')[0];
-            // get the coordinate of the mid point on the path
-            const midPointXY = shape.getPoint(0.5);
-            
-            const markerXOffset = 0;
-            const markerYOffset = 0;
-            const labelXOffset = 15;
-            let ttpMarkerOffset = 0;
-
-          if (cfg.ttp === true) {
-
-            // distance in pixels that edge frequency marker and message label needs to move to the right
-            ttpMarkerOffset = 18;
-
-            // TTP: Add the circular marker on the bottom
-            group.addShape('marker', {
-              attrs: {
-                ...style,
-                opacity: 1,
-                x: midPointXY.x + markerXOffset,
-                y: midPointXY.y + markerYOffset - 1.5,
-                r: 10,
-                symbol: circleIcon,
-                fill: 'orange',
-                stroke: 'black',
-                strokeWidth: 3.5,
-                lineWidth: 1.5,
-              },
-              draggable: true,
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'quadcurve-ttp-shape',
-            });   
-
-            // TTP -text
-            group.addShape('text', {
-              attrs: {
-                text: 'T',
-                x: midPointXY.x + markerXOffset - 4.85,
-                y: midPointXY.y + markerYOffset,
-                fontFamily: 'Arial',
-                fontWeight: "bold",
-                fontSize: 14.5,
-                textAlign: 'left',
-                textBaseline: 'middle',
-                fill: 'white',
-              },
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'quadcurve-ttp-text',
-            });
-
-            const ttpLabel = group.find((ele) => ele.get('name') === 'quadcurve-ttp-text')
-            ttpLabel.toFront();
-          }
-         
-          if (cfg.frequency !== undefined) {
-            // FREQUENCY Add the circular marker on the bottom
-            group.addShape('marker', {
-              attrs: {
-                ...style,
-                opacity: 1,
-                x: midPointXY.x + markerXOffset + ttpMarkerOffset,
-                y: midPointXY.y + markerYOffset - 1.5,
-                r: 10,
-                symbol: circleIcon,
-                fill: '#63666A',
-                stroke: 'black',
-                strokeWidth: 3.5,
-                lineWidth: 1.5,
-              },
-              draggable: true,
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'quadcurve-frequency-shape',
-            });   
-
-            // freqency -text 
-            group.addShape('text', {
-              attrs: {
-                text: cfg && cfg.frequency,
-                x: midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5,
-                y: midPointXY.y + markerYOffset,
-                fontSize: 14,
-                textAlign: 'left',
-                textBaseline: 'middle',
-                fill: 'white',
-              },
-              // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-              name: 'quadcurve-frequency-text',
-            });
-            const frequencyLabel = group.find((ele) => ele.get('name') === 'quadcurve-frequency-text')
-            frequencyLabel.toFront();
-          }
-
-
-          // event
-          group.addShape('text', {
-            attrs: {
-              text: cfg && cfg.event,
-              x: midPointXY.x + markerXOffset + labelXOffset + ttpMarkerOffset,
-              y: midPointXY.y + markerYOffset,
-              fontSize: 12,
-              fontWeight: 300,
-              textAlign: 'left',
-              textBaseline: 'middle',
-              fill: '#000000D9',
-            },
-            // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-            name: 'quadcurve-event-text',
-          });
-          },
-          update: undefined,
-        },
-        'quadratic'
+        customQuadratic,
+        'quadratic' // built-in edge to extend from
       );
-
-
-
 
       /* *************************************************** */
       
@@ -666,12 +277,12 @@ const TimeBarTrend = () => {
           type: 'cCircle',
           size: [130], // The minimum size of the Combo
           padding: 20,
-          /* style: {
+          style: {
             position:'bottom',
             stroke: 'gray',
             fill: 'transparent',
             lineWidth: 1.5,
-          }, */
+          },
           labelCfg: {
             style: {
               position: 'bottom',
@@ -767,6 +378,7 @@ const TimeBarTrend = () => {
 
 
       /* *************** MOUSE EVENTS ************** */
+
       newGraph.on('node:mouseenter', (e) => {
         //log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
@@ -817,8 +429,6 @@ const TimeBarTrend = () => {
           }
         }
       });
-
-
 
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
@@ -895,6 +505,7 @@ const TimeBarTrend = () => {
       const combo = newGraph.findById(comboId);
       log('>>>>> SELECTED COMBO:',comboId);
       log('neighbors(): ', combo.getNeighbors());
+      log('children(): ', combo.getChildren());
       
       const comboNeighbors = combo.getNeighbors();
       comboNeighbors.forEach((neighbor, i) => {
@@ -998,9 +609,20 @@ const TimeBarTrend = () => {
         log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
 
-/*       const getAllNodesInCombo = (comboModel) => {
+      
 
-      } */
+      const getAllNodesInCombo = (combo) => {
+        let combos = combo.getCombos(); 
+        let childNodes = combo.getNodes(); 
+        
+        combos.forEach((inCombo) => { allNodesCount.concat(getAllComboNode(inCombo)); 
+        childNodes.forEach((node) => { allNodesCount.push(node); }); 
+        }); 
+        return allNodesCount;
+      }
+
+      
+
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
       newGraph.on("canvas:click", function (event) {
@@ -1026,8 +648,6 @@ const TimeBarTrend = () => {
 
 
 
-      
-      
       // RESIZING
       if (typeof window !== 'undefined')
         window.onresize = () => {
