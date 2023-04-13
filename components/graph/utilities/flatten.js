@@ -1,21 +1,20 @@
 
 
 
-const flatten = (comboModel) => {
+export const flatten = (comboModelChildren) => {
     // terminate looping when there are no more combos in combo children
     // else continue looping
-
-    if (noMoreCombosInChildren(comboModel.children)) {
-        return concatNodeIds(comboModel.children);
+    if (noMoreCombosInChildren(comboModelChildren)) {
+        return comboModelChildren;
     } else {
-        for(let i = 0; i < comboModel.children.length; i++ ) {
-            if(comboModel.children[i].id.includes('combo')){
-                return concatNodeIds(comboModel.children) + flatten
-            }
-        }
-        return  + flatten()
+        const nodes = collateNodes(comboModelChildren);
+        const combos = collateCombos(comboModelChildren)
+        const lastCombo = combos.pop();
+        const remainder = [...nodes, ...combos]
+        return  flatten(remainder.concat(flatten(lastCombo.children)));
     }
 }
+
 
 
 function noMoreCombosInChildren(childrenArray) {
@@ -27,12 +26,23 @@ function noMoreCombosInChildren(childrenArray) {
     return true;
 }
 
-function concatNodeIds(childrenArray) {
-    let nodeIds = [];
+function collateNodes(childrenArray) {
+    let nodes = [];
     for(let i = 0; i < childrenArray.length; i++ ){
         if(childrenArray[i].id.includes('node')){
-            nodeIds.push(childrenArray[i].id);
+            nodes.push(childrenArray[i]);
         }
     }
-    return nodeIds;
+    return nodes;
+}
+
+function collateCombos(childrenArray) {
+    let nodes = [];
+    let combos = [];
+    for(let i = 0; i < childrenArray.length; i++ ){
+        if(childrenArray[i].id.includes('combo')){
+            combos.push(childrenArray[i]);
+        }
+    }
+    return combos;
 }
