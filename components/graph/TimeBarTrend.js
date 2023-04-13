@@ -3,13 +3,13 @@ import { data as jsonData } from './source';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
-import { flatten } from "./utilities/flatten";
+//import { flatten } from "./utilities/flatten";
 
 let log = console.log; 
 let nodeA = "";
 let nodeB = "";
 let nodeDrag = false;
-// let allNodesCount = [];
+let allNodesCount = [];
 
 
 const TimeBarTrend = () => {
@@ -470,6 +470,15 @@ const TimeBarTrend = () => {
         newGraph.setItemState(e.item, 'dragenter', true);
       });
 
+      newGraph.on('combo:dragend', (e) => {
+        newGraph.getCombos().forEach((combo) =>{
+          newGraph.setItemState(combo, 'dragenter', false);
+        });
+      });
+
+      /* newGraph.on('combo:drop', (e) => {
+        newGraph.setItemState(e.item, 'dragenter', false);
+      }); */
 
       newGraph.on('combo:dragleave', (e) => {
         const comboId = e.item._cfg.id;
@@ -508,9 +517,12 @@ const TimeBarTrend = () => {
       log('neighbors(): ', combo.getNeighbors());
       log('children(): ', combo.getChildren());
       log('comboModelChildren = ',comboModel.children);
-      const comboChildren = Array.from(comboModel.children);
-      log('flattened children', flatten(comboChildren));//<======
+      //const comboChildren = Array.from(comboModel.children);
+
       
+      log('flattened children', getAllNodesInCombo(combo));//<======
+      allNodesCount = [];
+
       const comboNeighbors = combo.getNeighbors();
       comboNeighbors.forEach((neighbor, i) => {
           neighborIds.push(neighbor.getID());
@@ -613,20 +625,14 @@ const TimeBarTrend = () => {
         log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
 
-      
-
-      /* const getAllNodesInCombo = (combo) => {
+      const getAllNodesInCombo = (combo) => {
         let combos = combo.getCombos(); 
         let childNodes = combo.getNodes(); 
         
-        combos.forEach((inCombo) => { allNodesCount.concat(getAllComboNode(inCombo)); 
-        childNodes.forEach((node) => { allNodesCount.push(node); }); 
-        }); 
+        combos.forEach((inCombo) => { allNodesCount.concat(getAllNodesInCombo(inCombo)); });
+        childNodes.forEach((node) => { allNodesCount.push(node); });
         return allNodesCount;
-      } */
-
-      
-
+      }
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
       newGraph.on("canvas:click", function (event) {
