@@ -18,10 +18,14 @@ export const flatten = (comboModelChildren) => {
 
 
 function noMoreCombosInChildren(childrenArray) {
-    for(let i = 0; i < childrenArray.length; i ++) {
+    /* for(let i = 0; i < childrenArray.length; i ++) {
         if(childrenArray[i].id.includes('combo')){
             return false;
         }
+    } */
+    const firstCombo = childrenArray.find(child => child.id.includes('combo'));
+    if(firstCombo){
+        return false;
     }
     return true;
 }
@@ -37,7 +41,6 @@ function collateNodes(childrenArray) {
 }
 
 function collateCombos(childrenArray) {
-    let nodes = [];
     let combos = [];
     for(let i = 0; i < childrenArray.length; i++ ){
         if(childrenArray[i].id.includes('combo')){

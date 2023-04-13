@@ -3,7 +3,7 @@ import { data as jsonData } from './source';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
-//import { flatten } from "./utilities/flatten";
+import { flatten } from "./utilities/flatten";
 
 let log = console.log; 
 let nodeA = "";
@@ -517,14 +517,16 @@ const TimeBarTrend = () => {
       log('neighbors(): ', combo.getNeighbors());
       log('children(): ', combo.getChildren());
       log('comboModelChildren = ',comboModel.children);
-      //const comboChildren = Array.from(comboModel.children);
+      const comboChildren = Array.from(comboModel.children);
 
       
-      log('flattened children', getAllNodesInCombo(combo));//<======
-      allNodesCount = [];
+      //log('flattened children', getAllNodesInCombo(combo));//<======
+      //allNodesCount = [];
+
+      log('flattened children', flatten(comboModel.children));
 
       const comboNeighbors = combo.getNeighbors();
-      comboNeighbors.forEach((neighbor, i) => {
+      comboNeighbors.forEach((neighbor) => {
           neighborIds.push(neighbor.getID());
       });
       
@@ -643,14 +645,15 @@ const TimeBarTrend = () => {
         const combos = newGraph.getCombos();
         log(combos);
         });
-      newGraph.on("canvas:dblclick", function (event) {
-          /* const vedges = newGraph.get("vedges");
+
+/*       newGraph.on("canvas:dblclick", function (event) {
+           const vedges = newGraph.get("vedges");
           log('vedges =\n', vedges)   
           const edges = newGraph.getEdges();
           log('edges = \n', edges);
-          }); */          
+          });         
       });
-  
+   */
       // for Diagnosis
       newGraph.on('edge:dblclick', (e) => {
         log(`edge, event =${e}`)
