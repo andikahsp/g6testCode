@@ -11,7 +11,7 @@ export const flatten = (comboModelChildren) => {
         const combos = collateCombos(comboModelChildren)
         const lastCombo = combos.pop();
         const remainder = [...nodes, ...combos]
-        return  flatten(remainder.concat(flatten(lastCombo.children)));
+        return  flatten(remainder).concat(flatten(lastCombo.children));
     }
 }
 
