@@ -31,6 +31,22 @@ export const cCircleComboShape = {
         // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
         name: 'combo-keyShape',
       });
+
+      // **** DIAGNOSTIC ID LABEL
+      group.addShape('text', {
+        attrs: {
+            text:cfg.id,
+            x: -25,
+            y: style.r * 3 * -1,
+            fontFamily: 'Arial',
+            fontSize: 15,
+            fill: 'black',
+            stroke: 'grey',
+        },
+        draggable: true, 
+        name: 'combo-id-label'
+      });
+
       // Add the marker
       group.addShape('marker', {
         attrs: {
@@ -236,6 +252,8 @@ export const cCircleComboShape = {
 
   export const customQuadratic =  {
     afterDraw(cfg, group) { 
+
+      const style = cfg.style
 
       // get the first shape in the graphics group of this edge, it is the path of the edge here
       const shape = group.get('children')[0];
