@@ -1,3 +1,19 @@
+## BackLog
+
+1. Sort out Node+Combo Count display on combo
+
+- not working fully when dragging in/out combos
+
+2. Optimise getAllNodesFromCombo function using flatten function logic to not rely on external array.
+
+- check feasibility of using function as an import from a separate file.
+
+3. Continue refactoring to segregate out styling components, and configuration components
+
+4. Combo rings don't go back to solid gray lines and stay dotted after combo dragends when combo nesting exceeds depth of 3.
+
+## ============================================================================
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
