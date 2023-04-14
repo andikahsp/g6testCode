@@ -517,17 +517,18 @@ const TimeBarTrend = () => {
       log('neighbors(): ', combo.getNeighbors());
       log('children(): ', combo.getChildren());
       log('comboModelChildren = ',comboModel.children);
-      const comboChildren = Array.from(comboModel.children);
+      //const comboChildren = Array.from(comboModel.children);
+      //log('flattened children', flatten(comboModel.children));
 
       
-      //log('flattened children', getAllNodesInCombo(combo));//<======
-      //allNodesCount = [];
+      log('flattened children', getAllNodesInCombo(combo));// getAllNodesInCombo() Fn
+      allNodesCount = []; // required with getAllNodesInCombo 
 
-      log('flattened children', flatten(comboModel.children));
 
       const comboNeighbors = combo.getNeighbors();
-      comboNeighbors.forEach((neighbor) => {
+      comboNeighbors.forEach((neighbor, i) => {
           neighborIds.push(neighbor.getID());
+          log(`neighbor[${i}]`, neighbor.getID().includes('node'));
       });
       
       
@@ -537,32 +538,29 @@ const TimeBarTrend = () => {
         // populate edgesThruCombo Array
         allNodeEdges.forEach((edge, i) => {
           const edgeModel = edge.getModel();
-          log(`allNodeEdges[${i}]: `, edgeModel);
+          // log(`allNodeEdges[${i}]: `, edgeModel);
           const childNodes = combo.getNodes();
   
             childNodes.forEach((childNode, i) => {
               const childNodeModel = childNode.getModel();
               if (childNodeModel.id === edgeModel.source || childNodeModel.id === edgeModel.target) {
-                log(`childNodeEdge ${i + 1}: `, edgeModel );
+                // log(`childNodeEdge ${i + 1}: `, edgeModel );
                 edgesThruCombo.push(edgeModel)
               }
           });
         });
+        //log('edgesThruCombo =', edgesThruCombo);
 
-        log('edgesThruCombo =', edgesThruCombo);
-        const comboVEdges = combo.getEdges(); 
-        log('neighborIds =', neighborIds)
-
+        // BASED on neighborIds
         for (let i = 0; i < neighborIds.length; i++) {
-
           let ttpCheck = false;
-          let matchedNeighborId;
+          let matchedNeighborId; 
           if (neighborIds[i].includes('node')) {
             for (let t = 0; t < edgesThruCombo.length; t++)
             {
               // each edgeThruCombo.source or .target will never be a comboId!
-              log(`Loop ${t}: edgesThruCombo[t]`, edgesThruCombo[t] );
-              log(neighborIds[i]);
+              log(`edgesThruCombo[${t}]`, edgesThruCombo[t] );
+              log(`neighborIds[${i}]`,neighborIds[i]);
               if (edgesThruCombo[t].source === neighborIds[i] || edgesThruCombo[t].target === neighborIds[i])
               {
                 if (edgesThruCombo[t].ttp)
@@ -594,6 +592,7 @@ const TimeBarTrend = () => {
               }
           }
           if (ttpCheck) {
+            const comboVEdges = combo.getEdges(); 
             log('comboVEdges =', comboVEdges);
             let vedgeId;
             for (let m = 0; m < comboVEdges.length; m++) {
@@ -608,9 +607,11 @@ const TimeBarTrend = () => {
           }
          };
 
-         comboVEdges.forEach((vedge) => {
+         /* 
+         // LOGGING UPDATED VE
+         combo.getEdges().forEach((vedge) => {
           log(`updated VE:`, vedge.getModel());
-         });
+         }); */
         }
         log('=======END OF CLICK=======')
       });
@@ -673,7 +674,6 @@ const TimeBarTrend = () => {
       
       setGraph(newGraph);
       setTimeBar(newTimebar);
-      //log(newGraph);
     }, [])
   
     return <div ref={ref}></div>

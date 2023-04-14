@@ -26,7 +26,7 @@ export function populateNodesEdges (jsonData) {
          { id: 'node7', ...image, img: imageURLs[6], label: 'node7'/* `vector` */, date: 1636095553 }, 
         ], 
        edges: [
-         /* { id: 'edge1',
+         { id: 'edge1',
            source: 'node1', 
            target: 'node2', 
            //ttp: true,
@@ -46,7 +46,7 @@ export function populateNodesEdges (jsonData) {
            frequency: '9',
            ttp: true, 
            event: 'edge3',//`Event B`
-        }, */
+        },
        ],
   /*      combos: [
         {
