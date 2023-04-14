@@ -507,13 +507,12 @@ const TimeBarTrendTrial
       
       newGraph.on("combo:click", (e) => {
 
+      const combo = e.item;
       const comboId = e.item.getID();
       const comboModel = e.item.getModel()
 
-      const allNodeEdges = newGraph.getEdges();
-      const combo = newGraph.findById(comboId);
+      //const combo = newGraph.findById(comboId);
       log('>>>>> SELECTED COMBO:',comboId);
-      log('neighbors(): ', combo.getNeighbors());
       log('children(): ', combo.getChildren());
       //log('comboModelChildren = ',comboModel.children);
       //const comboChildren = Array.from(comboModel.children);
@@ -523,10 +522,15 @@ const TimeBarTrendTrial
       log('flattened children', getAllNodesInCombo(combo));// getAllNodesInCombo() Fn
       allNodesInCombo = []; // required with getAllNodesInCombo 
       
-      const neighbors = combo.getNeighbors();
-      
+      log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      log(combo);
+      log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      log(e.item);
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed === true) {
+        const neighbors = combo.getNeighbors();
+        log('NEIGHBORS: ', neighbors);
+        allNodesInCombo = []
         getAllNodesInCombo(combo);
         const selfNodes = Array.from(allNodesInCombo);
         allNodesInCombo = []; // clear getAllNodesInCombo []
@@ -551,6 +555,7 @@ const TimeBarTrendTrial
               }
             }
           } else if (neighbors[i].getID().includes('combo')) {
+              allNodesInCombo = []
               getAllNodesInCombo(neighbors[i]);
               const neighborNodes = Array.from(allNodesInCombo);
               allNodesInCombo = []; // clear getAllNodesInCombo []
