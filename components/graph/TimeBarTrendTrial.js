@@ -3,7 +3,7 @@ import { data as jsonData } from './source';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
-import { flatten } from "./utilities/flatten";
+//import { flatten } from "./utilities/flatten";
 
 let log = console.log; 
 let nodeA = "";
@@ -306,7 +306,7 @@ const TimeBarTrendTrial
           },
         },
         defaultEdge: {
-          type: 'fund-polyline',
+          type: 'line',/* 'fund-polyline', */
           style: {
             stroke: '#5f6266',
             lineWidth: 1.2,
@@ -423,7 +423,7 @@ const TimeBarTrendTrial
           if (nodeA !== "" && nodeB !== nodeA ) { 
             const comboCount = newGraph.getCombos().length;
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
-            const newComboId = `combo${parseInt(last) + 1}`
+            const newComboId = (comboCount === 0 ? `combo0` : `combo${parseInt(last) + 1}`);
             newGraph.createCombo({
               id: newComboId,   
               label: ""
@@ -508,12 +508,18 @@ const TimeBarTrendTrial
       newGraph.on("combo:click", (e) => {
 
       const combo = e.item;
-      const comboId = e.item.getID();
+      log('>>>>> SELECTED COMBO:',combo.getID());
       const comboModel = e.item.getModel()
+      //const neighbors = combo.getNeighbors();
+      const neighbors = grabNeighbors(combo);
+      //const neighborSources = combo.getNeighbors('source');
+      //const neighborTargets = combo.getNeighbors('target')
+      // log neighbors
+      //neighborSources.forEach((neighbor, i) => {log(`neighbor #${i + 1}`, neighbor.getID())})
+
 
       //const combo = newGraph.findById(comboId);
-      log('>>>>> SELECTED COMBO:',comboId);
-      log('children(): ', combo.getChildren());
+      //log('children(): ', combo.getChildren());
       //log('comboModelChildren = ',comboModel.children);
       //const comboChildren = Array.from(comboModel.children);
       //log('flattened children', flatten(comboModel.children));
@@ -528,20 +534,20 @@ const TimeBarTrendTrial
       log(e.item);
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed === true) {
-        const neighbors = combo.getNeighbors();
-        log('NEIGHBORS: ', neighbors);
+       
         allNodesInCombo = []
-        getAllNodesInCombo(combo);
-        const selfNodes = Array.from(allNodesInCombo);
+        
+        const selfNodes = getAllNodesInCombo(combo);/* Array.from(allNodesInCombo); */
         allNodesInCombo = []; // clear getAllNodesInCombo []
         log('selfNodes =', selfNodes);
 
         let ttpCheck = false;
         
         for (let i = 0; i < neighbors.length; i ++) {
-          if (neighbors[i].getID().includes('node')){
+          if (neighbors[i].getType() === "node"){
             const edgesOfNeighbor = neighbors[i].getEdges();
-  
+            
+            log('**** edgesOfNeighbor=', edgesOfNeighbor);
             for (let j = 0; j < edgesOfNeighbor.length; j++) {
               for (let k = 0; k < selfNodes.length; k++) {
                 if (edgesOfNeighbor[j].getSource() === selfNodes[k] ||
@@ -554,27 +560,49 @@ const TimeBarTrendTrial
                   }
               }
             }
-          } else if (neighbors[i].getID().includes('combo')) {
+          } else if (neighbors[i].getType() === "combo") {
               allNodesInCombo = []
-              getAllNodesInCombo(neighbors[i]);
-              const neighborNodes = Array.from(allNodesInCombo);
+              
+              const neighborNodes = getAllNodesInCombo(neighbors[i]);/* Array.from(allNodesInCombo) */;
               allNodesInCombo = []; // clear getAllNodesInCombo []
               log('neighborNodes =', neighborNodes);
 
               for (let j = 0; j < selfNodes.length; j++) {
                 const selfNodeNeighbors = selfNodes[j].getNeighbors();
                 for (let k = 0; k < selfNodeNeighbors.length; k++) {
-                  for (let m = 0; m < neighborNodes.length; m++) {
-                    log(`selfNodeNeighbors[${k}] id =`, selfNodeNeighbors[k].getID());
-                    log(`neighborNodes[${m}] id =`, neighborNodes[m].getID());
+                  //if(neighborNodes.include(selfNodeNeighbors[k]))
+                  //selfNodeNeighbors[k] is inside neighborNodes
+                  //edges1 = selfNodeNeighbors[k].getEdges()
+                  //foreach(edges1)
+                  //if(neighborNodes.includes(edge1.getSource || getTarget))
+                  //edge1.getModel().ttp
+
+                  if (neighborNodes.includes(selfNodeNeighbors[k])) {
+                    const edges = selfNodeNeighbors[k].getEdges();
+                    edges.forEach((edge) => {
+                      log(edge.getModel());
+                    });
+                    for(let m = 0; m < edges.length; m ++) {
+                      if (neighborNodes.includes(edges[m].getSource()) || neighborNodes.includes(edges[m].getTarget())) {
+                        //log('edges[m].getModel()',edges[m].getModel());
+                        if(edges[m].getModel().ttp){
+                          ttpCheck = true
+                          //log(`edges[m].getModel().ttp = ${edges[m].getModel().ttp},  ttpCheck = ${ttpCheck}`)
+                        }
+                      }
+                    }
+                    
+                  }
+                  /* for (let m = 0; m < neighborNodes.length; m++) {
                     if (selfNodeNeighbors[k] === neighborNodes[m]) {
                       log(`selfNodeNeighbors[${k}] === neighborNodes[${m}]`)
                       const neighborNodeEdges = neighborNodes[m].getEdges()
                       log('neighborNodeEdges =', neighborNodeEdges);
                       for(let p = 0; p < neighborNodeEdges.length; p++){
+                        log(`>>===========>>>>>>`)
                         log(`selfNodes[${j}]  =`, selfNodes[j]);
-                        log(`neighborNodeEdges[${p}].getSource()`, neighborNodeEdges[p].getSource());
-                        log(`neighborNodeEdges[${p}].getTarget()`, neighborNodeEdges[p].getTarget());
+                        log(`neighborNodeEdges[${p}] source ID:`, neighborNodeEdges[p].getSource().getID());
+                        log(`neighborNodeEdges[${p}] target ID:`, neighborNodeEdges[p].getTarget().getID());
                         if(neighborNodeEdges[p].getSource() === selfNodes[j] || 
                            neighborNodeEdges[p].getTarget() === selfNodes[j]) {
                             // we to search up all the straightEdges where  
@@ -585,7 +613,7 @@ const TimeBarTrendTrial
                         } 
                       }
                     }
-                  }
+                  } */
                 }
               }
           } else {
@@ -601,11 +629,11 @@ const TimeBarTrendTrial
                     vedgeId = VEdges[r].getID();
                   }
             }
-            newGraph.findById(vedgeId).getModel()['ttp'] = true;
+            newGraph.findById(vedgeId).getModel()['ttp'] = ttpCheck;
           }
         }
       }
-        log('=======END OF CLICK=======')
+        
       });
 
       const countChildrenInCombo = (comboId) => {
@@ -653,6 +681,32 @@ const TimeBarTrendTrial
         const edges = newGraph.getEdges();
         log(edges);
       });
+
+      function grabNeighbors(itemObj) {
+        let result = []
+        if (itemObj.getType() === "node"){
+          const allEdges = newGraph.getEdges()
+          for(let i = 0; i < allEdges.length; i++) {
+            const adjacentPoint = (allEdges[i].getSource() === itemObj) ? allEdges[i].getTarget() : allEdges[i].getSource();
+            result.push(adjacentPoint);
+          }
+        } else if ( itemObj.getType() === "combo" ) {
+            const comboEdges = itemObj.getEdges();
+            log('comboEdges =', comboEdges);
+            for(let j = 0; j < comboEdges.length; j++) {
+              //log('comboEdges[j].getSource() =', comboEdges[j].getSource());
+              //log('comboEdges[j].getSource() =', comboEdges[j].getSource());
+              log(itemObj.getID());
+              const adjacentPoint2 = (comboEdges[j].getSource() === itemObj) ? comboEdges[j].getTarget() : comboEdges[j].getSource();
+              log(`comboNeighbor ${j + 1}`,adjacentPoint2.getID())
+              result.push(adjacentPoint2);
+            }
+        } else {
+          throw 'ERROR with grabNeighbors'
+        }
+        log('result =', result);
+        return result;
+      }
 
 
 

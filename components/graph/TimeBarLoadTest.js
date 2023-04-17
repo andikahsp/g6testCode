@@ -711,9 +711,9 @@ const TimeBarLoadTest = () => {
             }
             return 150;
           },
-          nodeStrength: 0.5,
+          nodeStrength: 0.8,
           edgeStrength: 0.1,
-          collideStrength: 1,
+          collideStrength: 0.5,
           onTick,
           
         },
