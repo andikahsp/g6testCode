@@ -523,7 +523,7 @@ const TimeBarTrendTrial
       
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed === true) {
-       
+        const allNodeEdges = newGraph.getEdges();
         const selfNodes = getAllNodesInCombo(combo);/* Array.from(allNodesInCombo); */
         allNodesInCombo = []; // clear getAllNodesInCombo []
         log('selfNodes =', selfNodes);
@@ -567,10 +567,6 @@ const TimeBarTrendTrial
                           ttpCheck = true
                           log('selfNodeNeighbors[k] comboId:', selfNodeNeighbors[k].getModel().comboId )
                           log('selfNodes[j] comboId:',selfNodes[j].getModel().comboId);
-                          
-                          const allNodeEdges = newGraph.getEdges();
-                          
-
                         }
                       }
                     }                   
@@ -597,6 +593,14 @@ const TimeBarTrendTrial
       } 
         
       });
+
+
+      //FN: check if there a VEdge between 2 combos is valid: '
+      // 1) squash both combos
+      // 2) for each node in self, check if it has an edge with the node from neighbor Combo
+      //     - for edge N is N's source self's node | target self Neighbour's node  and vice versa 
+      //     - if yes, then true. 
+
 
       const countChildrenInCombo = (comboId) => {
         if (comboId !== undefined) {
