@@ -3,7 +3,6 @@ import { data as jsonData } from './source';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
-//import { flatten } from "./utilities/flatten";
 
 let log = console.log; 
 let nodeA = "";
@@ -20,7 +19,9 @@ const TimeBarTrendTrial
 
     useEffect(() => {
       const G6 = require('@antv/g6');
-      //const G6 = require('graphG6/packages/g6/src/index');
+
+      //const G6 = require('../../G6-master/packages/pc/src/index')
+
       
       //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData = populateNodesEdges(jsonData);
@@ -306,7 +307,7 @@ const TimeBarTrendTrial
           },
         },
         defaultEdge: {
-          type: 'line',/* 'fund-polyline', */
+          type: 'fund-polyline',
           style: {
             stroke: '#5f6266',
             lineWidth: 1.2,
@@ -381,6 +382,8 @@ const TimeBarTrendTrial
 
       /* *************** MOUSE EVENTS ************** */
 
+      window.addEventListener("contextmenu", e => e.preventDefault());
+
       newGraph.on('node:mouseenter', (e) => {
         //log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
@@ -421,13 +424,16 @@ const TimeBarTrendTrial
         if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
         (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if (nodeA !== "" && nodeB !== nodeA ) { 
+            
             const comboCount = newGraph.getCombos().length;
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
-            const newComboId = (comboCount === 0 ? `combo0` : `combo${parseInt(last) + 1}`);
+            log('last =', last);
+            const newComboId = `combo${parseInt(last) + 1}`
             newGraph.createCombo({
-              id: newComboId,   
+              id: newComboId, 
               label: ""
             }, [`${nodeA}`, `${nodeB}`]);
+
           }
         }
       });
@@ -501,7 +507,8 @@ const TimeBarTrendTrial
       });
 
       newGraph.on("combo:contextmenu", (e) => {
-        const comboId = e.item._cfg.id;
+        const comboId = e.item.getID();
+        /* newGraph.expandCombo(comboId); */
         newGraph.uncombo(comboId);
         });
       
@@ -510,44 +517,22 @@ const TimeBarTrendTrial
       const combo = e.item;
       log('>>>>> SELECTED COMBO:',combo.getID());
       const comboModel = e.item.getModel()
-      //const neighbors = combo.getNeighbors();
-      const neighbors = grabNeighbors(combo);
-      //const neighborSources = combo.getNeighbors('source');
-      //const neighborTargets = combo.getNeighbors('target')
-      // log neighbors
-      //neighborSources.forEach((neighbor, i) => {log(`neighbor #${i + 1}`, neighbor.getID())})
-
-
-      //const combo = newGraph.findById(comboId);
-      //log('children(): ', combo.getChildren());
-      //log('comboModelChildren = ',comboModel.children);
-      //const comboChildren = Array.from(comboModel.children);
-      //log('flattened children', flatten(comboModel.children));
-      
-      
+      const neighbors = combo.getNeighbors();
       log('flattened children', getAllNodesInCombo(combo));// getAllNodesInCombo() Fn
       allNodesInCombo = []; // required with getAllNodesInCombo 
       
-      log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-      log(combo);
-      log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      log(e.item);
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed === true) {
        
-        allNodesInCombo = []
-        
         const selfNodes = getAllNodesInCombo(combo);/* Array.from(allNodesInCombo); */
         allNodesInCombo = []; // clear getAllNodesInCombo []
         log('selfNodes =', selfNodes);
 
         let ttpCheck = false;
-        
         for (let i = 0; i < neighbors.length; i ++) {
           if (neighbors[i].getType() === "node"){
             const edgesOfNeighbor = neighbors[i].getEdges();
             
-            log('**** edgesOfNeighbor=', edgesOfNeighbor);
             for (let j = 0; j < edgesOfNeighbor.length; j++) {
               for (let k = 0; k < selfNodes.length; k++) {
                 if (edgesOfNeighbor[j].getSource() === selfNodes[k] ||
@@ -570,12 +555,6 @@ const TimeBarTrendTrial
               for (let j = 0; j < selfNodes.length; j++) {
                 const selfNodeNeighbors = selfNodes[j].getNeighbors();
                 for (let k = 0; k < selfNodeNeighbors.length; k++) {
-                  //if(neighborNodes.include(selfNodeNeighbors[k]))
-                  //selfNodeNeighbors[k] is inside neighborNodes
-                  //edges1 = selfNodeNeighbors[k].getEdges()
-                  //foreach(edges1)
-                  //if(neighborNodes.includes(edge1.getSource || getTarget))
-                  //edge1.getModel().ttp
 
                   if (neighborNodes.includes(selfNodeNeighbors[k])) {
                     const edges = selfNodeNeighbors[k].getEdges();
@@ -584,36 +563,18 @@ const TimeBarTrendTrial
                     });
                     for(let m = 0; m < edges.length; m ++) {
                       if (neighborNodes.includes(edges[m].getSource()) || neighborNodes.includes(edges[m].getTarget())) {
-                        //log('edges[m].getModel()',edges[m].getModel());
                         if(edges[m].getModel().ttp){
                           ttpCheck = true
-                          //log(`edges[m].getModel().ttp = ${edges[m].getModel().ttp},  ttpCheck = ${ttpCheck}`)
+                          log('selfNodeNeighbors[k] comboId:', selfNodeNeighbors[k].getModel().comboId )
+                          log('selfNodes[j] comboId:',selfNodes[j].getModel().comboId);
+                          
+                          const allNodeEdges = newGraph.getEdges();
+                          
+
                         }
                       }
-                    }
-                    
+                    }                   
                   }
-                  /* for (let m = 0; m < neighborNodes.length; m++) {
-                    if (selfNodeNeighbors[k] === neighborNodes[m]) {
-                      log(`selfNodeNeighbors[${k}] === neighborNodes[${m}]`)
-                      const neighborNodeEdges = neighborNodes[m].getEdges()
-                      log('neighborNodeEdges =', neighborNodeEdges);
-                      for(let p = 0; p < neighborNodeEdges.length; p++){
-                        log(`>>===========>>>>>>`)
-                        log(`selfNodes[${j}]  =`, selfNodes[j]);
-                        log(`neighborNodeEdges[${p}] source ID:`, neighborNodeEdges[p].getSource().getID());
-                        log(`neighborNodeEdges[${p}] target ID:`, neighborNodeEdges[p].getTarget().getID());
-                        if(neighborNodeEdges[p].getSource() === selfNodes[j] || 
-                           neighborNodeEdges[p].getTarget() === selfNodes[j]) {
-                            // we to search up all the straightEdges where  
-                            if(neighborNodeEdges[p].getModel().ttp) {
-                              log('neighborCombo ttpCheck', ttpCheck)
-                              ttpCheck = true;
-                            }
-                        } 
-                      }
-                    }
-                  } */
                 }
               }
           } else {
@@ -630,9 +591,10 @@ const TimeBarTrendTrial
                   }
             }
             newGraph.findById(vedgeId).getModel()['ttp'] = ttpCheck;
+            log('correct VEdge selected = ', newGraph.findById(vedgeId).getModel());
           }
         }
-      }
+      } 
         
       });
 
