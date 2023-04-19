@@ -1,3 +1,4 @@
+
 // The symbol for the marker inside the combo holding the nodecount 
 export const circleIcon = (x, y, r) => {
 return [
@@ -7,13 +8,6 @@ return [
     ['M', x - r + 4, y],
 ];
 };
-
-/* style: {
-    position:'bottom',
-    stroke: 'gray',
-    fill: 'transparent',
-    lineWidth: 1.5,
-  } */
 
 export const cCircleComboShape = {
     drawShape: function draw(cfg, group) {
