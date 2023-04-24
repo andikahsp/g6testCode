@@ -8,20 +8,14 @@ const nextConfig = {
 module.exports = {
   reactStrictMode: true, 
   // webpack: (config) => {
-  //   config.cache.buildDependencies.mydeps = ['/nonexistent/file/location'];
+  //   config.cache.buildDependencies.mydeps = ['/path/to/lockfile'];
   //   return config;
   // }
-  // webpack: (
-  //   config,
-  //   { snapshot }
-  // ) => {
-  //   config.snapshot.managedPaths = [/^(.+?[\\/]node_modules)[\\/]((?!@antv)).*[\\/]*/];
-  //   return config
-  // },
-  webpack: (config, {target, externalsPresets, externals }) =>  {
-    config.target = 'node';
-    config.externalsPresets = {node: true};
-    config.externals = [nodeExternals()];
-    return config
-  }
+  webpack: (
+    config,
+  ) => {
+    config.snapshot.managedPaths = [/^(.+?[\\/]node_modules)[\\/]((antv)).*[\\/]*/];
+    return config;
+  },
+
 }
