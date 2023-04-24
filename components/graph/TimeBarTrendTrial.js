@@ -181,7 +181,7 @@ const TimeBarTrendTrial
       // constrained the layout inside the area
       // x: offset dist from left in px ? X-coordinate of the first node?
       // y: offset dist from top in px ? Y-coordinate of the first node?
-      const constrainBox = { x: 60, y: 50, width: 800, height: 500 };
+      const constrainBox = { x: 60, y: 100, width: 800, height: 500 };
       
       const onTick = () => {
         let minx = 99999999;
@@ -235,7 +235,7 @@ const TimeBarTrendTrial
       const newGraph = new G6.Graph({
         container: ref.current,
         width: width,
-        height: height,
+        height: height + 50,
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
@@ -426,6 +426,7 @@ const TimeBarTrendTrial
           if (nodeA !== "" && nodeB !== nodeA ) { 
             
             const comboCount = newGraph.getCombos().length;
+            log(newGraph.getCombos());
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
             log('last =', last);
             const newComboId = `combo${parseInt(last) + 1}`
@@ -593,7 +594,6 @@ const TimeBarTrendTrial
       } 
         
       });
-
 
       //FN: check if there a VEdge between 2 combos is valid: '
       // 1) squash both combos
