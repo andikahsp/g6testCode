@@ -592,8 +592,64 @@ const TimeBarTrendTrial
           }
         }
       } 
-        
+      
+
       });
+
+
+      function checkTTP(node, combo) {
+        const nEdges = node.getEdges();
+        let x = false;
+        let combosInCombo = combo.getCombos();
+        if (combosInCombo.length > 0) {
+          for (let i = 0; i < combosInCombo.length; i++) {
+            x = checkTTP(node, combosInCombo[i]);
+            if (x) break;
+          }
+        }
+        if (x) return x; 
+        let cNodes = combo.getNodes();
+        for (let i = 0; i < nEdges.length; i++) {
+          if (
+            cNodes.includes(nEdges[i].getSource()) ||
+            cNodes.includes(nEdges[i].getTarget())
+          ) {
+            if (nEdges.getModel.ttp) {
+              x = true;
+              break;
+            }
+          }
+        }
+        return x;
+      }
+
+      // function checkTTP(node, combo){
+      //   let result = false; 
+        
+      //   const allEdges = graph.getEdges();
+      //   if (combo.getCombos().length !== 0) {
+      //     combo.getCombos.forEach((inCombo) => {
+      //       result = checkTTP(inCombo);
+      //       if  (result) {
+      //         return result;
+      //       }
+      //     })
+      //   }
+        
+      //   combo.getNodes().forEach((inNode) => {
+      //     allEdges.forEach((edge) => {
+      //       if((edge.getTarget().getID() === node.getID() && edge.getSource().getID() === inNode.getID()) || 
+      //          (edge.getTarget().getID() === inNode.getID() && edge.getSource().getID() === node.getID())
+      //       ) {
+      //         if(edge.getModel().ttp){
+      //           result = true;
+      //           return; 
+      //         }
+      //       }
+      //     });
+      //   });
+      //   return result; 
+      // }
 
       //FN: check if there a VEdge between 2 combos is valid: '
       // 1) squash both combos
