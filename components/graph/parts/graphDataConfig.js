@@ -101,31 +101,39 @@ export function populateNodesEdges (jsonData) {
        combos: [
         {
           id: 'combo1',
+          label: 1,
           // parentId: '8'
         },
         // {
         //   id: 'combo2',
+            //  label: 1,
         // },
         {
           id: 'combo3',
+          label: 1,
         //   // parentId: '8'
         },
         // {
         //   id: 'combo4',
+            //  label: 1
         // },
         // {
         //   id: 'combo5',
+            //  label: 1,
         //   parentId: '8'
         // },
         // {
         //   id: 'combo6',
+        //   label: 1,
         //   parentId: '8'
         // },
         // {
         //   id: 'combo7',
+        //   label: 1
         // },
         // {
         //   id: 'combo8',
+        //   label: 1
         // },
        ]
      } 
