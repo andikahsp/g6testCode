@@ -367,7 +367,7 @@ const TimeBarTrendTrial
             lineWidth: 3
           }
         },
-        edgeStateStyles: {
+        edgeStateStyles: { // <========== doesnt work anymore with custom edges
           hover: {
             stroke: 'blue',
             lineWidth: 3
@@ -441,6 +441,7 @@ const TimeBarTrendTrial
 
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
+        //log('EDGE =', e.item.getModel());
       });
   
       newGraph.on('edge:mouseleave', (e) => {
@@ -518,16 +519,15 @@ const TimeBarTrendTrial
       const combo = e.item;
       log('>>>>> SELECTED COMBO:',combo.getID());
       const comboModel = e.item.getModel()
-      const neighbors = combo.getNeighbors();
-      log('flattened children', getAllNodesInCombo(combo));// getAllNodesInCombo() Fn
-      allNodesInCombo = []; // required with getAllNodesInCombo 
+      log('combo=', combo);
       
+      const selfNodes = getAllNodesInCombo(combo);/* Array.from(allNodesInCombo); */
+      allNodesInCombo = []; // clear getAllNodesInCombo []
+      log('selfNodes =', selfNodes);
+ 
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed === true) {
-        const allNodeEdges = newGraph.getEdges();
-        const selfNodes = getAllNodesInCombo(combo);/* Array.from(allNodesInCombo); */
-        allNodesInCombo = []; // clear getAllNodesInCombo []
-        log('selfNodes =', selfNodes);
+        const neighbors = combo.getNeighbors();
 
         let ttpCheck = false;
         for (let i = 0; i < neighbors.length; i ++) {
@@ -548,7 +548,7 @@ const TimeBarTrendTrial
             }
           } else if (neighbors[i].getType() === "combo") {
               allNodesInCombo = []
-              
+
               const neighborNodes = getAllNodesInCombo(neighbors[i]);/* Array.from(allNodesInCombo) */;
               allNodesInCombo = []; // clear getAllNodesInCombo []
               log('neighborNodes =', neighborNodes);
@@ -591,10 +591,124 @@ const TimeBarTrendTrial
             log('correct VEdge selected = ', newGraph.findById(vedgeId).getModel());
           }
         }
-      } 
-      
+      } else {
+        log('expand1');
+        const childCombos = e.item.getCombos();
+        const childNodes = e.item.getNodes();
+        log('childNodes =', childNodes)
+        if (childNodes.length > 0) {
+          for (let i = 0; i < childNodes.length; i++) {
+            log('expand2');
+            const neighborsOfChildNode = childNodes[i].getNeighbors();
+            log('neighborsOfChildNode', neighborsOfChildNode);
+            let ttpCheck = false;
+            for(let j = 0; j < neighborsOfChildNode.length; j++) {
+              log('childNodes[i] =', childNodes[i]);
+              log('neighborsOfChildNode[j] =',neighborsOfChildNode[j]);
+              if (neighborsOfChildNode[j].getType() === 'combo') {
+                // check if there is TTP in the relation between a child node and its neighbor(combo or node)
+                ttpCheck = checkTTP(childNodes[i], neighborsOfChildNode[j]);
+                log('ttpCheck =', ttpCheck);
+                if (ttpCheck) {
+                  const edges = childNodes[i].getEdges();
+                  log('expand4-ttpCheck true');
+                  for (let k = 0; k < edges.length; k++) {
+                    if (edges[k].getModel().isVEdge) {
+                      if ( edges[k].getSource() === neighborsOfChildNode[j] || 
+                           edges[k].getTarget() === neighborsOfChildNode[j]
+                          ) {
+                            edges[k].getModel()['ttp'] = ttpCheck
+                            break;
+                      } 
+                    }
+                  }
+                  break;
+                }
+              }
+            }
+          }          
+        }
+        if (childCombos.length > 0) {
+          for(let i = 0; i < childCombos.length; i ++) {
+            const neighbors = childCombos[i].getNeighbors();
+            const comboNodes = childCombos[i].getNodes();
+            const comboEdges = childCombos[i].getEdges();
+            const comboCombos = childCombos[i].getCombos();
 
-      });
+            for(let j = 0; j < neighbors.length; j++ ){
+              if (neighbors[j].getType() === 'node' && !comboNodes.includes(neighbors[j])) {
+                let ttpCheck = false;
+                for (let k = 0; k < comboNodes.length; k++) {
+                  if (comboNodes[k].getNeighbors().includes(neighbors[j])){
+                    const nodeEdges = comboNodes[k].getEdges();
+                    for (let m = 0; m < nodeEdges.length; m++) {
+                      if (nodeEdges[m].getSource() === neighbors[j] || 
+                          nodeEdges[m].getTarget() === neighbors[j] 
+                          ) {
+                            ttpCheck = nodeEdges[m].getModel().ttp; 
+                            if(ttpCheck) break;
+                      }
+                    }
+                  };
+                }
+              } else if (neighbors[j].getType() === 'combo' && !comboCombos.includes(neighbors[j])){
+                let ttpCheck = false;
+                const nodesInNeighbor = getAllNodesInCombo(neighbors[j]);
+                allNodesInCombo = [];
+                const nodesInChildCombo = getAllNodesInCombo(childCombos[i]);
+                allNodesInCombo = [];
+
+                for(let n = 0; n < nodesInChildCombo.length; n++) {
+                  if(nodesInChildCombo[n].getNeighbors().some((item) => nodesInNeighbor.includes(item))) {
+                    const comboNodeEdges = nodesInChildCombo[n].getEdges();
+                    for (let h = 0; h < comboNodeEdges.length; h++) {
+                      if ( nodesInNeighbor.includes(comboNodeEdges[h].getSource()) || 
+                           nodesInNeighbor.includes(comboNodeEdges[h].getTarget())
+                      ) {
+                          if(comboNodeEdges[h].getModel().ttp) {
+                            ttpCheck = true; 
+                          }
+                      }
+                    }
+                  }
+                }
+                const comboEdges = childCombos[i].getEdges();
+                comboEdges.forEach((edge) => {
+                  if (
+                    edge.getSource() == neighbors[j] ||
+                    edge.getTarget() == neighbors[j]
+                  )
+                    edge.getModel()["ttp"] = ttp;
+                });
+              }
+            }
+          }
+        } 
+      }
+    });
+
+    
+      // WE ONLY NEED IT TO ASSIGN TTP LABEL WHEN NEIGHBOR IS A COLLAPSED COMBO
+
+      // 2 cases for expand: 
+      // case 1: self = node in collapsed combo (parent), neighbour n = collapsed combo
+      
+      
+      
+      
+      // case 2: self = node in collapsed combo, neighbour n = expanded combo 
+      // [ no need -> G6 will destroy the VE and regen standard edge between 2 expanded combos (node to node relation)]
+
+      // case 3: self = node in collapsed combo(child), neighbour n = collapsed combo
+          // e.item getNodes() to get child nodes within the combo
+          // grab neighbors of e.item -> (these neighbors will always be collapsed combos only.)
+          //  if neighbor is a combo, squash the neighbor to get all the nodes inside
+          //  graph.getEdges() 
+          // run through all edges and search for edge which has source/target , target source containing self child node and neighbor node
+          // once standard edge is found, retrieve the ttp value from the standard edge, 
+          // **** if ttp is true, set VE between self and neighborCollapsed combo to true ****
+          // >>> how to find which is the VE to change TTP marking?
+
 
 
       function checkTTP(node, combo) {
@@ -614,7 +728,7 @@ const TimeBarTrendTrial
             cNodes.includes(nEdges[i].getSource()) ||
             cNodes.includes(nEdges[i].getTarget())
           ) {
-            if (nEdges.getModel.ttp) {
+            if (nEdges[i].getModel().ttp) {
               x = true;
               break;
             }
@@ -622,40 +736,6 @@ const TimeBarTrendTrial
         }
         return x;
       }
-
-      // function checkTTP(node, combo){
-      //   let result = false; 
-        
-      //   const allEdges = graph.getEdges();
-      //   if (combo.getCombos().length !== 0) {
-      //     combo.getCombos.forEach((inCombo) => {
-      //       result = checkTTP(inCombo);
-      //       if  (result) {
-      //         return result;
-      //       }
-      //     })
-      //   }
-        
-      //   combo.getNodes().forEach((inNode) => {
-      //     allEdges.forEach((edge) => {
-      //       if((edge.getTarget().getID() === node.getID() && edge.getSource().getID() === inNode.getID()) || 
-      //          (edge.getTarget().getID() === inNode.getID() && edge.getSource().getID() === node.getID())
-      //       ) {
-      //         if(edge.getModel().ttp){
-      //           result = true;
-      //           return; 
-      //         }
-      //       }
-      //     });
-      //   });
-      //   return result; 
-      // }
-
-      //FN: check if there a VEdge between 2 combos is valid: '
-      // 1) squash both combos
-      // 2) for each node in self, check if it has an edge with the node from neighbor Combo
-      //     - for edge N is N's source self's node | target self Neighbour's node  and vice versa 
-      //     - if yes, then true. 
 
 
       const countChildrenInCombo = (comboId) => {
@@ -680,14 +760,40 @@ const TimeBarTrendTrial
       }
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
-      newGraph.on("canvas:click", function (event) {
-        const nodes = newGraph.getNodes();
-        log(nodes);
-        const edges = newGraph.getEdges();
-        log(edges);
-        const combos = newGraph.getCombos();
-        log(combos);
-        });
+      // newGraph.on("canvas:click", function (event) {
+      //   const nodes = newGraph.getNodes();
+      //   log(nodes);
+      //   const edges = newGraph.getEdges();
+      //   log(edges);
+      //   const combos = newGraph.getCombos();
+      //   log(combos);
+      //   });
+
+        newGraph.on("canvas:click", function (event) {
+          const nodes = newGraph.getNodes() //[]
+          // newGraph.getNodes().forEach((node)=>{
+          //   nodes.push(node.getModel())
+          // });
+          log('NODES ', nodes);
+          const edges = newGraph.getEdges() //[] 
+          // newGraph.getEdges().forEach((edge)=>{
+          //   edges.push(edge.getModel());
+          // });
+          log('EDGES ', edges);
+          const combos = newGraph.getCombos() //[]
+          // newGraph.getCombos().forEach((combo)=>{
+          //   combos.push(combo.getModel());
+          // });
+          log('COMBOS ', combos);
+
+          const edgeQ = newGraph.find('vedge', vedge => {
+            return (vedge.getSource().getID() === 'node0' && vedge.getTarget().getID() === 'combo3') || 
+            (vedge.getSource().getID() === 'combo3' && vedge.getTarget().getID() === 'node0');
+          })
+
+          log('edgeQ =', edgeQ);
+
+          });
 
 /*       newGraph.on("canvas:dblclick", function (event) {
            const vedges = newGraph.get("vedges");
@@ -697,13 +803,7 @@ const TimeBarTrendTrial
           });         
       });
    */
-      // for Diagnosis
-      newGraph.on('edge:dblclick', (e) => {
-        log(`edge, event =${e}`)
-        const edges = newGraph.getEdges();
-        log(edges);
-      });
-
+    
       function grabNeighbors(itemObj) {
         let result = []
         if (itemObj.getType() === "node"){
