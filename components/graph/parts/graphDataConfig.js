@@ -35,7 +35,7 @@ export function populateNodesEdges (jsonData) {
         ], 
        edges: [
          { id: 'edge1',
-           source: 'node1', 
+           source: 'node0', 
            target: 'node2', 
            ttp: true,
            frequency: '3', 
