@@ -17,13 +17,13 @@ export function populateNodesEdges (jsonData) {
      // node and edge definition will be based on backend logic                  
      const data = {
         nodes:[
-         { id: 'node0', ...image, img: imageURLs[0], label: 'node0'/* jsonData.computerName */, date: jsonData.logsourceTime },
-         { id: 'node1', ...image, img: imageURLs[1], label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime/* , comboId: 'combo1' */ },
-         { id: 'node2', ...image, img: imageURLs[2], label: 'node2'/* jsonData.logonProcess */, date: 1636095550/* , comboId: 'combo1' */ },    
-         { id: 'node3', ...image, img: imageURLs[3], label: 'node3'/* `vector` */, date: 1636095551 },  
-         { id: 'node4', ...image, img: imageURLs[4], label: 'node4'/* `vector` */, date: 1636095552 },  
-         { id: 'node5', ...image, img: imageURLs[5], label: 'node5'/* `vector` */, date: 1636095553 }, 
-         { id: 'node6', ...image, img: imageURLs[6], label: 'node6'/* `vector` */, date: 1636095553 }, 
+         { id: 'node0', ...image, img: imageURLs[0], comboId: 'combo1',  label: 'node0'/* jsonData.computerName */, date: jsonData.logsourceTime },
+         { id: 'node1', ...image, img: imageURLs[1], /* comboId: 'combo2',   */label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime},
+         { id: 'node2', ...image, img: imageURLs[2], comboId: 'combo3',  label: 'node2'/* jsonData.logonProcess */, date: 1636095550 },    
+         { id: 'node3', ...image, img: imageURLs[3], /* comboId: 'combo4',   */label: 'node3'/* `vector` */, date: 1636095551 },  
+         { id: 'node4', ...image, img: imageURLs[4], /* comboId: 'combo5',   */label: 'node4'/* `vector` */, date: 1636095552 },  
+         { id: 'node5', ...image, img: imageURLs[5], /* comboId: 'combo6',   */label: 'node5'/* `vector` */, date: 1636095553 }, 
+         { id: 'node6', ...image, img: imageURLs[6], /* comboId: 'combo7',   */label: 'node6'/* `vector` */, date: 1636095553 }, 
          { id: 'node7', ...image, img: imageURLs[7], label: 'node7'/* `vector` */, date: 1636095553 }, 
          { id: 'node8', ...image, img: imageURLs[8], label: 'node8'/* `vector` */, date: 1636095553 }, 
          { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, date: 1636095552 },  
@@ -35,7 +35,7 @@ export function populateNodesEdges (jsonData) {
         ], 
        edges: [
          { id: 'edge1',
-           source: 'node1', 
+           source: 'node0', 
            target: 'node2', 
            ttp: true,
            frequency: '3', 
@@ -43,7 +43,7 @@ export function populateNodesEdges (jsonData) {
         },
         {  id: 'edge2',
            source: 'node3',
-           target: 'node4', 
+           target: 'node5', 
            ttp: true, 
            frequency: '7', 
            event: 'edge2',//`some other Event`
@@ -98,12 +98,44 @@ export function populateNodesEdges (jsonData) {
         event: 'edge9',//`Event B`
         }, */
        ],
-  /*      combos: [
+       combos: [
         {
           id: 'combo1',
-          label: 2,
-        }
-       ] */
+          label: 1,
+          // parentId: '8'
+        },
+        // {
+        //   id: 'combo2',
+            //  label: 1,
+        // },
+        {
+          id: 'combo3',
+          label: 1,
+        //   // parentId: '8'
+        },
+        // {
+        //   id: 'combo4',
+            //  label: 1
+        // },
+        // {
+        //   id: 'combo5',
+            //  label: 1,
+        //   parentId: '8'
+        // },
+        // {
+        //   id: 'combo6',
+        //   label: 1,
+        //   parentId: '8'
+        // },
+        // {
+        //   id: 'combo7',
+        //   label: 1
+        // },
+        // {
+        //   id: 'combo8',
+        //   label: 1
+        // },
+       ]
      } 
      return data;
    }

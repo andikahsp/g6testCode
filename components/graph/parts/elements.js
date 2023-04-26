@@ -1,3 +1,4 @@
+
 // The symbol for the marker inside the combo holding the nodecount 
 export const circleIcon = (x, y, r) => {
 return [
@@ -7,13 +8,6 @@ return [
     ['M', x - r + 4, y],
 ];
 };
-
-/* style: {
-    position:'bottom',
-    stroke: 'gray',
-    fill: 'transparent',
-    lineWidth: 1.5,
-  } */
 
 export const cCircleComboShape = {
     drawShape: function draw(cfg, group) {
@@ -36,8 +30,8 @@ export const cCircleComboShape = {
       group.addShape('text', {
         attrs: {
             text:cfg.id,
-            x: -25,
-            y: style.r * 3 * -1,
+            x: style.r * 0.50 + 20, 
+            y: (style.r - 20) * - 1,
             fontFamily: 'Arial',
             fontSize: 15,
             fill: 'black',
@@ -79,16 +73,27 @@ export const cCircleComboShape = {
       });
       return circle;
     },
-    // Define the updating logic for the marker
+    // Define the updating logic for the marker (after Collapsed)
     afterUpdate: function afterUpdate(cfg, combo) {
       const self = this;
       // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
       const style = self.getShapeStyle(cfg);
       const group = combo.get('group');
+
+      // Find the comboKeyShape in the graphics group of the Combo
+      const comboShape = group.find((ele) => ele.get('name') === 'combo-keyShape');
       // Find the marker shape in the graphics group of the Combo
       const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
       //Find textLabel shape in the graphics group of the Combo
       const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-label');
+      //Find comboId shape in the graphics group of the Combo
+      const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
+
+      // Update the comboKeyShape
+      comboShape.attr({
+        r: cfg.collapsed ? 28: style.r,
+      });
+
 
       // Update the marker shape
       marker.attr({
@@ -99,6 +104,12 @@ export const cCircleComboShape = {
       textLabel.attr({
         text: cfg.label,
         x: style.r * 0.50 - 5, 
+        y: (style.r - 20) * - 1,
+      });
+      //Update the idlabel
+      idLabel.attr({
+        text: cfg.id,
+        x: style.r * 0.50 + 20, 
         y: (style.r - 20) * - 1,
       });
     },
@@ -210,12 +221,13 @@ export const cCircleComboShape = {
           name: 'edge-frequency-shape',
         });   
 
+        const freqTextXCoord = startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5;
         // freqency -text 
         group.addShape('text', {
           attrs: {
             text: cfg && cfg.frequency,
-            x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5,
-            y: startPoint.y + midPointXY.y + markerYOffset,
+            x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 3.5 ,
+            y: startPoint.y + midPointXY.y + markerYOffset - 1,
             fontSize: 14,
             textAlign: 'left',
             textBaseline: 'middle',

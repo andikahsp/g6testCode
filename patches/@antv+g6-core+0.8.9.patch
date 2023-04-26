@@ -1,0 +1,34 @@
+diff --git a/node_modules/@antv/g6-core/es/graph/graph.js b/node_modules/@antv/g6-core/es/graph/graph.js
+index e46df98..30e167c 100644
+--- a/node_modules/@antv/g6-core/es/graph/graph.js
++++ b/node_modules/@antv/g6-core/es/graph/graph.js
+@@ -2504,14 +2504,25 @@ var AbstractGraph = /** @class */function (_super) {
+     // find all the descendant nodes and combos
+     var cNodesCombos = [];
+     var comboTrees = this.get('comboTrees');
++    console.warn(comboTrees);
+     var found = false; 
++    let foundDepth; // <---------- ADDED CHANGES
+     (comboTrees || []).forEach(function (ctree) {
+       if (found) return; // if the combo is found, terminate the forEach
+-      traverseTree(ctree, function (subTree) {
++      traverseTree(ctree, function(subTree){
+         // if the combo is found and it is traversing the other branches, terminate
+-        if (found && subTree.depth <= comboModel.depth) return false;
+-        // if the combo is found
+-        if (comboModel.id === subTree.id) found = true;
++        if (found && ((subTree.depth <= foundDepth) || (subTree.parentId !== comboModel.id))) { // <---------- ADDED CHANGES
++          if (subTree.itemType === "combo") {   // <---------- ADDED CHANGES
++            return false;  // <---------- ADDED CHANGES
++          } else {         // <---------- ADDED CHANGES
++            return true;   // <---------- ADDED CHANGES
++          }
++        }
++        if (comboModel.id === subTree.id) 
++        { 
++          found = true;
++          foundDepth = subTree.depth; // <---------- ADDED CHANGES
++        }
+         if (found) {
+           // if the combo is found, concat the descendant nodes and combos
+           var item = _this.findById(subTree.id);
