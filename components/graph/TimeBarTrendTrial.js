@@ -312,9 +312,9 @@ const TimeBarTrendTrial
             stroke: '#5f6266',
             lineWidth: 1.2,
             endArrow: {
-              path: G6.Arrow.triangle(6.0, 6.0, 20), // (width, length, offset (wrt d))
+              path: G6.Arrow.triangle(6.0, 6.0, 5), // (width, length, offset (wrt d))
               fill: '#5f6466',
-              d: 20 // offset
+              d: 5 // offset
             },
             // startArrow style used for dual edges 
             startArrow: {
@@ -497,7 +497,7 @@ const TimeBarTrendTrial
         //log(`SUBTRACTING COUNT`);
         if (nodeDrag === true) {
           e.item._cfg.model.label = oldNodesCount - 1;
-          if (e.item._cfg.model.label === 0) {
+          if (e.item._cfg.model.label === 0 || countChildrenInCombo(comboId) === 0) {
             newGraph.uncombo(comboId);
           }
         }
@@ -507,6 +507,7 @@ const TimeBarTrendTrial
         newGraph.getCombos().forEach((combo) => {
           newGraph.setItemState(combo, 'dragleave', false);
           newGraph.setItemState(combo, 'dragenter', false);
+          combo.getModel().label = combo.getCombos().length + combo.getNodes().length; //<==== combo frequency update 
         });
       });
 
@@ -739,8 +740,8 @@ const TimeBarTrendTrial
           const combo = newGraph.findById(comboId);
           const nodesInCombo = combo.getChildren().nodes;
           const combosInCombo = combo.getChildren().combos;
-          log('nodesInCombo =', nodesInCombo);
-          log('combosInCombo =', combosInCombo);
+          log('# nodesInCombo =', nodesInCombo.length);
+          log('# combosInCombo =', combosInCombo.length);
          return nodesInCombo.length + combosInCombo.length;
         } 
         log(`ERROR: comboId is undefined when counting nodes in combo`)
