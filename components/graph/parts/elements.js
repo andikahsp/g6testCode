@@ -79,12 +79,21 @@ export const cCircleComboShape = {
       // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
       const style = self.getShapeStyle(cfg);
       const group = combo.get('group');
+
+      // Find the comboKeyShape in the graphics group of the Combo
+      const comboShape = group.find((ele) => ele.get('name') === 'combo-keyShape');
       // Find the marker shape in the graphics group of the Combo
       const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
       //Find textLabel shape in the graphics group of the Combo
       const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-label');
       //Find comboId shape in the graphics group of the Combo
       const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
+
+      // Update the comboKeyShape
+      comboShape.attr({
+        r: cfg.collapsed ? 28: style.r,
+      });
+
 
       // Update the marker shape
       marker.attr({
@@ -212,12 +221,13 @@ export const cCircleComboShape = {
           name: 'edge-frequency-shape',
         });   
 
+        const freqTextXCoord = startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5;
         // freqency -text 
         group.addShape('text', {
           attrs: {
             text: cfg && cfg.frequency,
-            x: startPoint.x + midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5,
-            y: startPoint.y + midPointXY.y + markerYOffset,
+            x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 3.5 ,
+            y: startPoint.y + midPointXY.y + markerYOffset - 1,
             fontSize: 14,
             textAlign: 'left',
             textBaseline: 'middle',
