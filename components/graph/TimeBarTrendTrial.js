@@ -278,7 +278,7 @@ const TimeBarTrendTrial
         groupByTypes: false,
         defaultCombo: {
           type: 'cCircle',
-          size: [130], // The minimum size of the Combo
+          //size: [130], // The minimum size of the Combo
           padding: 20,
           style: {
             position:'bottom',
@@ -485,9 +485,9 @@ const TimeBarTrendTrial
         });
       });
 
-      /* newGraph.on('combo:drop', (e) => {
+      newGraph.on('combo:drop', (e) => {
         newGraph.setItemState(e.item, 'dragenter', false);
-      }); */
+      });
 
       newGraph.on('combo:dragleave', (e) => {
         const comboId = e.item._cfg.id;
@@ -504,8 +504,10 @@ const TimeBarTrendTrial
       });
 
       newGraph.on('combo:mouseup', (e) =>{
-        newGraph.setItemState(e.item, 'dragleave', false);
-        newGraph.setItemState(e.item, 'dragenter', false);
+        newGraph.getCombos().forEach((combo) => {
+          newGraph.setItemState(combo, 'dragleave', false);
+          newGraph.setItemState(combo, 'dragenter', false);
+        });
       });
 
       newGraph.on("combo:contextmenu", (e) => {
