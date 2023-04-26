@@ -30,8 +30,8 @@ export const cCircleComboShape = {
       group.addShape('text', {
         attrs: {
             text:cfg.id,
-            x: -25,
-            y: style.r * 3 * -1,
+            x: style.r * 0.50 + 20, 
+            y: (style.r - 20) * - 1,
             fontFamily: 'Arial',
             fontSize: 15,
             fill: 'black',
@@ -73,7 +73,7 @@ export const cCircleComboShape = {
       });
       return circle;
     },
-    // Define the updating logic for the marker
+    // Define the updating logic for the marker (after Collapsed)
     afterUpdate: function afterUpdate(cfg, combo) {
       const self = this;
       // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
@@ -83,6 +83,8 @@ export const cCircleComboShape = {
       const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
       //Find textLabel shape in the graphics group of the Combo
       const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-label');
+      //Find comboId shape in the graphics group of the Combo
+      const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
 
       // Update the marker shape
       marker.attr({
@@ -93,6 +95,12 @@ export const cCircleComboShape = {
       textLabel.attr({
         text: cfg.label,
         x: style.r * 0.50 - 5, 
+        y: (style.r - 20) * - 1,
+      });
+      //Update the idlabel
+      idLabel.attr({
+        text: cfg.id,
+        x: style.r * 0.50 + 20, 
         y: (style.r - 20) * - 1,
       });
     },
