@@ -441,7 +441,7 @@ const TimeBarTrendTrial
 
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
-        //log('EDGE =', e.item.getModel());
+        log('EDGE =', e.item.getModel());
       });
   
       newGraph.on('edge:mouseleave', (e) => {
@@ -591,27 +591,20 @@ const TimeBarTrendTrial
             log('correct VEdge selected = ', newGraph.findById(vedgeId).getModel());
           }
         }
-      } else {
-        log('expand1');
+       } 
+         else {
         const childCombos = e.item.getCombos();
         const childNodes = e.item.getNodes();
-        log('childNodes =', childNodes)
         if (childNodes.length > 0) {
           for (let i = 0; i < childNodes.length; i++) {
-            log('expand2');
             const neighborsOfChildNode = childNodes[i].getNeighbors();
-            log('neighborsOfChildNode', neighborsOfChildNode);
             let ttpCheck = false;
             for(let j = 0; j < neighborsOfChildNode.length; j++) {
-              log('childNodes[i] =', childNodes[i]);
-              log('neighborsOfChildNode[j] =',neighborsOfChildNode[j]);
               if (neighborsOfChildNode[j].getType() === 'combo') {
                 // check if there is TTP in the relation between a child node and its neighbor(combo or node)
                 ttpCheck = checkTTP(childNodes[i], neighborsOfChildNode[j]);
-                log('ttpCheck =', ttpCheck);
                 if (ttpCheck) {
                   const edges = childNodes[i].getEdges();
-                  log('expand4-ttpCheck true');
                   for (let k = 0; k < edges.length; k++) {
                     if (edges[k].getModel().isVEdge) {
                       if ( edges[k].getSource() === neighborsOfChildNode[j] || 
@@ -631,16 +624,16 @@ const TimeBarTrendTrial
         if (childCombos.length > 0) {
           for(let i = 0; i < childCombos.length; i ++) {
             const neighbors = childCombos[i].getNeighbors();
-            const comboNodes = childCombos[i].getNodes();
-            const comboEdges = childCombos[i].getEdges();
-            const comboCombos = childCombos[i].getCombos();
-
+            const nodesOfChildCombo = childCombos[i].getNodes();
+            //const edgesOfChildCombo = childCombos[i].getEdges();
+            const combosOfChildCombo = childCombos[i].getCombos();
             for(let j = 0; j < neighbors.length; j++ ){
-              if (neighbors[j].getType() === 'node' && !comboNodes.includes(neighbors[j])) {
+              if (neighbors[j].getType() === 'node' && 
+                  !nodesOfChildCombo.includes(neighbors[j])) {
                 let ttpCheck = false;
-                for (let k = 0; k < comboNodes.length; k++) {
-                  if (comboNodes[k].getNeighbors().includes(neighbors[j])){
-                    const nodeEdges = comboNodes[k].getEdges();
+                for (let k = 0; k < nodesOfChildCombo.length; k++) {
+                  if (nodesOfChildCombo[k].getNeighbors().includes(neighbors[j])){
+                    const nodeEdges = nodesOfChildCombo[k].getEdges();
                     for (let m = 0; m < nodeEdges.length; m++) {
                       if (nodeEdges[m].getSource() === neighbors[j] || 
                           nodeEdges[m].getTarget() === neighbors[j] 
@@ -651,7 +644,8 @@ const TimeBarTrendTrial
                     }
                   };
                 }
-              } else if (neighbors[j].getType() === 'combo' && !comboCombos.includes(neighbors[j])){
+              } else if (neighbors[j].getType() === 'combo' &&
+                         !combosOfChildCombo.includes(neighbors[j])){
                 let ttpCheck = false;
                 const nodesInNeighbor = getAllNodesInCombo(neighbors[j]);
                 allNodesInCombo = [];
@@ -672,13 +666,13 @@ const TimeBarTrendTrial
                     }
                   }
                 }
-                const comboEdges = childCombos[i].getEdges();
-                comboEdges.forEach((edge) => {
+                const edgesOfChildCombo = childCombos[i].getEdges();
+                edgesOfChildCombo.forEach((edge) => {
                   if (
                     edge.getSource() == neighbors[j] ||
                     edge.getTarget() == neighbors[j]
                   )
-                    edge.getModel()["ttp"] = ttp;
+                    edge.getModel().ttp = ttpCheck;
                 });
               }
             }
