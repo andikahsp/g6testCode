@@ -520,17 +520,25 @@ const TimeBarTrendTrial
           newGraph.setItemState(combo, 'dragleave', false);
           newGraph.setItemState(combo, 'dragenter', false);
 
-          log('parentOfDragComboId =', parentOfDragComboId);
-          log('dragleaveComboId =', dragleaveComboId);
-          log('dragOverComboId =', dragOverComboId);
-          // if(parentOfDragComboId === dragleaveComboId === dragOverComboId) {
-          //   log('>>>>BAZINGA')
-          //   const dragOverCombo = newGraph.findById(dragOverComboId);
-          //   combo.getModel().label = countChildrenInCombo(dragOverComboId) - 1;    
-          // } else {
-          //   combo.getModel().label = countChildrenInCombo(dragOverComboId);
-          // }
-          newGraph.updateCombo(combo);
+          // log('parentOfDragComboId =', parentOfDragComboId);
+          // log('dragleaveComboId =', dragleaveComboId);
+          // log('dragOverComboId =', dragOverComboId);
+          const dragOverCombo = newGraph.findById(dragOverComboId);
+          
+          if (dragOverComboId !== undefined) {
+            if( (parentOfDragComboId === dragleaveComboId) && 
+                (dragleaveComboId === dragOverComboId)) {
+                dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - 1;    
+            } else {
+                dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
+            }
+            if (dragOverCombo.getModel().label === 0) {
+                newGraph.uncombo(dragOverComboId);
+                dragOverComboId = undefined;
+            } else {
+              newGraph.updateCombo(dragOverCombo);
+            }
+          }
         });
       });
 
@@ -620,97 +628,10 @@ const TimeBarTrendTrial
        } 
          else {
           comboExpandTTP(e.item);
-      //   const childCombos = e.item.getCombos();
-      //   const childNodes = e.item.getNodes();
-      //   if (childNodes.length > 0) {
-      //     for (let i = 0; i < childNodes.length; i++) {
-      //       const neighborsOfChildNode = childNodes[i].getNeighbors();
-      //       let ttpCheck = false;
-      //       for(let j = 0; j < neighborsOfChildNode.length; j++) {
-      //         if (neighborsOfChildNode[j].getType() === 'combo') {
-      //           // check if there is TTP in the relation between a child node and its neighbor(combo or node)
-      //           ttpCheck = checkTTP(childNodes[i], neighborsOfChildNode[j]);
-      //           if (ttpCheck) {
-      //             const edges = childNodes[i].getEdges();
-      //             for (let k = 0; k < edges.length; k++) {
-      //               if (edges[k].getModel().isVEdge) {
-      //                 if ( edges[k].getSource() === neighborsOfChildNode[j] || 
-      //                      edges[k].getTarget() === neighborsOfChildNode[j]
-      //                     ) {
-      //                       edges[k].getModel()['ttp'] = ttpCheck
-      //                       break;
-      //                 } 
-      //               }
-      //             }
-      //             break;
-      //           }
-      //         }
-      //       }
-      //     }          
-      //   }
-      //   if (childCombos.length > 0) {
-      //     for(let i = 0; i < childCombos.length; i ++) {
-      //       const neighbors = childCombos[i].getNeighbors();
-      //       const nodesOfChildCombo = childCombos[i].getNodes();
-      //       //const edgesOfChildCombo = childCombos[i].getEdges();
-      //       const combosOfChildCombo = childCombos[i].getCombos();
-      //       for(let j = 0; j < neighbors.length; j++ ){
-      //         if (neighbors[j].getType() === 'node' && 
-      //             !nodesOfChildCombo.includes(neighbors[j])) {
-      //           let ttpCheck = false;
-      //           for (let k = 0; k < nodesOfChildCombo.length; k++) {
-      //             if (nodesOfChildCombo[k].getNeighbors().includes(neighbors[j])){
-      //               const nodeEdges = nodesOfChildCombo[k].getEdges();
-      //               for (let m = 0; m < nodeEdges.length; m++) {
-      //                 if (nodeEdges[m].getSource() === neighbors[j] || 
-      //                     nodeEdges[m].getTarget() === neighbors[j] 
-      //                     ) {
-      //                       ttpCheck = nodeEdges[m].getModel().ttp; 
-      //                       if(ttpCheck) break;
-      //                 }
-      //               }
-      //             };
-      //           }
-      //         } else if (neighbors[j].getType() === 'combo' &&
-      //                    !combosOfChildCombo.includes(neighbors[j])){
-      //           let ttpCheck = false;
-      //           const nodesInNeighbor = getAllNodesInCombo(neighbors[j]);
-      //           allNodesInCombo = [];
-      //           const nodesInChildCombo = getAllNodesInCombo(childCombos[i]);
-      //           allNodesInCombo = [];
-
-      //           for(let n = 0; n < nodesInChildCombo.length; n++) {
-      //             if(nodesInChildCombo[n].getNeighbors().some((item) => nodesInNeighbor.includes(item))) {
-      //               const comboNodeEdges = nodesInChildCombo[n].getEdges();
-      //               for (let h = 0; h < comboNodeEdges.length; h++) {
-      //                 if ( nodesInNeighbor.includes(comboNodeEdges[h].getSource()) || 
-      //                      nodesInNeighbor.includes(comboNodeEdges[h].getTarget())
-      //                 ) {
-      //                     if(comboNodeEdges[h].getModel().ttp) {
-      //                       ttpCheck = true; 
-      //                     }
-      //                 }
-      //               }
-      //             }
-      //           }
-      //           const edgesOfChildCombo = childCombos[i].getEdges();
-      //           edgesOfChildCombo.forEach((edge) => {
-      //             if (
-      //               edge.getSource() == neighbors[j] ||
-      //               edge.getTarget() == neighbors[j]
-      //             )
-      //               edge.getModel().ttp = ttpCheck;
-      //           });
-      //         }
-      //       }
-      //     }
-      //   } 
        } 
     });
-
     
     
-      
       function comboExpandTTP(combo) {
         const combos = combo.getCombos();
         const nodes = combo.getNodes();
@@ -873,76 +794,14 @@ const TimeBarTrendTrial
       }
 
       // DO NOT DELETE - LESLIE's EXPERIMENTATION
-      // newGraph.on("canvas:click", function (event) {
-      //   const nodes = newGraph.getNodes();
-      //   log(nodes);
-      //   const edges = newGraph.getEdges();
-      //   log(edges);
-      //   const combos = newGraph.getCombos();
-      //   log(combos);
-      //   });
-
-        newGraph.on("canvas:click", function (event) {
-          const nodes = newGraph.getNodes() //[]
-          // newGraph.getNodes().forEach((node)=>{
-          //   nodes.push(node.getModel())
-          // });
-          log('NODES ', nodes);
-          const edges = newGraph.getEdges() //[] 
-          // newGraph.getEdges().forEach((edge)=>{
-          //   edges.push(edge.getModel());
-          // });
-          log('EDGES ', edges);
-          const combos = newGraph.getCombos() //[]
-          // newGraph.getCombos().forEach((combo)=>{
-          //   combos.push(combo.getModel());
-          // });
-          log('COMBOS ', combos);
-
-          const edgeQ = newGraph.find('vedge', vedge => {
-            return (vedge.getSource().getID() === 'node0' && vedge.getTarget().getID() === 'combo3') || 
-            (vedge.getSource().getID() === 'combo3' && vedge.getTarget().getID() === 'node0');
-          })
-
-          log('edgeQ =', edgeQ);
-
-          });
-
-/*       newGraph.on("canvas:dblclick", function (event) {
-           const vedges = newGraph.get("vedges");
-          log('vedges =\n', vedges)   
-          const edges = newGraph.getEdges();
-          log('edges = \n', edges);
-          });         
-      });
-   */
-    
-      function grabNeighbors(itemObj) {
-        let result = []
-        if (itemObj.getType() === "node"){
-          const allEdges = newGraph.getEdges()
-          for(let i = 0; i < allEdges.length; i++) {
-            const adjacentPoint = (allEdges[i].getSource() === itemObj) ? allEdges[i].getTarget() : allEdges[i].getSource();
-            result.push(adjacentPoint);
-          }
-        } else if ( itemObj.getType() === "combo" ) {
-            const comboEdges = itemObj.getEdges();
-            log('comboEdges =', comboEdges);
-            for(let j = 0; j < comboEdges.length; j++) {
-              //log('comboEdges[j].getSource() =', comboEdges[j].getSource());
-              //log('comboEdges[j].getSource() =', comboEdges[j].getSource());
-              log(itemObj.getID());
-              const adjacentPoint2 = (comboEdges[j].getSource() === itemObj) ? comboEdges[j].getTarget() : comboEdges[j].getSource();
-              log(`comboNeighbor ${j + 1}`,adjacentPoint2.getID())
-              result.push(adjacentPoint2);
-            }
-        } else {
-          throw 'ERROR with grabNeighbors'
-        }
-        log('result =', result);
-        return result;
-      }
-
+      newGraph.on("canvas:click", function (event) {
+        const nodes = newGraph.getNodes();
+        log('NODES:', nodes);
+        const edges = newGraph.getEdges();
+        log('EDGES:', edges);
+        const combos = newGraph.getCombos();
+        log('COMBOS:', combos);
+        });
 
 
       // RESIZING
