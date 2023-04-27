@@ -9,9 +9,8 @@ let nodeA = "";
 let nodeB = "";
 let nodeDrag = false;
 let allNodesInCombo = [];
-let dragComboId;
-let parentOfDragComboId; 
-let dragOverComboId; 
+let comboDrag = false;
+let dragCombo;
 let dragleaveComboId;
 
 
@@ -478,20 +477,19 @@ const TimeBarTrendTrial
       
 
       newGraph.on(`combo:drag`,(e) => {
-        dragComboId = e.item.getID();
-        parentOfDragComboId = e.item.getModel().parentId;
+
+        dragCombo = e.item;
         // prevents dotted red border from showing when dragging combo
         newGraph.setItemState(e.item, 'dragleave', false);
       });
 
       
       newGraph.on('combo:dragover', (e) => {
-        //log('dragOver combo =',e.item.getID());
-        dragOverComboId = e.item.getID();
         newGraph.setItemState(e.item, 'dragenter', true);
       });
 
       newGraph.on('combo:dragend', (e) => {
+        comboDrag = false;
         newGraph.getCombos().forEach((combo) =>{
           newGraph.setItemState(combo, 'dragenter', false);
         });
@@ -503,13 +501,12 @@ const TimeBarTrendTrial
 
 
       newGraph.on('combo:dragleave', (e) => {
-
         dragleaveComboId = e.item.getID();
         //log('dragleave comboId =', dragleaveComboId)
         newGraph.setItemState(e.item, 'dragleave', true);
         const oldNodesCount = countChildrenInCombo(dragleaveComboId);
       
-        //log(`SUBTRACTING COUNT`);
+        //log(`SUBTRACTING Node count on NodeDrag`);
         if (nodeDrag === true) {
           e.item._cfg.model.label = oldNodesCount - 1;
           if (e.item._cfg.model.label === 0 || countChildrenInCombo(dragleaveComboId) === 0) {
@@ -518,42 +515,62 @@ const TimeBarTrendTrial
         }
       });
 
-      newGraph.on('combo:mouseup', (e) =>{
-        log(`parentOfDragComboId: ${parentOfDragComboId}\ndragleaveComboId: ${dragleaveComboId}\ndragOverComboId: ${dragOverComboId}`)
-        const combosToDelete = [];
-        const dragOverCombo = newGraph.findById(dragOverComboId);          
-        if (dragOverCombo !== undefined && dragComboId !== undefined) {
-          // if all 3 comboIds are the same, user is dragging child combo out from parent combo.
-          if( (parentOfDragComboId === dragleaveComboId) && 
-              (dragleaveComboId === dragOverComboId)) {
-              const draggedCombo = newGraph.findById(dragComboId);
-              const removedCount = getAllNodesInCombo(draggedCombo).length;
-              allNodesInCombo = [];
-              dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - removedCount;   
-              if (dragOverCombo.getModel().label === 0) {
-                newGraph.uncombo(dragOverComboId);
-                // dragOverComboId = undefined;
-                // dragComboId = undefined;
+      newGraph.on('combo:mouseup', (e) => {
+        /*  COMBO SUBTRACTION */
+        let allParents;
+        if (dragCombo) {
+          allParents = getAllParents(dragCombo, newGraph);
+          const removedCount = countChildrenInCombo(dragCombo.getID())
+          allParents.forEach((parent) => {
+            newGraph.setItemState(parent, 'dragleave', false);
+            newGraph.setItemState(parent, 'dragenter', false);
+            parent.getModel().label = countChildrenInCombo(parent.getID()) - removedCount;
+            if(parent.getModel().label > 0) {
+              newGraph.updateCombo(parent);
             } else {
-              newGraph.updateCombo(dragOverCombo);
-            } 
-          } else {
-              dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
-          }
+              newGraph.uncombo(parent);
+            }
+          });
         }
-        newGraph.getCombos().forEach((combo) => {
-          newGraph.setItemState(combo, 'dragleave', false);
-          newGraph.setItemState(combo, 'dragenter', false);
-          combo.getModel().label = countChildrenInCombo(combo.getID());
-          allNodesInCombo = [];
-          if (combo.getNodes().length === 0 && combo.getCombos().length === 0) {
-            // combosToDelete.push(combo.getID());
-            newGraph.uncombo(combo.getID())
-          } else {
-            newGraph.updateCombo(combo);
-          }
-        });
       });
+
+
+      // newGraph.on('combo:mouseup', (e) =>{
+      //   log(`parentOfDragComboId: ${parentOfDragComboId}\ndragleaveComboId: ${dragleaveComboId}\ndragOverComboId: ${dragOverComboId}`)
+      //   const combosToDelete = [];
+      //   const dragOverCombo = newGraph.findById(dragOverComboId);          
+      //   if (dragOverCombo !== undefined && dragComboId !== undefined) {
+      //     // if all 3 comboIds are the same, user is dragging child combo out from parent combo.
+      //     if( (parentOfDragComboId === dragleaveComboId) && 
+      //         (dragleaveComboId === dragOverComboId)) {
+      //         const draggedCombo = newGraph.findById(dragComboId);
+      //         const removedCount = getAllNodesInCombo(draggedCombo).length;
+      //         allNodesInCombo = [];
+      //         dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - removedCount;   
+      //         if (dragOverCombo.getModel().label === 0) {
+      //           newGraph.uncombo(dragOverComboId);
+      //           // dragOverComboId = undefined;
+      //           // dragComboId = undefined;
+      //       } else {
+      //         newGraph.updateCombo(dragOverCombo);
+      //       } 
+      //     } else {
+      //         dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
+      //     }
+      //   }
+      //   newGraph.getCombos().forEach((combo) => {
+      //     newGraph.setItemState(combo, 'dragleave', false);
+      //     newGraph.setItemState(combo, 'dragenter', false);
+      //     combo.getModel().label = countChildrenInCombo(combo.getID());
+      //     allNodesInCombo = [];
+      //     if (combo.getNodes().length === 0 && combo.getCombos().length === 0) {
+      //       // combosToDelete.push(combo.getID());
+      //       newGraph.uncombo(combo.getID())
+      //     } else {
+      //       newGraph.updateCombo(combo);
+      //     }
+      //   });
+      // });
 
       newGraph.on("combo:contextmenu", (e) => {
         const comboId = e.item.getID();
@@ -756,6 +773,22 @@ const TimeBarTrendTrial
             }
           });
         }
+      }
+
+      function getAllParents (childCombo, graph) {
+        let arr = []
+        function grabParents (combo) {
+          if (combo.getModel().parentId === undefined) {
+            return 
+          } else {
+            const parentID = combo.getModel().parentId
+            const parentCombo = graph.findById(parentID);
+            arr.push(parentCombo);
+            grabParents(parentCombo);
+          }
+        }
+        grabParents(childCombo);
+        return arr;
       }
 
 
