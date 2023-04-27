@@ -526,9 +526,9 @@ const TimeBarTrendTrial
           // log('parentOfDragComboId =', parentOfDragComboId);
           // log('dragleaveComboId =', dragleaveComboId);
           // log('dragOverComboId =', dragOverComboId);
-          const dragOverCombo = newGraph.findById(dragOverComboId);
           
           if (dragOverComboId !== undefined && dragComboId !== undefined) {
+            const dragOverCombo = newGraph.findById(dragOverComboId);
             if( (parentOfDragComboId === dragleaveComboId) && 
                 (dragleaveComboId === dragOverComboId)) {
                 const draggedCombo = newGraph.findById(dragComboId);
@@ -538,18 +538,18 @@ const TimeBarTrendTrial
             } else {
                 dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
             }
-            // if (dragOverCombo.getModel().label === 0) {
-            //     newGraph.uncombo(dragOverComboId);
-            //     dragOverComboId = undefined;
-            //     dragComboId = undefined;
-            // } else {
-            //   newGraph.updateCombo(dragOverCombo);
-            // }
-            if(countChildrenInCombo(combo.getID()) === 0){
-              newGraph.uncombo(combo.getID());
+            if (dragOverCombo.getModel().label === 0) {
+                newGraph.uncombo(dragOverComboId);
+                dragOverComboId = undefined;
+                dragComboId = undefined;
             } else {
-              newGraph.updateCombo(combo)
+              newGraph.updateCombo(dragOverCombo);
             }
+            // if(countChildrenInCombo(combo.getID()) === 0){
+            //   newGraph.uncombo(combo.getID());
+            // } else {
+            //   newGraph.updateCombo(combo)
+            // }
 
 
           }
