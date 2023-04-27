@@ -71,18 +71,18 @@ const TimeBarTrendTrial
         },
           tickLabelStyle:{ 
             fontSize: 13, 
-            fontFamily: 'Arial',
+            fontFamily: 'Segoe UI',
             fillOpacity: 0.9,
-            stroke: 'blue',
-            strokeOpacity: 0.9,
+            stroke: '#686868',
+            strokeOpacity: 0.3,
           },
           tickLineStyle: {
             width: 30, //<<==== no effect, not working
             height: 15, //<===== no effect, not working 
             //offset: 250, //<===== no effect, not working
-            stroke: 'orange',
-            lineWidth: 5,  
-            strokeOpacity: 1,
+            stroke: '#686868',
+            lineWidth: 2.5,  
+            strokeOpacity: 0.6,
           }
       },
         trend: {
@@ -90,12 +90,12 @@ const TimeBarTrendTrial
           data: timeBarData,
           smooth: false,
           lineStyle: {
-            stroke: 'blue',
+            stroke: 'transparent', // 'blue',
             lineWidth: 10,
           },
           isArea: true,
           areaStyle:{
-            fill: 'pink',
+            fill: 'lightgrey', // 'pink'
           },
         },
         slider: { 
@@ -103,8 +103,8 @@ const TimeBarTrendTrial
             fill: 'transparent', 
           },
           foregroundStyle: { // ShapeStyle object format
-            fill: 'cyan', 
-            fillOpacity: 0.3,
+            fill: 'lightgrey', //'cyan',
+            fillOpacity: 0.25,
           }, 
           height: 60,
           start: 0.25,
@@ -132,34 +132,34 @@ const TimeBarTrendTrial
         controllerCfg:{
           fontFamily: 'Arial',
           fontSize: 10,
-          fill: 'yellow',
-          stroke: 'red',
+          fill: 'transparent',
+          stroke: 'transparent',
           preBtnStyle: {
-            fill: 'purple',
-            stroke: 'blue'
+            fill: '#6C6C6C',
+            stroke: '#6C6C6C'
           },
           nextBtnStyle: {
-            fill: 'red',
-            stroke: 'blue'
+            fill: '#6C6C6C',
+            stroke: '#6C6C6C'
           },
           playBtnStyle: {
-            stroke: 'teal'
+            stroke: '#6C6C6C'
           },
           speedControllerStyle: {
             pointer: {
-              fill:`red`,
+              fill: '#6C6C6C',
               fillOpacity:1,
-              stroke: 'red',
+              stroke: '#6C6C6C',
             },
             scroller: {
-              fill: `white`,
+              fill: '#6C6C6C',
               fillOpacity:0,
-              stroke: 'blue',
+              stroke: '#6C6C6C',
             },
             text: {
-              fill: `red`,
+              fill: '#6C6C6C',
               fillOpacity:0,
-              stroke: 'black',
+              stroke: '#6C6C6C',
             }, 
           },
           /** whether hide the 'time type controller' on the right-bottom */
@@ -243,7 +243,7 @@ const TimeBarTrendTrial
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
-          type: 'force',
+          //type: 'force',
           center: [200, 200],
           preventOverlap: true,
           nodeSpacing: 5, 

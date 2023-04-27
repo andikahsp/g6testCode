@@ -7,19 +7,19 @@ export function populateNodesEdges (jsonData) {
     
     const image = { type: 'image', 
                      size: 36};
-  /*   const circle = { type: 'circle', 
+    const circle = { type: 'circle', 
                      size: 48 };
     
     const triangle = { type: 'triangle',
                        size: 20, 
-                       direction: 'up'}; */
+                       direction: 'up'};
      
      // node and edge definition will be based on backend logic                  
      const data = {
         nodes:[
-         { id: 'node0', ...image, img: imageURLs[0], comboId: 'combo1',  label: 'node0'/* jsonData.computerName */, date: jsonData.logsourceTime },
-         { id: 'node1', ...image, img: imageURLs[1], /* comboId: 'combo2',   */label: 'node1'/* jsonData.originatingComputer */, date: jsonData.logsourceTime},
-         { id: 'node2', ...image, img: imageURLs[2], comboId: 'combo3',  label: 'node2'/* jsonData.logonProcess */, date: 1636095550 },    
+         { id: 'node0', ...circle, /* img: imageURLs[0], */ comboId: 'combo1',  label: /* 'node0' */jsonData.computerName, date: jsonData.logsourceTime },
+         { id: 'node1', ...image, img: imageURLs[1], /* comboId: 'combo2',   */label: 'node1'/* jsonData.logonProcess */, date: jsonData.logsourceTime},
+         { id: 'node2', ...triangle, /* img: imageURLs[2], */ comboId: 'combo3',  label: /* 'node2' */jsonData.originatingComputer, date: 1636095550 },    
          { id: 'node3', ...image, img: imageURLs[3], /* comboId: 'combo4',   */label: 'node3'/* `vector` */, date: 1636095551 },  
          { id: 'node4', ...image, img: imageURLs[4], /* comboId: 'combo5',   */label: 'node4'/* `vector` */, date: 1636095552 },  
          { id: 'node5', ...image, img: imageURLs[5], /* comboId: 'combo6',   */label: 'node5'/* `vector` */, date: 1636095553 }, 
@@ -39,15 +39,15 @@ export function populateNodesEdges (jsonData) {
            target: 'node2', 
            ttp: true,
            frequency: '3', 
-           event: 'edge1',//`${jsonData.message}`       
+           event: `${jsonData.message}` //'edge1',      
         },
-        {  id: 'edge2',
-           source: 'node3',
-           target: 'node5', 
-           ttp: true, 
-           frequency: '7', 
-           event: 'edge2',//`some other Event`
-        },
+        // {  id: 'edge2',
+        //    source: 'node3',
+        //    target: 'node5', 
+        //    ttp: true, 
+        //    frequency: '7', 
+        //    event: 'edge2',//`some other Event`
+        // },
         {  id: 'edge3',
            source: 'node5', 
            target: 'node6', 
@@ -101,7 +101,7 @@ export function populateNodesEdges (jsonData) {
        combos: [
         {
           id: 'combo1',
-          label: 1,
+          label: 77,
           // parentId: '8'
         },
         // {

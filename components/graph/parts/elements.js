@@ -48,10 +48,10 @@ export const cCircleComboShape = {
           opacity: 1,
           x: 0,
           y: style.r,
-          r: 15,
+          r: 13,
           symbol: circleIcon,
-          fill: '#FDFD96',
-          stroke: 'grey',
+          fill: 'red',
+          stroke: 'black',
         },
         draggable: true,
         // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
@@ -65,8 +65,8 @@ export const cCircleComboShape = {
             y: style.r,
             fontFamily: 'Arial',
             fontSize: 19,
-            fill: 'black',
-            stroke: 'grey',
+            fill: 'white',
+            stroke: 'white',
         },
         draggable: true, 
         name: 'combo-marker-label'
@@ -103,7 +103,7 @@ export const cCircleComboShape = {
       //Update the textlabel
       textLabel.attr({
         text: cfg.label,
-        x: style.r * 0.50 - 5, 
+        x: cfg.label.toString().length === 1 ? style.r * 0.50 - 5.63 : style.r * 0.50 - 10, 
         y: (style.r - 20) * - 1,
       });
       //Update the idlabel
