@@ -9,6 +9,7 @@ let nodeA = "";
 let nodeB = "";
 let nodeDrag = false;
 let allNodesInCombo = [];
+let dragComboId;
 let parentOfDragComboId; 
 let dragOverComboId; 
 let dragleaveComboId;
@@ -244,7 +245,8 @@ const TimeBarTrendTrial
         plugins: [newTimebar],
         layout: {
           //type: 'force',
-          center: [200, 200],
+          //center: [200, 200],
+          center: [800, 340], 
           preventOverlap: true,
           nodeSpacing: 5, 
           linkDistance: d => {
@@ -445,7 +447,7 @@ const TimeBarTrendTrial
 
       newGraph.on('edge:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
-        log('EDGE =', e.item.getModel());
+        // log('EDGE =', e.item.getModel());
       });
   
       newGraph.on('edge:mouseleave', (e) => {
@@ -476,6 +478,7 @@ const TimeBarTrendTrial
       
 
       newGraph.on(`combo:drag`,(e) => {
+        dragComboId = e.item.getID();
         parentOfDragComboId = e.item.getModel().parentId;
         // prevents dotted red border from showing when dragging combo
         newGraph.setItemState(e.item, 'dragleave', false);
@@ -528,7 +531,10 @@ const TimeBarTrendTrial
           if (dragOverComboId !== undefined) {
             if( (parentOfDragComboId === dragleaveComboId) && 
                 (dragleaveComboId === dragOverComboId)) {
-                dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - 1;    
+                const draggedCombo = newGraph.findById(dragComboId);
+                const removedCount = getAllNodesInCombo(draggedCombo).length;
+                allNodesInCombo = [];
+                dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - removedCount;    
             } else {
                 dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
             }
@@ -774,12 +780,22 @@ const TimeBarTrendTrial
       }
 
 
+      // const countChildrenInCombo = (comboId) => {
+      //   if (comboId !== undefined) {
+      //     const combo = newGraph.findById(comboId);
+      //     log('# nodesInCombo =', combo.getNodes().length );
+      //     log('# combosInCombo =', combo.getCombos().length);
+      //    return combo.getNodes().length + combo.getCombos().length;
+      //   } 
+      //   log(`ERROR: comboId is undefined when counting nodes in combo`)
+      // }
+
       const countChildrenInCombo = (comboId) => {
         if (comboId !== undefined) {
           const combo = newGraph.findById(comboId);
-          log('# nodesInCombo =', combo.getNodes().length );
-          log('# combosInCombo =', combo.getCombos().length);
-         return combo.getNodes().length + combo.getCombos().length;
+          const allNodesCount = getAllNodesInCombo(combo).length;
+          allNodesInCombo = [];
+         return allNodesCount;
         } 
         log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
