@@ -239,12 +239,13 @@ const TimeBarTrendTrial
       const newGraph = new G6.Graph({
         container: ref.current,
         width: width,
-        height: height + 50,
+        height: height + 55,
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
           //type: 'force',
-          center: [200, 200],
+          //center: [200, 200],
+          center: [840, 340],
           preventOverlap: true,
           nodeSpacing: 5, 
           linkDistance: d => {

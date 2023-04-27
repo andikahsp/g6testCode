@@ -31,7 +31,7 @@ export function populateNodesEdges (jsonData) {
          { id: 'node11', ...image, img: imageURLs[11], label: 'node11'/* `vector` */, date: 1636095553 }, 
          { id: 'node12', ...image, img: imageURLs[12], label: 'node12'/* `vector` */, date: 1636095553 }, 
          { id: 'node13', ...image, img: imageURLs[13], label: 'node13'/* `vector` */, date: 1636095553 },
-         { id: 'node14', ...image, img: imageURLs[14], label: 'node14'/* `vector` */, date: 1636095553 }, 
+         { id: 'node14', ...image, img: imageURLs[14], label: 'pointer'/* `vector` */, date: 1636095553 }, 
         ], 
        edges: [
          { id: 'edge1',
