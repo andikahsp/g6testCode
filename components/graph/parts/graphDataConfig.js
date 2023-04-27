@@ -101,7 +101,7 @@ export function populateNodesEdges (jsonData) {
        combos: [
         {
           id: 'combo1',
-          label: 77,
+          label: 1,
           // parentId: '8'
         },
         // {
