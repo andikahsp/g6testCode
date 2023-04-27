@@ -521,39 +521,36 @@ const TimeBarTrendTrial
       newGraph.on('combo:mouseup', (e) =>{
         log(`parentOfDragComboId: ${parentOfDragComboId}\ndragleaveComboId: ${dragleaveComboId}\ndragOverComboId: ${dragOverComboId}`)
         const combosToDelete = [];
+        const dragOverCombo = newGraph.findById(dragOverComboId);          
+        if (dragOverCombo !== undefined && dragComboId !== undefined) {
+          // if all 3 comboIds are the same, user is dragging child combo out from parent combo.
+          if( (parentOfDragComboId === dragleaveComboId) && 
+              (dragleaveComboId === dragOverComboId)) {
+              const draggedCombo = newGraph.findById(dragComboId);
+              const removedCount = getAllNodesInCombo(draggedCombo).length;
+              allNodesInCombo = [];
+              dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - removedCount;   
+              if (dragOverCombo.getModel().label === 0) {
+                newGraph.uncombo(dragOverComboId);
+                // dragOverComboId = undefined;
+                // dragComboId = undefined;
+            } else {
+              newGraph.updateCombo(dragOverCombo);
+            } 
+          } else {
+              dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
+          }
+        }
         newGraph.getCombos().forEach((combo) => {
           newGraph.setItemState(combo, 'dragleave', false);
           newGraph.setItemState(combo, 'dragenter', false);
-          if (dragOverComboId !== undefined && dragComboId !== undefined) {
-            const dragOverCombo = newGraph.findById(dragOverComboId);
-            // if all 3 comboIds are the same, user is dragging child combo out from parent combo.
-            if( (parentOfDragComboId === dragleaveComboId) && 
-                (dragleaveComboId === dragOverComboId)) {
-                const draggedCombo = newGraph.findById(dragComboId);
-                const removedCount = getAllNodesInCombo(draggedCombo).length;
-                allNodesInCombo = [];
-                dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId) - removedCount;   
-                if (dragOverCombo.getModel().label === 0) {
-                  newGraph.uncombo(dragOverComboId);
-                  dragOverComboId = undefined;
-                  dragComboId = dragComboId;//undefined;
-              } else {
-                newGraph.updateCombo(dragOverCombo);
-              } 
-            } else {
-              if (dragOverCombo !== undefined) {
-                dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
-              }
-            }
-            
-            combo.getModel().label = countChildrenInCombo(combo.getID());
-            allNodesInCombo = [];
-
-            newGraph.updateCombo(combo)
-          }
-          if (combo.getModel().label === 0) {
+          combo.getModel().label = countChildrenInCombo(combo.getID());
+          allNodesInCombo = [];
+          if (combo.getNodes().length === 0 && combo.getCombos().length === 0) {
             // combosToDelete.push(combo.getID());
-            newGraph.uncombo(combo.getID());
+            newGraph.uncombo(combo.getID())
+          } else {
+            newGraph.updateCombo(combo);
           }
         });
       });
