@@ -18,7 +18,7 @@ export function populateNodesEdges (jsonData) {
      const data = {
         nodes:[
          { id: 'node0', ...circle, /* img: imageURLs[0], */ comboId: 'combo1',  label: /* 'node0' */jsonData.computerName, date: jsonData.logsourceTime },
-         { id: 'node1', ...image, img: imageURLs[1], /* comboId: 'combo2',   */label: 'node1'/* jsonData.logonProcess */, date: jsonData.logsourceTime},
+         { id: 'node1', ...image, img: imageURLs[1], comboId: 'combo4',  label: 'node1'/* jsonData.logonProcess */, date: jsonData.logsourceTime},
          { id: 'node2', ...triangle, /* img: imageURLs[2], */ comboId: 'combo3',  label: /* 'node2' */jsonData.originatingComputer, date: 1636095550 },    
          { id: 'node3', ...image, img: imageURLs[3], /* comboId: 'combo4',   */label: 'node3'/* `vector` */, date: 1636095551 },  
          { id: 'node4', ...image, img: imageURLs[4], /* comboId: 'combo5',   */label: 'node4'/* `vector` */, date: 1636095552 },  
@@ -55,13 +55,13 @@ export function populateNodesEdges (jsonData) {
            ttp: true, 
            event: 'edge3',//`Event B`
         },
-        {  id: 'edge4',
-        source: 'node10', 
-        target: 'node9', 
-        frequency: '11',
-        ttp: true, 
-        event: 'edge4',//`Event B`
-        },
+        // {  id: 'edge4',
+        // source: 'node10', 
+        // target: 'node9', 
+        // frequency: '11',
+        // ttp: true, 
+        // event: 'edge4',//`Event B`
+        // },
         /* {  id: 'edge5',
         source: 'node9', 
         target: 'node10', 
@@ -83,13 +83,13 @@ export function populateNodesEdges (jsonData) {
         ttp: true, 
         event: 'edge7',//`Event B`
         }, */
-        {  id: 'edge8',
-        source: 'node7', 
-        target: 'node8', 
-        frequency: '21',
-        ttp: true, 
-        event: 'edge8',//`Event B`
-        },
+        // {  id: 'edge8',
+        // source: 'node7', 
+        // target: 'node8', 
+        // frequency: '21',
+        // ttp: true, 
+        // event: 'edge8',//`Event B`
+        // },
         /* {  id: 'edge9',
         source: 'node5', 
         target: 'node6', 
@@ -102,21 +102,22 @@ export function populateNodesEdges (jsonData) {
         {
           id: 'combo1',
           label: 1,
-          // parentId: '8'
+          parentId: 'combo2'
         },
-        // {
-        //   id: 'combo2',
-            //  label: 1,
-        // },
+        {
+          id: 'combo2',
+          label: 1,
+          parentId: 'combo3'
+        },
         {
           id: 'combo3',
           label: 1,
         //   // parentId: '8'
         },
-        // {
-        //   id: 'combo4',
-            //  label: 1
-        // },
+        {
+          id: 'combo4',
+             label: 1
+        },
         // {
         //   id: 'combo5',
             //  label: 1,

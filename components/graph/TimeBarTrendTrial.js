@@ -8,8 +8,9 @@ let log = console.log;
 let nodeA = "";
 let nodeB = "";
 let nodeDrag = false;
-let allNodesInCombo = [];
 let comboDrag = false;
+let recipientComboId = [];
+let allNodesInCombo = [];
 let dragCombo;
 let dragleaveComboId;
 
@@ -431,9 +432,7 @@ const TimeBarTrendTrial
           if (nodeA !== "" && nodeB !== nodeA ) { 
             
             const comboCount = newGraph.getCombos().length;
-            log(newGraph.getCombos());
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
-            log('last =', last);
             const newComboId = `combo${parseInt(last) + 1}`
             newGraph.createCombo({
               id: newComboId, 
@@ -462,6 +461,8 @@ const TimeBarTrendTrial
             e.item._cfg.model.label = currentNodeCount;
           } else {
             if (nodeDrag === true) {
+              // addition of node Count
+              log('NODE ADDED!')
               const combo = newGraph.findById(comboIdOfNode);
               combo.getModel().label = currentNodeCount;
               newGraph.updateCombo(combo);
@@ -477,7 +478,7 @@ const TimeBarTrendTrial
       
 
       newGraph.on(`combo:drag`,(e) => {
-
+        comboDrag = true; 
         dragCombo = e.item;
         // prevents dotted red border from showing when dragging combo
         newGraph.setItemState(e.item, 'dragleave', false);
@@ -489,13 +490,14 @@ const TimeBarTrendTrial
       });
 
       newGraph.on('combo:dragend', (e) => {
-        comboDrag = false;
         newGraph.getCombos().forEach((combo) =>{
           newGraph.setItemState(combo, 'dragenter', false);
         });
       });
 
       newGraph.on('combo:drop', (e) => {
+        recipientComboId.push(e.item.getID());
+        log('combo:drop e.item = ', e.item.getID());
         newGraph.setItemState(e.item, 'dragenter', false);
       });
 
@@ -507,6 +509,7 @@ const TimeBarTrendTrial
         const oldNodesCount = countChildrenInCombo(dragleaveComboId);
       
         //log(`SUBTRACTING Node count on NodeDrag`);
+        log('NODE SUBTRACTED')
         if (nodeDrag === true) {
           e.item._cfg.model.label = oldNodesCount - 1;
           if (e.item._cfg.model.label === 0 || countChildrenInCombo(dragleaveComboId) === 0) {
@@ -518,19 +521,29 @@ const TimeBarTrendTrial
       newGraph.on('combo:mouseup', (e) => {
         /*  COMBO SUBTRACTION */
         let allParents;
-        if (dragCombo) {
+        log(`${e.item.getID()}: mouseup, parent: ${e.item.getModel().parentId}`);
+        log(`dragCombo: ${dragCombo.getID()}  mouseup:${e.item.getID()}`);
+        if (comboDrag) { // problem with this check;
           allParents = getAllParents(dragCombo, newGraph);
-          const removedCount = countChildrenInCombo(dragCombo.getID())
+          const difference = countChildrenInCombo(dragCombo.getID())
           allParents.forEach((parent) => {
             newGraph.setItemState(parent, 'dragleave', false);
             newGraph.setItemState(parent, 'dragenter', false);
-            parent.getModel().label = countChildrenInCombo(parent.getID()) - removedCount;
+            if(recipientComboId[0] === parent.getID()) {
+              log('COMBO ADDED');
+              parent.getModel().label = countChildrenInCombo(parent.getID());
+            } else {
+              log('COMBO SUBTRACTED');
+              parent.getModel().label = countChildrenInCombo(parent.getID()) - difference;
+            }
             if(parent.getModel().label > 0) {
               newGraph.updateCombo(parent);
             } else {
               newGraph.uncombo(parent);
             }
           });
+
+          comboDrag = false;
         }
       });
 
