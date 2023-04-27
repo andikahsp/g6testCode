@@ -369,8 +369,8 @@ const TimeBarTrendTrial
         },
         nodeStateStyles: {
           hover: {
-            stroke: 'red',
-            lineWidth: 3
+            stroke: 'orange',
+            lineWidth: 4.5
           }
         },
         edgeStateStyles: { // <========== doesnt work anymore with custom edges
@@ -378,7 +378,7 @@ const TimeBarTrendTrial
             stroke: 'blue',
             lineWidth: 3
           }
-        }
+        },
       });
       // load graph data
       newGraph.data(nodeEdgeData);
@@ -528,7 +528,7 @@ const TimeBarTrendTrial
           // log('dragOverComboId =', dragOverComboId);
           const dragOverCombo = newGraph.findById(dragOverComboId);
           
-          if (dragOverComboId !== undefined) {
+          if (dragOverComboId !== undefined && dragComboId !== undefined) {
             if( (parentOfDragComboId === dragleaveComboId) && 
                 (dragleaveComboId === dragOverComboId)) {
                 const draggedCombo = newGraph.findById(dragComboId);
@@ -538,12 +538,20 @@ const TimeBarTrendTrial
             } else {
                 dragOverCombo.getModel().label = countChildrenInCombo(dragOverComboId);
             }
-            if (dragOverCombo.getModel().label === 0) {
-                newGraph.uncombo(dragOverComboId);
-                dragOverComboId = undefined;
+            // if (dragOverCombo.getModel().label === 0) {
+            //     newGraph.uncombo(dragOverComboId);
+            //     dragOverComboId = undefined;
+            //     dragComboId = undefined;
+            // } else {
+            //   newGraph.updateCombo(dragOverCombo);
+            // }
+            if(countChildrenInCombo(combo.getID()) === 0){
+              newGraph.uncombo(combo.getID());
             } else {
-              newGraph.updateCombo(dragOverCombo);
+              newGraph.updateCombo(combo)
             }
+
+
           }
         });
       });
@@ -567,9 +575,8 @@ const TimeBarTrendTrial
  
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed === true) {
-        const neighbors = combo.getNeighbors();
-
         let ttpCheck = false;
+        const neighbors = combo.getNeighbors();
         for (let i = 0; i < neighbors.length; i ++) {
           if (neighbors[i].getType() === "node"){
             const edgesOfNeighbor = neighbors[i].getEdges();
