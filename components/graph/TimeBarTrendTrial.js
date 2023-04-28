@@ -12,7 +12,7 @@ let comboDrag = false;
 let recipientCombo;
 let dragCombo;
 let dragleaveCombo;
-
+let draggedOverCombos = [];
 
 
 const TimeBarTrendTrial
@@ -485,6 +485,9 @@ const TimeBarTrendTrial
 
       
       newGraph.on('combo:dragover', (e) => {
+        if(!(draggedOverCombos.includes(e.item)) && !nodeDrag){
+          draggedOverCombos.push(e.item);
+        }
         newGraph.setItemState(e.item, 'dragenter', true);
       });
 
@@ -500,11 +503,12 @@ const TimeBarTrendTrial
         newGraph.updateCombo(e.item);
         newGraph.setItemState(e.item, 'dragenter', false);
 
-        if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
+        if(dragleaveCombo !== undefined && 
+          dragleaveCombo._cfg !== null) {
           // log('combo:drop e.item = ', e.item.getID());
           // log('dragged out from:', dragleaveCombo.getID());
           // log('draggedCombo parent:', dragCombo.getModel().parentId);
-          log('COMBO SUBTRACTED -BETWEEN NESTING ');
+          log('COMBO UPDATED -BETWEEN NESTING ');
           dragleaveCombo.getModel().label = countChildrenInCombo(dragleaveCombo);
           newGraph.updateCombo(dragleaveCombo);
           newGraph.setItemState(dragleaveCombo, 'dragenter', false);
@@ -534,18 +538,28 @@ const TimeBarTrendTrial
       });
 
       newGraph.on('combo:mouseup', (e) => {
-        /*  COMBO SUBTRACTION */
+        
+        log('draggedOverCombos =', draggedOverCombos);
         let allParents;
-        log(`${e.item.getID()}: mouseup, parent: ${e.item.getModel().parentId}`);
-        log(`dragCombo: ${dragCombo.getID()}  mouseup:${e.item.getID()}`);
-        if (comboDrag) { // problem with this check;
+        // log(`${e.item.getID()}: mouseup, parent: ${e.item.getModel().parentId}`);
+        // log(`dragCombo: ${dragCombo.getID()}  mouseup:${e.item.getID()}`);
+        if (comboDrag && recipientCombo === undefined && draggedOverCombos.length > 0) { // problem with this check;
+          
+          // draggedOverCombos.forEach((combo) => {
+          //   combo.getModel().label = countChildrenInCombo(combo) - countChildrenInCombo(dragCombo);
+          //   newGraph.updateCombo(combo);
+          //   newGraph.setItemState(combo, 'dragleave', false);
+          //   newGraph.setItemState(combo, 'dragenter', false);
+          // });
+
+          // draggedOverCombos = [];
+
           allParents = getAllParents(dragCombo, newGraph);
           allParents.forEach((parent) => {
             newGraph.setItemState(parent, 'dragleave', false);
             newGraph.setItemState(parent, 'dragenter', false);
             if(recipientCombo !== undefined && recipientCombo._cfg !== null && recipientCombo.getID() === parent.getID()) {
               log('COMBO ADDED');
-              log(allParents);
               parent.getModel().label = countChildrenInCombo(parent);
             } 
             if(dragCombo.getModel().parentId === dragleaveCombo.getID()) {
@@ -561,7 +575,10 @@ const TimeBarTrendTrial
               newGraph.setItemState(dragleaveCombo, 'dragleave', false);
             }
             parent.getModel().label = countChildrenInCombo(parent); //<==== FIX for direct drop across nested combos
+            newGraph.setItemState(parent, 'dragleave', false);
+            newGraph.setItemState(parent, 'dragleave', false);
             newGraph.updateCombo(parent);
+            
             dragleaveCombo.getModel().label = countChildrenInCombo(dragleaveCombo);
             newGraph.updateCombo(dragleaveCombo);
           });
@@ -772,7 +789,6 @@ const TimeBarTrendTrial
       function getAllParents (childCombo, graph) {
         let arr = []
         grabParents(childCombo, arr, graph);
-        log('at FN, arr =', arr);
         return arr;
       }
       
