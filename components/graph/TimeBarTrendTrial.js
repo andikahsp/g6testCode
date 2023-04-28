@@ -771,20 +771,21 @@ const TimeBarTrendTrial
 
       function getAllParents (childCombo, graph) {
         let arr = []
-        function grabParents (combo) {
-          if (combo.getModel().parentId === undefined) {
-            return 
-          } else {
-            const parentID = combo.getModel().parentId
-            const parentCombo = graph.findById(parentID);
-            arr.push(parentCombo);
-            grabParents(parentCombo);
-          }
-        }
-        grabParents(childCombo);
+        grabParents(childCombo, arr, graph);
+        log('at FN, arr =', arr);
         return arr;
       }
-
+      
+      function grabParents (combo, array, graph) {
+        if (combo.getModel().parentId === undefined) {
+          return 
+        } else {
+          const parentID = combo.getModel().parentId
+          const parentCombo = graph.findById(parentID);
+          array.push(parentCombo);
+          grabParents(parentCombo, array, graph);
+        }
+      }
 
       function checkTTP(node, combo) {
         const nEdges = node.getEdges();
