@@ -9,7 +9,7 @@ let nodeA = "";
 let nodeB = "";
 let nodeDrag = false;
 let comboDrag = false;
-let recipientComboId = [];
+let recipientCombo;
 let allNodesInCombo = [];
 let dragCombo;
 let dragleaveComboId;
@@ -496,9 +496,14 @@ const TimeBarTrendTrial
       });
 
       newGraph.on('combo:drop', (e) => {
-        recipientComboId.push(e.item.getID());
+        recipientCombo = e.item;
         log('combo:drop e.item = ', e.item.getID());
+        
+        e.item.getModel().label = countChildrenInCombo(e.item.getID());
+        newGraph.updateCombo(e.item);
+
         newGraph.setItemState(e.item, 'dragenter', false);
+        
       });
 
 
@@ -525,22 +530,25 @@ const TimeBarTrendTrial
         log(`dragCombo: ${dragCombo.getID()}  mouseup:${e.item.getID()}`);
         if (comboDrag) { // problem with this check;
           allParents = getAllParents(dragCombo, newGraph);
-          const difference = countChildrenInCombo(dragCombo.getID())
           allParents.forEach((parent) => {
             newGraph.setItemState(parent, 'dragleave', false);
             newGraph.setItemState(parent, 'dragenter', false);
-            if(recipientComboId[0] === parent.getID()) {
+            if(recipientCombo.getID() === parent.getID()) {
               log('COMBO ADDED');
               parent.getModel().label = countChildrenInCombo(parent.getID());
-            } else {
+            } 
+            if(dragCombo.getModel().parentId === dragleaveComboId) {
               log('COMBO SUBTRACTED');
-              parent.getModel().label = countChildrenInCombo(parent.getID()) - difference;
+              const removedCount = countChildrenInCombo(dragCombo.getID())
+              parent.getModel().label = countChildrenInCombo(parent.getID()) - removedCount;
             }
-            if(parent.getModel().label > 0) {
-              newGraph.updateCombo(parent);
-            } else {
+            if(parent.getModel().label < 1) {
               newGraph.uncombo(parent);
-            }
+            } 
+            // if(parent) {
+              newGraph.setItemState(newGraph.findById(dragleaveComboId), 'dragleave', false);
+              newGraph.updateCombo(parent);
+            // }           
           });
 
           comboDrag = false;
