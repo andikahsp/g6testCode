@@ -521,6 +521,29 @@ const TimeBarTrendTrial
         
       }); */
 
+      newGraph.on('combo:drop', (e) => { 
+        // -> get largest parent?
+         const allParents = getAllParents(e.item, newGraph)
+         //what about the recipient combo drop- who is also a parent?
+         log('allParents =', allParents);
+         const allNodes = getAllNodesInCombo(e.item);
+         const allComboIds = []
+         allNodes.forEach((node)=>{
+          if(!(allComboIds.includes(node.getModel().comboId))){
+            allComboIds.push(node.getModel().comboId)
+          }
+          //handles chained updating for dragging within a grand parent.
+          allComboIds.forEach((comboId) => {
+            const combo = newGraph.findById(comboId);
+            combo.getModel().label = countChildrenInCombo(combo);
+            newGraph.setItemState(combo, 'dragenter', false);
+            newGraph.setItemState(combo, 'dragleave', false);
+            
+            newGraph.updateCombo(combo);
+          })
+         });
+      });
+
 
       newGraph.on('combo:dragleave', (e) => {
         dragleaveCombo = e.item;
@@ -539,56 +562,56 @@ const TimeBarTrendTrial
       });
 
       newGraph.on('combo:mouseup', (e) => {
-        log(`dragleaveCombo: ${dragleaveCombo.getID()} `)
+        // log(`dragleaveCombo: ${dragleaveCombo.getID()} `)
         
-        //log('draggedOverCombos =', draggedOverCombos);
-        let allParents;
-        // log(`${e.item.getID()}: mouseup, parent: ${e.item.getModel().parentId}`);
-        // log(`dragCombo: ${dragCombo.getID()}  mouseup:${e.item.getID()}`);
-        if (comboDrag && recipientCombo === undefined && draggedOverCombos.length > 0) { // problem with this check;
+        // //log('draggedOverCombos =', draggedOverCombos);
+        // let allParents;
+        // // log(`${e.item.getID()}: mouseup, parent: ${e.item.getModel().parentId}`);
+        // // log(`dragCombo: ${dragCombo.getID()}  mouseup:${e.item.getID()}`);
+        // if (comboDrag /* && recipientCombo === undefined */ && draggedOverCombos.length > 0) { // problem with this check;
           
-          // draggedOverCombos.forEach((combo) => {
-          //   combo.getModel().label = countChildrenInCombo(combo) - countChildrenInCombo(dragCombo);
-          //   newGraph.updateCombo(combo);
-          //   newGraph.setItemState(combo, 'dragleave', false);
-          //   newGraph.setItemState(combo, 'dragenter', false);
-          // });
+        //   // draggedOverCombos.forEach((combo) => {
+        //   //   combo.getModel().label = countChildrenInCombo(combo) - countChildrenInCombo(dragCombo);
+        //   //   newGraph.updateCombo(combo);
+        //   //   newGraph.setItemState(combo, 'dragleave', false);
+        //   //   newGraph.setItemState(combo, 'dragenter', false);
+        //   // });
 
-          // draggedOverCombos = [];
+        //   // draggedOverCombos = [];
 
-          allParents = getAllParents(dragCombo, newGraph);
-          allParents.forEach((parent) => {
-            log('parent = ', parent.getID());
-            newGraph.setItemState(parent, 'dragleave', false);
-            newGraph.setItemState(parent, 'dragenter', false);
-            if(recipientCombo !== undefined && recipientCombo._cfg !== null && recipientCombo.getID() === parent.getID()) {
-              parent.getModel().label = countChildrenInCombo(parent);
-              log('COMBO ADDED');
-            } 
-            if(dragCombo.getModel().parentId === dragleaveCombo.getID()) {
+        //   allParents = getAllParents(dragCombo, newGraph);
+        //   allParents.forEach((parent) => {
+        //     log('parent = ', parent.getID());
+        //     // newGraph.setItemState(parent, 'dragleave', false);
+        //     // newGraph.setItemState(parent, 'dragenter', false);
+        //     if(recipientCombo !== undefined && recipientCombo._cfg !== null && recipientCombo.getID() === parent.getID()) {
+        //       parent.getModel().label = countChildrenInCombo(parent);
+        //       log('COMBO ADDED');
+        //     } 
+        //     if(dragCombo.getModel().parentId === dragleaveCombo.getID()) {
               
-              const removedCount = countChildrenInCombo(dragCombo)
-              parent.getModel().label = countChildrenInCombo(parent) - removedCount;
-              log('COMBO SUBTRACTED - TO GRAPH SPACE');
-            }
-            if(parent.getModel().label < 1) {
-              newGraph.uncombo(parent);
-              return;
-            } 
-            if(dragleaveCombo !== undefined) {
-              newGraph.setItemState(dragleaveCombo, 'dragleave', false);
-            }
-            parent.getModel().label = countChildrenInCombo(parent); //<==== FIX for direct drop across nested combos
-            newGraph.setItemState(parent, 'dragleave', false);
-            newGraph.setItemState(parent, 'dragleave', false);
-            newGraph.updateCombo(parent);
-            log('combo Updated')
-            dragleaveCombo.getModel().label = countChildrenInCombo(dragleaveCombo);
-            newGraph.updateCombo(dragleaveCombo);
-            log('combo updated 2');
-          });
+        //       const removedCount = countChildrenInCombo(dragCombo)
+        //       parent.getModel().label = countChildrenInCombo(parent) - removedCount;
+        //       log('COMBO SUBTRACTED - TO GRAPH SPACE');
+        //     }
+        //     if(parent.getModel().label < 1) {
+        //       newGraph.uncombo(parent);
+        //       return;
+        //     } 
+        //     if(dragleaveCombo !== undefined) {
+        //       newGraph.setItemState(dragleaveCombo, 'dragleave', false);
+        //     }
+        //     parent.getModel().label = countChildrenInCombo(parent); //<==== FIX for direct drop across nested combos
+        //     newGraph.setItemState(parent, 'dragleave', false);
+        //     newGraph.setItemState(parent, 'dragleave', false);
+        //     newGraph.updateCombo(parent);
+        //     log('combo Updated')
+        //     dragleaveCombo.getModel().label = countChildrenInCombo(dragleaveCombo);
+        //     newGraph.updateCombo(dragleaveCombo);
+        //     log('combo updated 2');
+        //   });
 
-        }
+        // }
         comboDrag = false;
       });
 
