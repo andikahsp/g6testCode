@@ -12,6 +12,7 @@ let comboDrop = false;
 let dragCombo;
 let dragleaveCombo;
 let draggedOverCombos = [];
+let draggedNode;
 
 
 
@@ -404,6 +405,7 @@ const TimeBarTrendTrial
       })
 
       newGraph.on('node:drag', (e) => {
+        draggedNode = e.item;
         // we need this check when dragging nodes in or out of combo 
         // to differentiate when combo is moved (dragged)
         nodeDrag = true; 
@@ -460,12 +462,12 @@ const TimeBarTrendTrial
           if (e.item._cfg.model.label === "") {
             e.item._cfg.model.label = currentNodeCount;
           } else {
-            if (nodeDrag === true) {
+            /* if (nodeDrag === true) {
               // addition of node Count
               log('NODE ADDED!')
               combo.getModel().label = currentNodeCount;
               newGraph.updateCombo(combo);
-              } 
+              }  */
           }
         }
         const updatedCombos = newGraph.getCombos();
@@ -484,7 +486,7 @@ const TimeBarTrendTrial
 
       
       newGraph.on('combo:dragover', (e) => {
-        if(e.item._cfg !== null && dragCombo._cfg !== null) {
+        if(e.item._cfg !== null /* && dragCombo._cfg !== null */) {
           if(!(draggedOverCombos.includes(e.item)) && !nodeDrag && e.item.getID() !== dragCombo.getID()){
               draggedOverCombos.push(e.item);
           }
@@ -501,7 +503,7 @@ const TimeBarTrendTrial
 
       newGraph.on('combo:drop', (e) => { 
         comboDrop = true; 
-
+        log('draggedover combos', draggedOverCombos)
         if(!nodeDrag /* && e.item.getModel().parentId !== undefined */){
         // GET OUTERMOST COUNTER DETAILS!
          let outerMostCombo = e.item; 
@@ -509,13 +511,12 @@ const TimeBarTrendTrial
            const allParents = getAllParents(e.item, newGraph)
            outerMostCombo = allParents[allParents.length - 1];          
          }
-
          // we want to update only the combos which have been dragged over, 
          // including the recipient combo and the outermost combo affected
          const allCombos = getAllCombosInCombo(outerMostCombo).concat(outerMostCombo);
-
          allCombos.forEach((combo) => {
           combo.getModel().label = countNodesInCombo(combo);
+          //REQUIRED when deleting combos from multiple nested layers.
           if(combo.getModel().label < 1) {
             newGraph.uncombo(combo.getID());
           } else {
@@ -524,21 +525,71 @@ const TimeBarTrendTrial
             newGraph.updateCombo(combo);
           }
          })
-       } 
+       } else {
+        log('node dropped into combo')
+   
+        let combosToUpdate = [];
+        e.item.getModel().label = countNodesInCombo(e.item);
+        
+        // for updating all recipient combo nodecounts and for the parents, grandparents' nodeCount
+        if(e.item.getModel().parentId !== undefined) {
+          const comboParents = getAllParents(e.item, newGraph);
+          combosToUpdate = combosToUpdate.concat(comboParents);
+
+        // for updating nodeCount when moving node across 2 sibling combos in the same parent
+          const parent = newGraph.findById(e.item.getModel().parentId);
+          if(parent.getCombos().length > 1){
+            const children = parent.getCombos();
+            const siblings = children.filter(child =>child.getID() !== e.item.getID());
+            log('siblings = ', siblings);
+            siblings.forEach((sibling) => {
+              combosToUpdate.push(sibling);
+            })
+          }
+        } 
+
+        // for updating all the sibling combos of the recipients 
+        //(? when node is drag out of a child combo, into a parent combo?)
+        if(e.item.getCombos() !== undefined) {
+          const childCombos = e.item.getCombos();
+          let allCCombos = [];
+          childCombos.forEach((cCombo)=>{
+            let cComboFamily = getAllCombosInCombo(cCombo, newGraph);
+            cComboFamily.push(cCombo);
+            allCCombos = allCCombos.concat(cComboFamily);
+          });
+          log('allCCombos', allCCombos);
+          combosToUpdate = combosToUpdate.concat(allCCombos);
+        }
+
+
+        log('dragleaveCombo =', dragleaveCombo.getID());
+
+        combosToUpdate.push(e.item);
+
+        const updatedCombosDisplay = []
+        combosToUpdate.forEach((combo) => {
+          updatedCombosDisplay.push(combo.getID())
+          combo.getModel().label = countNodesInCombo(combo);
+          newGraph.setItemState(combo, 'dragleave', false);
+          newGraph.setItemState(combo, 'dragenter', false);
+          newGraph.updateCombo(combo);
+        })
+        log('updated combos =', updatedCombosDisplay);
+       }
       });
 
-   
-
-
+//  1. update number when  dragging node out of nested combo into other combos in nesting (SOLVED)
+// 2. update number when dragging node out of combo assembly.
       newGraph.on('combo:dragleave', (e) => {
         dragleaveCombo = e.item;
         newGraph.setItemState(e.item, 'dragleave', true);
         const oldNodesCount = countNodesInCombo(e.item);
       
         //log(`SUBTRACTING Node count on NodeDrag`);
-        //log('NODE SUBTRACTED')
         if (nodeDrag === true) {
-          e.item._cfg.model.label = oldNodesCount - 1;
+          log('glock')
+          //e.item._cfg.model.label = oldNodesCount - 1;
           if (e.item._cfg.model.label === 0 || (countNodesInCombo(e.item) === 0 && e.item.getNodes() === 0)) {
             newGraph.uncombo(e.item.getID());
           }
@@ -551,12 +602,8 @@ const TimeBarTrendTrial
         
        
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined){
-          //const draggedOverDisplay = [];
-          //draggedOverCombos.forEach((underCombo) => {draggedOverDisplay.push(underCombo.getID())});
-          //log('draggedOverDisplay =', draggedOverDisplay)
-          //log('dragleave comboId =', dragleaveCombo.getID());
-          
-          // for subtracting count from outermost combo
+        
+          // for SUBTRACTING count from outermost combo
           if(!comboDrop && !nodeDrag && dragleaveCombo.getID() !== dragCombo.getID()) {
             const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
             otherCombos.forEach((combo, i) => {
@@ -570,7 +617,7 @@ const TimeBarTrendTrial
                 newGraph.setItemState(combo, 'dragenter', false);
                 newGraph.updateCombo(combo);
               }
-              //log('MINUS')
+
             });
           };
         }
@@ -851,8 +898,8 @@ const TimeBarTrendTrial
         grabAllCombos(outerMostCombo, arr);
         return arr; 
       }
+
       function grabAllCombos(combo, array) {
-        
         let cCombos = combo.getCombos();
         if(cCombos === []){
           array.push(combo)
