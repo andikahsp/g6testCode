@@ -563,11 +563,14 @@ const TimeBarTrendTrial
               draggedOverCombos.push(e.item);
             }
           }
-        }/* if(nodeDrag && dragCombo === undefined) */ else {
+        }/* if(nodeDrag && dragCombo === undefined) */ 
+        //else {
           // for updating node count of combos on node drag
-          draggedOverCombos.push(e.item);
-          log('node dragged over combo')
-        }
+          if (!(draggedOverCombos.includes(e.item))) {
+            draggedOverCombos.push(e.item);
+            log('node dragged over combo')
+          }
+        //}
         newGraph.setItemState(e.item, 'dragenter', true);
       });
 
@@ -644,11 +647,19 @@ const TimeBarTrendTrial
         //log('dragleaveCombo =', dragleaveCombo.getID());
         combosToUpdate.push(e.item);
 
-        const draggedOverCombosDisplay = []
-        draggedOverCombos.forEach((combo) => {
-          draggedOverCombosDisplay.push(combo.getID());
-        });
-        log('node dragged over:', draggedOverCombosDisplay);
+
+
+        if(draggedOverCombos.length > 0) {
+          const draggedOverCombosDisplay = []
+          draggedOverCombos.forEach((combo) => {
+            if (combo._cfg !== null) {
+              draggedOverCombosDisplay.push(combo.getID());
+              // add code HERE!
+              // draggedOver Combos now fixed!
+            }
+          });
+          log('node dragged over these combos:', draggedOverCombosDisplay);
+        }
 
 
 
