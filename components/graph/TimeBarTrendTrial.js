@@ -12,6 +12,8 @@ let comboDrop = false;
 let dragCombo;
 let dragleaveCombo;
 let draggedOverCombos = [];
+let comboDraggedOver; 
+
 let draggedNode;
 
 
@@ -401,6 +403,22 @@ const TimeBarTrendTrial
       })
 
       newGraph.on('node:mouseup', (e) => {
+        if (comboDraggedOver !== undefined && e.item.getModel().comboId === undefined) {
+          if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
+            log('draggedover combos on node mouseup', draggedOverCombos)
+            log('node mouseup- dragleaveCombo',dragleaveCombo.getID());
+            // check the dragovercombos array!
+            const combosToUpdate = getAllCombosInCombo(dragleaveCombo).concat(dragleaveCombo);
+            combosToUpdate.forEach((combo) => {
+              combo.getModel().label = countNodesInCombo(combo)
+              if(combo.getModel().label < 1) {
+                newGraph.uncombo(combo.getID());  
+              } else {
+                newGraph.updateCombo(combo);
+              }
+            });
+          }
+        }
         newGraph.setItemState(e.item, 'hover', false)
       })
 
@@ -461,13 +479,16 @@ const TimeBarTrendTrial
           const currentNodeCount = countNodesInCombo(combo);
           if (e.item._cfg.model.label === "") {
             e.item._cfg.model.label = currentNodeCount;
-          } else {
+          } 
+          else {
             if (nodeDrag === true) {
               //for updating the subtraction of node count from outermost combo
               // see combo drag leave
-              if (dragleaveCombo._cfg !== null) {
+              if (dragleaveCombo._cfg !== null && dragleaveCombo !== undefined) {
                 newGraph.updateCombo(dragleaveCombo);
-              } else {
+              } 
+
+              else {
                 newGraph.updateCombo(combo);
               }
             } 
@@ -490,7 +511,8 @@ const TimeBarTrendTrial
 
       
       newGraph.on('combo:dragover', (e) => {
-        if(e.item._cfg !== null && dragCombo._cfg !== null) {
+        comboDraggedOver = e.item;
+        if(e.item._cfg !== null && dragCombo._cfg !== null && dragCombo !== undefined) {
           if(!(draggedOverCombos.includes(e.item)) && !nodeDrag && e.item.getID() !== dragCombo.getID()){
               draggedOverCombos.push(e.item);
           }
@@ -507,7 +529,6 @@ const TimeBarTrendTrial
 
       newGraph.on('combo:drop', (e) => { 
         comboDrop = true; 
-        log('draggedover combos', draggedOverCombos)
         if(!nodeDrag /* && e.item.getModel().parentId !== undefined */){
         // GET OUTERMOST COUNTER DETAILS!
          let outerMostCombo = e.item; 
@@ -593,22 +614,21 @@ const TimeBarTrendTrial
       newGraph.on('combo:dragleave', (e) => {
         log('dragleave');
         dragleaveCombo = e.item;
-        
         newGraph.setItemState(e.item, 'dragleave', true);
       
         //log(`SUBTRACTING Node count on NodeDrag`);
-        if (nodeDrag === true) {
-          log('glock')
-          // for subtraction of count on outermost combo
-          if (e.item.getModel().parentId === undefined ) {
+        // if (nodeDrag === true) {
+        //   log('glock')
+        //   // for subtraction of count on outermost combo
+        //   if (e.item.getModel().parentId === undefined ) {
 
-            e.item.getModel().label = countNodesInCombo(e.item) - 1;
-          }
-          //e.item._cfg.model.label = oldNodesCount - 1;
-          if (e.item._cfg.model.label === 0 || (countNodesInCombo(e.item) === 0 && e.item.getNodes() === 0)) {
-            newGraph.uncombo(e.item.getID());
-          } 
-        }
+        //     e.item.getModel().label = countNodesInCombo(e.item) - 1;
+        //   }
+        //   //e.item._cfg.model.label = oldNodesCount - 1;
+        //   if (e.item._cfg.model.label === 0 || (countNodesInCombo(e.item) === 0 && e.item.getNodes() === 0)) {
+        //     newGraph.uncombo(e.item.getID());
+        //   } 
+        // }
       });
 
       newGraph.on('combo:mouseup', (e) => {
@@ -618,7 +638,7 @@ const TimeBarTrendTrial
        
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo._cfg !== null){ 
           // for SUBTRACTING count from outermost combo
-          if(!comboDrop && !nodeDrag && dragleaveCombo.getID() !== dragCombo.getID()) {
+          if(!comboDrop/*  && !nodeDrag  */&& dragleaveCombo.getID() !== dragCombo.getID()) {
             const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
             otherCombos.forEach((combo, i) => {
               combo.getModel().label = countNodesInCombo(combo) - countNodesInCombo(dragCombo);
