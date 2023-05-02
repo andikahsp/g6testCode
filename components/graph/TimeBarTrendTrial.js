@@ -279,7 +279,7 @@ const TimeBarTrendTrial
             style: {
               fill: '#000000A6',
               fontFamily: 'Arial',
-              fontSize: 11
+              fontSize: 11,
             }
           },
         },
@@ -304,21 +304,7 @@ const TimeBarTrendTrial
             }
           },
         },
-        comboStateStyles: {
-          dragenter: {
-            lineWidth: 4,
-            stroke: '#FF5349',
-          },
-          dragleave: {
-            lineWidth: 4,
-            stroke: '#FF5349',
-            lineDash: [6, 18]
-          },
-          mouseenter: {
-            lineWidth: 5,
-            stroke: '#39FF14',
-          }
-        },
+
         defaultEdge: {
           type: 'fund-polyline',
           style: {
@@ -386,6 +372,21 @@ const TimeBarTrendTrial
             lineWidth: 3
           }
         },
+        comboStateStyles: {
+          dragenter: {
+            lineWidth: 4,
+            stroke: '#FF5349',
+          },
+          dragleave: {
+            lineWidth: 4,
+            stroke: '#FF5349',
+            lineDash: [6, 18]
+          },
+          mouseenter: {
+            lineWidth: 6,
+            stroke: 'black',
+          }
+        },
       });
       // load graph data
       newGraph.data(nodeEdgeData);
@@ -399,13 +400,48 @@ const TimeBarTrendTrial
 
 
       newGraph.on('node:mouseenter', (e) => {
-        //log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
+        //turn on node highlight
+        newGraph.updateItem(e.item, {
+          labelCfg:{
+            style:{
+              fontFamily: 'Arial',
+              fontWeight: 'bold',
+              fontSize: 13,
+              fill:'white',
+              background:{
+                fill: 'gray',
+                padding: [5, 6, 5, 6], // [top, right, bottom, left]
+                stroke: 'black',
+                radius: 8,
+                lineWidth: 2.5,
+              }
+            }
+          }
+        });
         nodeA = e.item._cfg.id;
       })
 
       newGraph.on('node:mouseleave', (e) => {
         newGraph.setItemState(e.item, 'hover', false)
+        // turn off node highlight
+        newGraph.updateItem(e.item, {
+          labelCfg:{
+            style:{
+              fontFamily: 'Arial',
+              fontWeight: 'normal',
+              fontSize: 11, 
+              fill:'black',
+              background:{
+                fill: 'transparent',
+                padding:  [0, 0, 0, 0], // [top, right, bottom, left]
+                stroke: 'transparent',
+                lineWidth: 0,
+                radius: 0,
+              }
+            }
+          }
+        });
       })
 
       newGraph.on('node:mouseup', (e) => {
