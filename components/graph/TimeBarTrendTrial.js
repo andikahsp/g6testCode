@@ -313,6 +313,10 @@ const TimeBarTrendTrial
             stroke: '#FF5349',
             lineDash: [6, 18]
           },
+          mouseenter: {
+            lineWidth: 5,
+            stroke: '#39FF14',
+          }
         },
         defaultEdge: {
           type: 'fund-polyline',
@@ -372,7 +376,7 @@ const TimeBarTrendTrial
         nodeStateStyles: {
           hover: {
             stroke: 'orange',
-            lineWidth: 4.5
+            lineWidth: 4.5,
           }
         },
         edgeStateStyles: { // <========== doesnt work anymore with custom edges
@@ -392,6 +396,7 @@ const TimeBarTrendTrial
 
       window.addEventListener("contextmenu", e => e.preventDefault());
 
+
       newGraph.on('node:mouseenter', (e) => {
         //log('node:mouseenter e =', e);
         newGraph.setItemState(e.item, 'hover', true)
@@ -405,8 +410,8 @@ const TimeBarTrendTrial
       newGraph.on('node:mouseup', (e) => {
         if (comboDraggedOver !== undefined && e.item.getModel().comboId === undefined) {
           if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
-            log('draggedover combos on node mouseup', draggedOverCombos)
-            log('node mouseup- dragleaveCombo',dragleaveCombo.getID());
+            // log('draggedover combos on node mouseup', draggedOverCombos)
+            // log('node mouseup- dragleaveCombo',dragleaveCombo.getID());
             // check the dragovercombos array!
             const combosToUpdate = getAllCombosInCombo(dragleaveCombo).concat(dragleaveCombo);
             combosToUpdate.forEach((combo) => {
@@ -551,7 +556,7 @@ const TimeBarTrendTrial
           }
          })
        } else {
-        log('node dropped into combo')
+        //log('node dropped into combo')
    
         let combosToUpdate = [];
         e.item.getModel().label = countNodesInCombo(e.item);
@@ -566,7 +571,7 @@ const TimeBarTrendTrial
           if(parent.getCombos().length > 1){
             const children = parent.getCombos();
             const siblings = children.filter(child =>child.getID() !== e.item.getID());
-            log('siblings = ', siblings);
+            //log('siblings = ', siblings);
             siblings.forEach((sibling) => {
               combosToUpdate.push(sibling);
             })
@@ -583,13 +588,11 @@ const TimeBarTrendTrial
             cComboFamily.push(cCombo);
             allCCombos = allCCombos.concat(cComboFamily);
           });
-          log('allCCombos', allCCombos);
+          //log('allCCombos', allCCombos);
           combosToUpdate = combosToUpdate.concat(allCCombos);
         }
 
-
         //log('dragleaveCombo =', dragleaveCombo.getID());
-
         combosToUpdate.push(e.item);
 
         const updatedCombosDisplay = []
@@ -604,7 +607,7 @@ const TimeBarTrendTrial
             newGraph.updateCombo(combo);
           }
         })
-        log('updated combos =', updatedCombosDisplay);
+        //log('updated combos =', updatedCombosDisplay);
        }
       });
 
@@ -612,7 +615,7 @@ const TimeBarTrendTrial
 //  1. update number when  dragging node out of nested combo into other combos in nesting (SOLVED)
 // 2. update number when dragging node out of combo assembly.
       newGraph.on('combo:dragleave', (e) => {
-        log('dragleave');
+        //log('dragleave');
         dragleaveCombo = e.item;
         newGraph.setItemState(e.item, 'dragleave', true);
       
@@ -631,11 +634,17 @@ const TimeBarTrendTrial
         // }
       });
 
+      newGraph.on('combo:mouseenter',(e) => {
+        newGraph.setItemState(e.item, 'mouseenter', true);
+      });
+      newGraph.on('combo:mouseleave',(e) => {
+        newGraph.setItemState(e.item, 'mouseenter', false);
+      });
+
+
       newGraph.on('combo:mouseup', (e) => {
 
-        //BUG: UNABLE TO DELETE COMBO WHEN CHILD COMBO PULLED OUT BECOMES NEIGHBOR AND PARENT IS EMPTY
-        
-       
+        //BUG: UNABLE TO DELETE COMBO WHEN CHILD COMBO PULLED OUT BECOMES NEIGHBOR AND PARENT IS EMPTY        
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo._cfg !== null){ 
           // for SUBTRACTING count from outermost combo
           if(!comboDrop/*  && !nodeDrag  */&& dragleaveCombo.getID() !== dragCombo.getID()) {
@@ -860,13 +869,21 @@ const TimeBarTrendTrial
         }
       }
 
-      function getAllParents (childCombo, graph) {
+      function getTextWidth(text) {
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let string = ctx.measureText(text);
+        console.log(string.width);
+        return Math.floor(string.width) + 4;
+      }
+
+      function getAllParents(childCombo, graph) {
         let arr = []
         grabParents(childCombo, arr, graph);
         return arr;
       }
       
-      function grabParents (combo, array, graph) {
+      function grabParents(combo, array, graph) {
         if (combo.getModel().parentId === undefined) {
           return 
         } else {
