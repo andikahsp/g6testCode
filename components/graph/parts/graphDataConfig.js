@@ -76,20 +76,20 @@ export function populateNodesEdges (jsonData) {
         ttp: true, 
         event: 'edge6',//`Event B`
         },
-        /* {  id: 'edge7',
+        {  id: 'edge7',
         source: 'node12', 
         target: 'node11', 
         frequency: '21',
         ttp: true, 
         event: 'edge7',//`Event B`
-        }, */
-        // {  id: 'edge8',
-        // source: 'node7', 
-        // target: 'node8', 
-        // frequency: '21',
-        // ttp: true, 
-        // event: 'edge8',//`Event B`
-        // },
+        },
+        {  id: 'edge8',
+        source: 'node7', 
+        target: 'node8', 
+        frequency: '21',
+        ttp: true, 
+        event: 'edge8',//`Event B`
+        },
         /* {  id: 'edge9',
         source: 'node5', 
         target: 'node6', 
