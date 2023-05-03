@@ -14,7 +14,6 @@ let dragleaveCombo;
 let draggedOverCombos = [];
 let comboDraggedOver; 
 
-
 const TimeBarTrendTrial
  = () => {
     const ref = React.useRef(null)
@@ -443,7 +442,6 @@ const TimeBarTrendTrial
           if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
             // log('draggedover combos on node mouseup', draggedOverCombos)
             // log('node mouseup- dragleaveCombo',dragleaveCombo.getID());
-            // check the dragovercombos array!
             const combosToUpdate = getAllCombosInCombo(dragleaveCombo).concat(dragleaveCombo);
             combosToUpdate.forEach((combo) => {
               combo.getModel().label = countNodesInCombo(combo)
@@ -459,7 +457,6 @@ const TimeBarTrendTrial
       })
 
       newGraph.on('node:drag', (e) => {
-        draggedNode = e.item;
         // we need this check when dragging nodes in or out of combo 
         // to differentiate when combo is moved (dragged)
         nodeDrag = true; 
@@ -498,15 +495,6 @@ const TimeBarTrendTrial
         }
       });
 
-      newGraph.on('edge:mouseenter', (e) => {
-        newGraph.setItemState(e.item, 'hover', true)
-        // log('EDGE =', e.item.getModel());
-      });
-  
-      newGraph.on('edge:mouseleave', (e) => {
-        newGraph.setItemState(e.item, 'hover', false)
-      });
-
       newGraph.on("node:mouseup", (e) => {
         if (e.item.getModel().comboId != undefined) {
           const comboIdOfNode = e.item.getModel().comboId;
@@ -530,7 +518,6 @@ const TimeBarTrendTrial
             } 
           }
         }
-
         const updatedCombos = newGraph.getCombos();
           updatedCombos.forEach((combo) => {
             newGraph.setItemState(combo, 'dragleave', false);
@@ -824,6 +811,17 @@ const TimeBarTrendTrial
           comboExpandTTP(e.item);
        } 
     });
+
+    
+    newGraph.on('edge:mouseenter', (e) => {
+      newGraph.setItemState(e.item, 'hover', true)
+      // log('EDGE =', e.item.getModel());
+    });
+
+    newGraph.on('edge:mouseleave', (e) => {
+      newGraph.setItemState(e.item, 'hover', false)
+    });
+
     
     
       function comboExpandTTP(combo) {
