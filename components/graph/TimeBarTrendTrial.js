@@ -14,9 +14,6 @@ let dragleaveCombo;
 let draggedOverCombos = [];
 let comboDraggedOver; 
 
-let draggedNode;
-
-
 
 const TimeBarTrendTrial
  = () => {
@@ -27,9 +24,6 @@ const TimeBarTrendTrial
     useEffect(() => {
       const G6 = require('@antv/g6');
 
-      //const G6 = require('../../G6-master/packages/pc/src/index')
-
-      
       //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData = populateNodesEdges(jsonData);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 32, 'quadratic-custom', 'fund-polyline', undefined);
@@ -563,14 +557,12 @@ const TimeBarTrendTrial
               draggedOverCombos.push(e.item);
             }
           }
-        }/* if(nodeDrag && dragCombo === undefined) */ 
-        //else {
-          // for updating node count of combos on node drag
-          if (!(draggedOverCombos.includes(e.item))) {
-            draggedOverCombos.push(e.item);
-            log('node dragged over combo')
-          }
-        //}
+        }
+        // for updating node count of combos on node drag
+        if (!(draggedOverCombos.includes(e.item))) {
+          draggedOverCombos.push(e.item);
+          log('node dragged over combo')
+        }
         newGraph.setItemState(e.item, 'dragenter', true);
       });
 
@@ -584,7 +576,7 @@ const TimeBarTrendTrial
       newGraph.on('combo:drop', (e) => { 
         comboDrop = true; 
         //for COMBO: DRAG
-        if(!nodeDrag /* && e.item.getModel().parentId !== undefined */){
+        if(!nodeDrag){
           log('combo dropped into combo')
         // GET OUTERMOST COUNTER DETAILS!
          let outerMostCombo = e.item; 
@@ -631,7 +623,7 @@ const TimeBarTrendTrial
         } 
 
         // for updating all the sibling combos of the recipients 
-        //(? when node is drag out of a child combo, into a parent combo?)
+        //( when node is drag out of a child combo, into a parent combo )
         if(e.item.getCombos() !== undefined) {
           const childCombos = e.item.getCombos();
           let allCCombos = [];
@@ -683,8 +675,6 @@ const TimeBarTrendTrial
       });
 
 
-//  1. update number when  dragging node out of nested combo into other combos in nesting (SOLVED)
-// 2. update number when dragging node out of combo assembly.(SOLVED)
       newGraph.on('combo:dragleave', (e) => {
         //log('dragleave');
         dragleaveCombo = e.item;
@@ -756,17 +746,13 @@ const TimeBarTrendTrial
 
       newGraph.on("combo:contextmenu", (e) => {
         const comboId = e.item.getID();
-        /* newGraph.expandCombo(comboId); */
         newGraph.uncombo(comboId);
         });
       
       newGraph.on("combo:click", (e) => {
-
       const combo = e.item;
-      //log('>>>>> SELECTED COMBO:',combo.getID());
       const comboModel = e.item.getModel()
-      //log('combo=', combo);
-      
+
       const selfNodes = getAllNodesInCombo(combo);
       //log('selfNodes =', selfNodes);
  
