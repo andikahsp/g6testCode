@@ -702,9 +702,10 @@ const TimeBarTrendTrial
 
       newGraph.on('combo:mouseup', (e) => {
         log('combo:mouseup')
-        //BUG: UNABLE TO DELETE COMBO WHEN CHILD COMBO PULLED OUT BECOMES NEIGHBOR AND PARENT IS EMPTY        
+       
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo._cfg !== null){ 
           // for SUBTRACTING count from outermost combo
+          // if condition has to work for BOTH COMBO & NODE dragging.
           if(!comboDrop/*  && !nodeDrag  */&& dragleaveCombo.getID() !== dragCombo.getID()) {
             const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
             otherCombos.forEach((combo, i) => {
