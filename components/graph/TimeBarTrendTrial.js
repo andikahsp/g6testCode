@@ -374,8 +374,8 @@ const TimeBarTrendTrial
         },
         comboStateStyles: {
           dragenter: {
-            lineWidth: 4,
-            stroke: '#FF5349',
+            lineWidth: 6,
+            stroke: '#00E100',
           },
           dragleave: {
             lineWidth: 4,
@@ -703,49 +703,52 @@ const TimeBarTrendTrial
       newGraph.on('combo:mouseup', (e) => {
         log('combo:mouseup')
        
-        if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo._cfg !== null){ 
-          // for SUBTRACTING count from outermost combo
-          // if condition has to work for BOTH COMBO & NODE dragging.
-          if(!comboDrop/*  && !nodeDrag  */&& dragleaveCombo.getID() !== dragCombo.getID()) {
-            const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
-            otherCombos.forEach((combo, i) => {
-              combo.getModel().label = countNodesInCombo(combo) - countNodesInCombo(dragCombo);
-
-              // ??? REQUIRED for 1 layer of nested combo?
-              if (combo.getModel().label === 0 || countNodesInCombo(combo) === 0) {
-                newGraph.uncombo(combo);
-              } else {
-                newGraph.setItemState(combo, 'dragleave', false);
-                newGraph.setItemState(combo, 'dragenter', false);
-                newGraph.updateCombo(combo);
-              }
-            });
-          };
-          // Unable to delete combo when child combo dragged out from nested combo 
-          // becomes a neighbor of the nested combo and original parent become empty.
-          // ALMOST REPEATED Function (check combo:mouseup event)!
-          log('combo:mouseup > dragOverCombos', draggedOverCombos);
-          if(draggedOverCombos.length > 0) {
-            const draggedOverCombosDisplay = []
-            draggedOverCombos.forEach((combo) => {
-              // if combo node count become 0 after node or combo dragging, item's _cfg becomes null for that instance. (destroyed)
-              if (combo._cfg !== null) {
-                // for logging
-                draggedOverCombosDisplay.push(combo.getID());
-                combo.getModel().label = countNodesInCombo(combo);
-                if(combo.getModel().label > 0) {
+        if(draggedOverCombos !== [] && dragleaveCombo._cfg !== null /* !== undefined */ && dragCombo._cfg !== null){ 
+          // prevents deletion of orphan combo when dragging across graph space quickly
+          // (dragged Combo id can become dragleave combo id)
+          if(dragleaveCombo.getID() !== dragCombo.getID()) {
+            // to graph space
+            if(!comboDrop) {
+              // for SUBTRACTING count when DRAGGING NODES & COMBO from OUTERMOST COMBO out to GRAPH SPACE
+              // if condition has to work for BOTH COMBO & NODE dragging.
+              const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
+              otherCombos.forEach((combo, i) => {
+                log('CHECK IT')
+                combo.getModel().label = countNodesInCombo(combo) - countNodesInCombo(dragCombo);
+                if (combo.getModel().label === 0 || countNodesInCombo(combo) === 0) {
+                  newGraph.uncombo(combo);
+                } else {
                   newGraph.setItemState(combo, 'dragleave', false);
                   newGraph.setItemState(combo, 'dragenter', false);
-                  newGraph.updateCombo(combo); //===> draggedOVerCombos here CLASH WITH COMBO:DROPS use of DRAGGEDOVER COMBO!
-                } else {
-                  newGraph.uncombo(combo.getID());
+                  newGraph.updateCombo(combo);
                 }
-              }
-            });
-            log('draggedOver combos updated:', draggedOverCombosDisplay);
+              });
+            } 
+            // to other combo tree
+            else if (comboDrop) {
+              // for SUBTRACTING/ADDING (UPDATING) node when DRAGGING NODES & COMBO from nested cCOMBO into different combo tree.
+              const draggedOverCombosDisplay = []
+              draggedOverCombos.forEach((combo) => {
+                // if combo node count become 0 after node or combo dragging, item's _cfg becomes null for that instance. (destroyed)
+                if (combo._cfg !== null) {
+                  // for logging
+                  draggedOverCombosDisplay.push(combo.getID());
+                  const nodeCount= countNodesInCombo(combo);
+                  combo.getModel().label = nodeCount;
+                  if(combo.getModel().label > 0) {
+                    log(`KEYED, ${combo.getID()}, count: ${nodeCount}`)
+                    newGraph.setItemState(combo, 'dragleave', false);
+                    newGraph.setItemState(combo, 'dragenter', false);
+                    newGraph.updateCombo(combo); //===> draggedOVerCombos here CLASH WITH COMBO:DROPS use of DRAGGEDOVER COMBO? 
+                                                // STILL NOT WORKING FULLY WHEN MOVING child combo out to graph space.
+                  } else {
+                    newGraph.uncombo(combo.getID());
+                  }
+                }
+              });
+              log('draggedOver combos updated:', draggedOverCombosDisplay);
+            }
           }
-
-
         }
         draggedOverCombos = [];
         comboDrop = false;
