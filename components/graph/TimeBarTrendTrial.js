@@ -679,7 +679,7 @@ const TimeBarTrendTrial
         })
         // log('updated combos =', updatedCombosDisplay);
        }
-       draggedOverCombos = [];
+       // draggedOverCombos = [];
       });
 
 
@@ -719,10 +719,35 @@ const TimeBarTrendTrial
                 newGraph.setItemState(combo, 'dragenter', false);
                 newGraph.updateCombo(combo);
               }
-
             });
           };
+          // Unable to delete combo when child combo dragged out from nested combo 
+          // becomes a neighbor of the nested combo and original parent become empty.
+          // ALMOST REPEATED Function (check combo:mouseup event)!
+          log('combo:mouseup > dragOverCombos', draggedOverCombos);
+          if(draggedOverCombos.length > 0) {
+            const draggedOverCombosDisplay = []
+            draggedOverCombos.forEach((combo) => {
+              // if combo node count become 0 after node or combo dragging, item's _cfg becomes null for that instance. (destroyed)
+              if (combo._cfg !== null) {
+                // for logging
+                draggedOverCombosDisplay.push(combo.getID());
+                combo.getModel().label = countNodesInCombo(combo);
+                if(combo.getModel().label > 0) {
+                  newGraph.setItemState(combo, 'dragleave', false);
+                  newGraph.setItemState(combo, 'dragenter', false);
+                  newGraph.updateCombo(combo); //===> draggedOVerCombos here CLASH WITH COMBO:DROPS use of DRAGGEDOVER COMBO!
+                } else {
+                  newGraph.uncombo(combo.getID());
+                }
+              }
+            });
+            log('draggedOver combos updated:', draggedOverCombosDisplay);
+          }
+
+
         }
+        draggedOverCombos = [];
         comboDrop = false;
       });
 
