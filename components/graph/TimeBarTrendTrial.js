@@ -644,25 +644,24 @@ const TimeBarTrendTrial
           combosToUpdate = combosToUpdate.concat(allCCombos);
         }
 
-        //log('dragleaveCombo =', dragleaveCombo.getID());
-        combosToUpdate.push(e.item);
-
-
-
+        // decrement previous parent combo 
+        // when dragging node from one combo tree to another 
         if(draggedOverCombos.length > 0) {
           const draggedOverCombosDisplay = []
           draggedOverCombos.forEach((combo) => {
             if (combo._cfg !== null) {
               draggedOverCombosDisplay.push(combo.getID());
-              // add code HERE!
-              // draggedOver Combos now fixed!
+              // add previous parent to combosToUpdate
+              if (!(combosToUpdate.includes(combo))) {
+                combosToUpdate.push(combo)
+              }
             }
           });
-          log('node dragged over these combos:', draggedOverCombosDisplay);
+          // log('node dragged over these combos:', draggedOverCombosDisplay);
         }
 
-
-
+        //log('dragleaveCombo =', dragleaveCombo.getID());
+        combosToUpdate.push(e.item);
 
         // for updating originating combo's node count, 
         // when dragging node from it into a child of another combo
