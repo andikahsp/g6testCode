@@ -34,69 +34,87 @@ export function populateNodesEdges (jsonData) {
          { id: 'node14', ...image, img: imageURLs[14], label: 'pointer'/* `vector` */, date: 1636095553 }, 
         ], 
        edges: [
-        //  { id: 'edge1',
-        //    source: 'node0', 
-        //    target: 'node2', 
-        //    ttp: true,
-        //    frequency: '3', 
-        //    event: `${jsonData.message}` //'edge1',      
-        // },
-        // {  id: 'edge2',
-        //    source: 'node3',
-        //    target: 'node5', 
-        //    ttp: true, 
-        //    frequency: '7', 
-        //    event: 'edge2',//`some other Event`
-        // },
-        {  id: 'edge3',
-           source: 'node5', 
-           target: 'node6', 
-           frequency: '9',
-           ttp: true, 
-           event: 'edge3',//`Event B`
+        { 
+          id: 'edge1',
+          source: 'node0', 
+          target: 'node2', 
+          ttp: true,
+          frequency: '3', 
+          event: `${jsonData.message}`, //'edge1',      
+          date: 1636095548
         },
-        // {  id: 'edge4',
-        // source: 'node10', 
-        // target: 'node9', 
-        // frequency: '11',
-        // ttp: true, 
-        // event: 'edge4',//`Event B`
-        // },
-        /* {  id: 'edge5',
-        source: 'node9', 
-        target: 'node10', 
-        frequency: '15',
-        ttp: true, 
-        event: 'edge5',//`Event B`
-        }, */
-        {  id: 'edge6',
-        source: 'node11', 
-        target: 'node12', 
-        frequency: '17',
-        ttp: true, 
-        event: 'edge6',//`Event B`
+        { 
+          id: 'edge2',
+          source: 'node3',
+          target: 'node5', 
+          ttp: true, 
+          frequency: '7', 
+          event: 'edge2',//`some other Event`
+          date: 1636095549
         },
-        {  id: 'edge7',
-        source: 'node12', 
-        target: 'node11', 
-        frequency: '21',
-        ttp: true, 
-        event: 'edge7',//`Event B`
+        { 
+          id: 'edge3',
+          source: 'node5', 
+          target: 'node6', 
+          frequency: '9',
+          ttp: true, 
+          event: 'edge3',
+          date: 1636095550
         },
-        {  id: 'edge8',
-        source: 'node7', 
-        target: 'node8', 
-        frequency: '21',
-        ttp: true, 
-        event: 'edge8',//`Event B`
+        { 
+          id: 'edge4',
+          source: 'node10', 
+          target: 'node9', 
+          frequency: '11',
+          ttp: true, 
+          event: 'edge4',
+          date: 1636095551
         },
-        /* {  id: 'edge9',
-        source: 'node5', 
-        target: 'node6', 
-        frequency: '21',
-        ttp: true, 
-        event: 'edge9',//`Event B`
-        }, */
+        { 
+          id: 'edge5',
+          source: 'node9', 
+          target: 'node10', 
+          frequency: '15',
+          ttp: true, 
+          event: 'edge5',
+          date: 1636095552
+        },
+        { 
+          id: 'edge6',
+          source: 'node11', 
+          target: 'node12', 
+          frequency: '17',
+          ttp: true, 
+          event: 'edge6',
+          date: 1636095553
+        },
+        { 
+          id: 'edge7',
+          source: 'node12', 
+          target: 'node11', 
+          frequency: '21',
+          ttp: true, 
+          event: 'edge7',
+          date: 1636095554
+        },
+        { 
+          id: 'edge8',
+          source: 'node7', 
+          target: 'node8', 
+          frequency: '21',
+          ttp: true, 
+          event: 'edge8',
+          date: 1636095555
+        },
+        { 
+          id: 'edge9',
+          source: 'node6', 
+          target: 'node5', 
+          frequency: '21',
+          ttp: true, 
+          event: 'edge9',
+          date: 1636095554
+        },
        ],
        combos: [
         {

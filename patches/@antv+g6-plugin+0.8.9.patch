@@ -1,7 +1,16 @@
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..27ac80c 100644
+index b07b81f..87a975d 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
+@@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
+       },
+       textStyle: {},
+       filterEdge: false,
+-      filterItemTypes: ['node'],
++      filterItemTypes: ['node', 'edge'], /*  added 'edge' */
+       containerCSS: {}
+     };
+   };
 @@ -342,10 +342,16 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = currentNodeExistMap_1[node.id];
@@ -19,3 +28,12 @@ index b07b81f..27ac80c 100644
                currentNodeExistMap_1[node.id] = true;
              }
            });
+@@ -386,7 +392,7 @@ var TimeBar = /** @class */function (_super) {
+             }
+           });
+         }
+-      } else {
++       } else {
+         if (filterItemTypes.includes('node')) {
+           graph.getNodes().forEach(function (node) {
+             var model = node.getModel();
