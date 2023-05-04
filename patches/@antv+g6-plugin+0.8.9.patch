@@ -1,5 +1,5 @@
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..87a975d 100644
+index b07b81f..92b2f9b 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -7,11 +7,19 @@ index b07b81f..87a975d 100644
        textStyle: {},
        filterEdge: false,
 -      filterItemTypes: ['node'],
-+      filterItemTypes: ['node', 'edge'], /*  added 'edge' */
++      filterItemTypes: [/* 'node',  */'edge'], /* remove node,  added 'edge' */
        containerCSS: {}
      };
    };
-@@ -342,10 +342,16 @@ var TimeBar = /** @class */function (_super) {
+@@ -321,6 +321,7 @@ var TimeBar = /** @class */function (_super) {
+       var getDate_1 = this.get('getDate');
+       var shouldIgnore_1 = this.get('shouldIgnore');
+       var minDate_1 = trendData[min].date,
++
+         maxDate_1 = trendData[max].date;
+       if (changeData || changeData === undefined) {
+         var originNodes = this.cacheGraphData.nodes;
+@@ -342,10 +343,16 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = currentNodeExistMap_1[node.id];
              if (exist && !hitRange) {
@@ -28,7 +36,27 @@ index b07b81f..87a975d 100644
                currentNodeExistMap_1[node.id] = true;
              }
            });
-@@ -386,7 +392,7 @@ var TimeBar = /** @class */function (_super) {
+@@ -377,16 +384,25 @@ var TimeBar = /** @class */function (_super) {
+             var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target];
+             var shouldShow = hitRange && endsExist;
+             var exist = currentEdgeExistMap_1[edge.id];
++
++            if(edge.id==="edge6"){
++              console.warn('exist =', exist);
++              console.warn('currentEdgeExistMap_1 =', currentEdgeExistMap_1);
++              console.warn('currentEdgeExistMap_1[edge.id]', currentEdgeExistMap_1[edge.id]);
++              console.warn('shouldShow =',shouldShow)
++            }
+             if (exist && !shouldShow) {
+               currentEdgeExistMap_1[edge.id] = false;
+-              graph.removeItem(edge.id);
++              //graph.removeItem(edge.id);
++              graph.hideItem(graph.findById(edge.id));
+             } else if (!exist && shouldShow) {
+               currentEdgeExistMap_1[edge.id] = true;
+-              graph.addItem('edge', edge);
++              //graph.addItem('edge', edge);
++              graph.showItem(graph.findById(edge.id));
              }
            });
          }
