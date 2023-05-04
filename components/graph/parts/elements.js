@@ -226,7 +226,7 @@ export const cCircleComboShape = {
         group.addShape('text', {
           attrs: {
             text: cfg && cfg.frequency,
-            x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 3.5 ,
+            x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 3.5,
             y: startPoint.y + midPointXY.y + markerYOffset - 1,
             fontSize: 14,
             textAlign: 'left',
@@ -342,11 +342,13 @@ export const cCircleComboShape = {
         name: 'quadcurve-frequency-shape',
       });   
 
+      const freqTextXCoord =  midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5;
+        
       // freqency -text 
       group.addShape('text', {
         attrs: {
           text: cfg && cfg.frequency,
-          x: midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5,
+          x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 4.5,
           y: midPointXY.y + markerYOffset,
           fontSize: 14,
           textAlign: 'left',
