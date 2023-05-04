@@ -1,14 +1,15 @@
 diff --git a/node_modules/@antv/g6-core/es/graph/graph.js b/node_modules/@antv/g6-core/es/graph/graph.js
-index e46df98..de9557a 100644
+index e46df98..b602600 100644
 --- a/node_modules/@antv/g6-core/es/graph/graph.js
 +++ b/node_modules/@antv/g6-core/es/graph/graph.js
-@@ -2504,14 +2504,25 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2504,18 +2504,30 @@ var AbstractGraph = /** @class */function (_super) {
      // find all the descendant nodes and combos
      var cNodesCombos = [];
      var comboTrees = this.get('comboTrees');
 +    console.warn(comboTrees);
      var found = false;
 +    let foundDepth; // <---------- ADDED CHANGES
++    let cNodesCombosID = []; //<=====UNEW
      (comboTrees || []).forEach(function (ctree) {
        if (found) return; // if the combo is found, terminate the forEach
 -      traverseTree(ctree, function (subTree) {
@@ -18,12 +19,11 @@ index e46df98..de9557a 100644
 -        // if the combo is found
 -        if (comboModel.id === subTree.id) found = true;
 +        if (found && ((subTree.depth <= foundDepth) || (subTree.parentId !== comboModel.id))) { // <---------- ADDED CHANGES
-+          if (subTree.itemType === "combo") {   // <---------- ADDED CHANGES
-+            return false;  // <---------- ADDED CHANGES
-+          } else {         // <---------- ADDED CHANGES
-+            return true;   // <---------- ADDED CHANGES
-+          }
-+        }
++          if (subTree.itemType === "combo" 
++          && !cNodesCombosID.includes(subTree.parentId) //<=====UNEW
++          )   return false;  // <---------- ADDED CHANGES
++        } //<=====UPDATED
++        // if the combo is found or in the children
 +        if (comboModel.id === subTree.id) 
 +        { 
 +          found = true;
@@ -32,30 +32,43 @@ index e46df98..de9557a 100644
          if (found) {
            // if the combo is found, concat the descendant nodes and combos
            var item = _this.findById(subTree.id);
-@@ -2619,13 +2630,24 @@ var AbstractGraph = /** @class */function (_super) {
+           if (item && item.getType && item.getType() === 'combo') {
++            cNodesCombosID.push(subTree.id); //<=====UNEW
+             cNodesCombos = cNodesCombos.concat(item.getNodes());
+             cNodesCombos = cNodesCombos.concat(item.getCombos());
+           }
+@@ -2619,16 +2631,32 @@ var AbstractGraph = /** @class */function (_super) {
      // find all the descendant nodes and combos
      var cNodesCombos = [];
      var comboTrees = this.get('comboTrees');
 +    console.warn(comboTrees);
      var found = false;
 +    let foundDepth; // <---------- ADDED CHANGES
++    let cNodesCombosID = []; //<=====UNEW
      (comboTrees || []).forEach(function (ctree) {
        if (found) return; // if the combo is found, terminate
        traverseTree(ctree, function (subTree) {
          // if the combo is found and it is traversing the other branches, terminate
 -        if (found && subTree.depth <= comboModel.depth) return false;
 -        if (comboModel.id === subTree.id) found = true;
-+        if (found && ((subTree.depth <= foundDepth) || (subTree.parentId !== comboModel.id))) { // <---------- ADDED CHANGES
-+          if (subTree.itemType === "combo") {   // <---------- ADDED CHANGES
-+            return false;  // <---------- ADDED CHANGES
-+          } else {         // <---------- ADDED CHANGES
-+            return true;   // <---------- ADDED CHANGES
-+          }
-+        }
++        if (found && 
++          ((subTree.depth <= foundDepth) || (subTree.parentId !== comboModel.id))
++          ) { // <---------- ADDED CHANGES
++          if (
++            subTree.itemType === "combo" && 
++            !cNodesCombosID.includes(subTree.parentId) //<=====UNEW
++            ) return false;  // <---------- ADDED CHANGES
++        } //<=====UPDATED 
++        // if the combo is found or in the children
 +        if (comboModel.id === subTree.id) {
 +          found = true;
 +          foundDepth = subTree.depth; // <---------- ADDED CHANGES
 +        }
          if (found) {
++          // if the combo is found, concat the descendant nodes and combos
            var item = _this.findById(subTree.id);
            if (item && item.getType && item.getType() === 'combo') {
++            cNodesCombosID.push(subTree.id); //<=====UNEW
+             cNodesCombos = cNodesCombos.concat(item.getNodes());
+             cNodesCombos = cNodesCombos.concat(item.getCombos());
+           }
