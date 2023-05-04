@@ -348,8 +348,8 @@ export const cCircleComboShape = {
       group.addShape('text', {
         attrs: {
           text: cfg && cfg.frequency,
-          x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 4.5,
-          y: midPointXY.y + markerYOffset,
+          x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 4,
+          y: midPointXY.y + markerYOffset - 1,
           fontSize: 14,
           textAlign: 'left',
           textBaseline: 'middle',
