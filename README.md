@@ -1,16 +1,16 @@
 ## BackLog
 
-1. Sort out Node+Combo Count display on combo
+1. Sort out Node+Combo Count display on combo [ **DONE** ]
 
-- not working fully when dragging in/out combos
+- not working fully when dragging in/out combos [ **FIXED** ]
 
-2. Optimise getAllNodesFromCombo function using flatten function logic to not rely on external array.
+2. Optimise getAllNodesFromCombo function using flatten function logic to not rely on external array. [ **DONE** ]
 
 - check feasibility of using function as an import from a separate file.
 
-3. Continue refactoring to segregate out styling components, and configuration components
+3. Continue refactoring to segregate out styling components, and configuration components. [ **IN PROGRESS** ]
 
-4. Combo rings don't go back to solid gray lines and stay dotted after combo dragends when combo nesting exceeds depth of 3.
+4. Combo rings don't go back to solid gray lines and stay dotted after combo dragends when combo nesting exceeds depth of 3. [ **FIXED** ]
 
 ## ============================================================================
 
