@@ -1,0 +1,21 @@
+diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
+index b07b81f..27ac80c 100644
+--- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
++++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
+@@ -342,10 +342,16 @@ var TimeBar = /** @class */function (_super) {
+             }));
+             var exist = currentNodeExistMap_1[node.id];
+             if (exist && !hitRange) {
++              //*** Save the node comboID ***//
++              const comboID = node.comboId; //<=== added
+               graph.removeItem(node.id);
++              //***Append back the comboID back to node***//
++              console.log('node removed!:', node); //<=== added
++              node.comboId = comboID; //<=== added
+               currentNodeExistMap_1[node.id] = false;
+             } else if (!exist && hitRange) {
+               graph.addItem('node', node);
++              console.log('node added back:', node); //<=== added
+               currentNodeExistMap_1[node.id] = true;
+             }
+           });
