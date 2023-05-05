@@ -151,7 +151,7 @@ export const cCircleComboShape = {
 
       const markerXOffset = 10;
       const markerYOffset = -15;
-      const freqMarkerOffset = 15;
+      let freqMarkerOffset = 0;
       let ttpMarkerOffset = 0 /* 30 */;
 
 
@@ -201,7 +201,7 @@ export const cCircleComboShape = {
       ttpLabel.toFront();
       }
      
-      if (cfg.frequency !== undefined) {
+      if (cfg.frequency !== undefined && cfg.frequency > 1) {
         // FREQUENCY Add the circular marker on the bottom
         group.addShape('marker', {
           attrs: {
@@ -236,6 +236,7 @@ export const cCircleComboShape = {
           // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
           name: 'edge-frequency-text',
         });
+        freqMarkerOffset = 15;
         const frequencyLabel = group.find((ele) => ele.get('name') === 'edge-frequency-text')
         frequencyLabel.toFront();
       }

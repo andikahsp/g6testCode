@@ -60,11 +60,11 @@ const TimeBarTrendTrial
         padding: 20,
         type: 'trend',
         tick: {
-          tickLabelFormatter: (d) => {
-            // convert the data accordingly
-           // log(`d => ${JSON.stringify(d, null, 3)}`);
-            return getUTCHrMinSec(d.date);
-        },
+        //   tickLabelFormatter: (d) => {
+        //     // convert the data accordingly
+        //    // log(`d => ${JSON.stringify(d, null, 3)}`);
+        //     return getUTCHrMinSec(d.date);
+        // },
           tickLabelStyle:{ 
             fontSize: 13, 
             fontFamily: 'Segoe UI',
@@ -680,7 +680,7 @@ const TimeBarTrendTrial
       newGraph.on('combo:mouseup', (e) => {
         log('combo:mouseup')
        
-        if(draggedOverCombos !== [] && dragleaveCombo._cfg !== null /* !== undefined */ && dragCombo._cfg !== null){ 
+        if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo !== undefined){ 
           // prevents deletion of orphan combo when dragging across graph space quickly
           // (dragged Combo id can become dragleave combo id)
           if(dragleaveCombo.getID() !== dragCombo.getID()) {

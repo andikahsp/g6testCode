@@ -1,5 +1,18 @@
+diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.d.ts b/node_modules/@antv/g6-plugin/es/timeBar/index.d.ts
+index 1ebc924..a7f60de 100644
+--- a/node_modules/@antv/g6-plugin/es/timeBar/index.d.ts
++++ b/node_modules/@antv/g6-plugin/es/timeBar/index.d.ts
+@@ -39,7 +39,7 @@ interface TimeBarConfig extends IPluginBaseConfig {
+     readonly containerCSS?: Object;
+     readonly changeData?: boolean;
+     rangeChange?: (graph: IGraph, minValue: string, maxValue: string) => void;
+-    getDate?: (d: any) => number;
++    getDate?: (d: any) => number[]; //<------
+     getValue?: (d: any) => number;
+     shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
+         min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..92b2f9b 100644
+index b07b81f..3370aaf 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -11,14 +24,16 @@ index b07b81f..92b2f9b 100644
        containerCSS: {}
      };
    };
-@@ -321,6 +321,7 @@ var TimeBar = /** @class */function (_super) {
-       var getDate_1 = this.get('getDate');
-       var shouldIgnore_1 = this.get('shouldIgnore');
-       var minDate_1 = trendData[min].date,
-+
-         maxDate_1 = trendData[max].date;
-       if (changeData || changeData === undefined) {
-         var originNodes = this.cacheGraphData.nodes;
+@@ -331,7 +331,8 @@ var TimeBar = /** @class */function (_super) {
+           return currentNodeExistMap_1[node.getID()] = true; 
+         });
+         graph.getEdges().forEach(function (edge) {
+-          return currentEdgeExistMap_1[edge.getID()] = true;
++          return currentEdgeExistMap_1[edge.getID()] = edge.isVisible(); // <================ ADDED
++          // return currentEdgeExistMap_1[edge.getID()] = true; // <=================NOT USED
+         });
+         if (filterItemTypes.includes('node')) {
+           originNodes === null || originNodes === void 0 ? void 0 : originNodes.forEach(function (node) {
 @@ -342,10 +343,16 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = currentNodeExistMap_1[node.id];
@@ -36,27 +51,67 @@ index b07b81f..92b2f9b 100644
                currentNodeExistMap_1[node.id] = true;
              }
            });
-@@ -377,16 +384,25 @@ var TimeBar = /** @class */function (_super) {
+@@ -370,23 +377,64 @@ var TimeBar = /** @class */function (_super) {
+         if (this.get('filterEdge') || filterItemTypes.includes('edge')) {
+           originEdges === null || originEdges === void 0 ? void 0 : originEdges.filter(function (edge) {
+             var date = +((getDate_1 === null || getDate_1 === void 0 ? void 0 : getDate_1(edge)) || edge.date);
+-            var hitRange = date >= minDate_1 && date <= maxDate_1 || (shouldIgnore_1 === null || shouldIgnore_1 === void 0 ? void 0 : shouldIgnore_1('edge', edge, {
++            const dates = edge.date; // <---- ADDED
++            const dateHit = dates.some((date) => (date >= minDate_1 && date <= maxDate_1)); // <---- ADDED
++            var hitRange = /* date >= minDate_1 && date <= maxDate_1 */ dateHit || (shouldIgnore_1 === null || shouldIgnore_1 === void 0 ? void 0 : shouldIgnore_1('edge', edge, {
+               min: minDate_1,
+               max: maxDate_1
+             }));
++            const hitDates = []; // <---- ADDED
++            edge.date.forEach((date) => { // <---- ADDED
++              if(date >= minDate_1 && date <= maxDate_1) hitDates.push(date); // <---- ADDED
++            }); // <---- ADDED
++            graph.findById(edge.id).getModel().frequency = hitDates.length; // <---- ADDED
++            graph.updateItem(graph.findById(edge.id), { // <---- ADDED
++              frequency: hitDates.length  // <---- ADDED
++            }); // <---- ADDED
              var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target];
              var shouldShow = hitRange && endsExist;
              var exist = currentEdgeExistMap_1[edge.id];
-+
-+            if(edge.id==="edge6"){
-+              console.warn('exist =', exist);
-+              console.warn('currentEdgeExistMap_1 =', currentEdgeExistMap_1);
-+              console.warn('currentEdgeExistMap_1[edge.id]', currentEdgeExistMap_1[edge.id]);
-+              console.warn('shouldShow =',shouldShow)
-+            }
              if (exist && !shouldShow) {
                currentEdgeExistMap_1[edge.id] = false;
 -              graph.removeItem(edge.id);
 +              //graph.removeItem(edge.id);
-+              graph.hideItem(graph.findById(edge.id));
++              const edgeObject = graph.findById(edge.id);// <---- ADDED
++              graph.hideItem(edgeObject); // <---- change we don't remove the item.
++              const source = edgeObject.getSource(); // <---- ADDED
++              const target = edgeObject.getTarget(); // <---- ADDED
++              const sourceEdges = source.getEdges(); // <---- ADDED
++              const targetEdges = target.getEdges(); // <---- ADDED
++              let sourceEdgeScore = 0; // <---- ADDED
++              sourceEdges.forEach((edge) => { // <---- ADDED
++                if(edge.isVisible()) { // <---- ADDED
++                  sourceEdgeScore++; // <---- ADDED
++                } // <---- ADDED
++              }); // <---- ADDED
++              if(sourceEdgeScore === 0){ // <---- ADDED
++                graph.hideItem(source); // <---- ADDED
++              }
++              let targetEdgeScore = 0; // <---- ADDED
++              targetEdges.forEach((edge) => { // <---- ADDED
++                if(edge.isVisible()) { // <---- ADDED
++                  targetEdgeScore++; // <---- ADDED
++                } // <---- ADDED
++              }); // <---- ADDED
++              if(targetEdgeScore === 0){ // <---- ADDED
++                graph.hideItem(target); // <---- ADDED
++              }
++
              } else if (!exist && shouldShow) {
                currentEdgeExistMap_1[edge.id] = true;
 -              graph.addItem('edge', edge);
 +              //graph.addItem('edge', edge);
-+              graph.showItem(graph.findById(edge.id));
++              const edgeObject = graph.findById(edge.id); // <---- ADDED
++              graph.showItem(edgeObject); // <---- ADDED
++              const source = edgeObject.getSource(); // <---- ADDED
++              const target = edgeObject.getTarget(); // <---- ADDED
++              graph.showItem(target); // <---- ADDED
++              graph.showItem(source); // <---- ADDED
              }
            });
          }
