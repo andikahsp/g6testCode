@@ -12,7 +12,7 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..3370aaf 100644
+index b07b81f..0b2ae54 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -24,7 +24,29 @@ index b07b81f..3370aaf 100644
        containerCSS: {}
      };
    };
-@@ -331,7 +331,8 @@ var TimeBar = /** @class */function (_super) {
+@@ -269,6 +269,21 @@ var TimeBar = /** @class */function (_super) {
+     });
+     this.set('timebar', timebar);
+   };
++
++  function getAllNodesInCombo(combo) {  // ---ADDED
++    let arr = []; // ---ADDED
++    return grabAllNodes(combo, arr); // ---ADDED 
++  }
++
++  function grabAllNodes(combo, array) { // ---ADDED
++    let combos = combo.getCombos();  // ---ADDED
++    let childNodes = combo.getNodes();  // ---ADDED
++    
++    combos.forEach((inCombo) => { array.concat(grabAllNodes(inCombo, array)); }); // ---ADDED
++    childNodes.forEach((node) => { array.push(node); }); // ---ADDED
++    return array;
++  }
++
+   TimeBar.prototype.filterData = function (evt) {
+     var _a;
+     var value = evt.value;
+@@ -331,7 +346,8 @@ var TimeBar = /** @class */function (_super) {
            return currentNodeExistMap_1[node.getID()] = true; 
          });
          graph.getEdges().forEach(function (edge) {
@@ -34,7 +56,7 @@ index b07b81f..3370aaf 100644
          });
          if (filterItemTypes.includes('node')) {
            originNodes === null || originNodes === void 0 ? void 0 : originNodes.forEach(function (node) {
-@@ -342,10 +343,16 @@ var TimeBar = /** @class */function (_super) {
+@@ -342,10 +358,16 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = currentNodeExistMap_1[node.id];
              if (exist && !hitRange) {
@@ -51,7 +73,7 @@ index b07b81f..3370aaf 100644
                currentNodeExistMap_1[node.id] = true;
              }
            });
-@@ -370,23 +377,64 @@ var TimeBar = /** @class */function (_super) {
+@@ -370,23 +392,120 @@ var TimeBar = /** @class */function (_super) {
          if (this.get('filterEdge') || filterItemTypes.includes('edge')) {
            originEdges === null || originEdges === void 0 ? void 0 : originEdges.filter(function (edge) {
              var date = +((getDate_1 === null || getDate_1 === void 0 ? void 0 : getDate_1(edge)) || edge.date);
@@ -70,6 +92,7 @@ index b07b81f..3370aaf 100644
 +            graph.updateItem(graph.findById(edge.id), { // <---- ADDED
 +              frequency: hitDates.length  // <---- ADDED
 +            }); // <---- ADDED
++
              var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target];
              var shouldShow = hitRange && endsExist;
              var exist = currentEdgeExistMap_1[edge.id];
@@ -79,6 +102,7 @@ index b07b81f..3370aaf 100644
 +              //graph.removeItem(edge.id);
 +              const edgeObject = graph.findById(edge.id);// <---- ADDED
 +              graph.hideItem(edgeObject); // <---- change we don't remove the item.
++              edge.inRange = false; // <---- ADDED
 +              const source = edgeObject.getSource(); // <---- ADDED
 +              const target = edgeObject.getTarget(); // <---- ADDED
 +              const sourceEdges = source.getEdges(); // <---- ADDED
@@ -91,6 +115,20 @@ index b07b81f..3370aaf 100644
 +              }); // <---- ADDED
 +              if(sourceEdgeScore === 0){ // <---- ADDED
 +                graph.hideItem(source); // <---- ADDED
++                source.getModel().inRange = false // <---- ADDED
++                // update ComboID
++                if (source.getModel().comboId !== undefined) {
++                  const sCombo = graph.findById(source.getModel().comboId);
++                  const nodesInCombo = getAllNodesInCombo(sCombo);
++                  const visibleNodes = nodesInCombo.filter((node) => node.isVisible())
++                  sCombo.getModel().label = visibleNodes.length; 
++                  if(sCombo.getModel().label === 0 && sCombo.isVisible()) {
++                    graph.updateItem(sCombo, { visible: false });
++                    sCombo.getModel().inRange = false;
++                  } else {
++                    graph.updateCombo(sCombo);
++                  }
++                }
 +              }
 +              let targetEdgeScore = 0; // <---- ADDED
 +              targetEdges.forEach((edge) => { // <---- ADDED
@@ -100,18 +138,58 @@ index b07b81f..3370aaf 100644
 +              }); // <---- ADDED
 +              if(targetEdgeScore === 0){ // <---- ADDED
 +                graph.hideItem(target); // <---- ADDED
++                target.getModel().inRange = false // <---- ADDED
++                if (target.getModel().comboId !== undefined) {
++                  const tCombo = graph.findById(target.getModel().comboId);
++                  const nodesInCombo = getAllNodesInCombo(tCombo);
++                  const visibleNodes = nodesInCombo.filter((node) => node.isVisible())
++                  tCombo.getModel().label = visibleNodes.length; 
++                  if(tCombo.getModel().label === 0 && tCombo.isVisible() ) {
++                    graph.updateItem(tCombo, { visible: false })
++                    tCombo.getModel().inRange = false;
++                  } else {
++                    graph.updateCombo(tCombo);
++                  }
++                }
 +              }
-+
              } else if (!exist && shouldShow) {
                currentEdgeExistMap_1[edge.id] = true;
 -              graph.addItem('edge', edge);
 +              //graph.addItem('edge', edge);
 +              const edgeObject = graph.findById(edge.id); // <---- ADDED
 +              graph.showItem(edgeObject); // <---- ADDED
++              edge.inRange = true; // <---- ADDED
 +              const source = edgeObject.getSource(); // <---- ADDED
 +              const target = edgeObject.getTarget(); // <---- ADDED
++              target.getModel().inRange = true; 
++              source.getModel().inRange = true;
 +              graph.showItem(target); // <---- ADDED
++              if (target.getModel().comboId !== undefined) { 
++                const tCombo = graph.findById(target.getModel().comboId);
++                const nodesInCombo = getAllNodesInCombo(tCombo);
++                const visibleNodes = nodesInCombo.filter((node) => node.isVisible())
++                tCombo.getModel().label = visibleNodes.length;
++                if(!tCombo.isVisible()) {
++                  graph.updateItem(tCombo, {visible: true});
++                  tCombo.getModel().inRange = true;
++                } else {
++                  graph.updateCombo(tCombo);
++                }
++              }
 +              graph.showItem(source); // <---- ADDED
++              if (source.getModel().comboId !== undefined) { 
++                const sCombo = graph.findById(source.getModel().comboId);
++                const nodesInCombo = getAllNodesInCombo(sCombo);
++                const visibleNodes = nodesInCombo.filter((node) => node.isVisible())
++                sCombo.getModel().label = visibleNodes.length;
++                if(!sCombo.isVisible()) {
++                  graph.updateItem(sCombo, {visible: true});
++                  sCombo.getModel().inRange = true; 
++                } else {
++                  graph.updateCombo(sCombo);
++                }
++              }
++              
              }
            });
          }

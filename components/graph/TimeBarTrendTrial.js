@@ -103,8 +103,8 @@ const TimeBarTrendTrial
             fillOpacity: 0.25,
           }, 
           height: 60,
-          start: 0.25,
-          end: 0.75,
+          start: 0.01,
+          end: 0.99,
           handlerStyle:{
             height: 500, // <===== not working
             width: 2, 
@@ -683,7 +683,7 @@ const TimeBarTrendTrial
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo !== undefined){ 
           // prevents deletion of orphan combo when dragging across graph space quickly
           // (dragged Combo id can become dragleave combo id)
-          if(dragleaveCombo.getID() !== dragCombo.getID()) {
+          if(dragleaveCombo._cfg !== null && dragleaveCombo.getID() !== dragCombo.getID()) {
             // to graph space
             if(!comboDrop) {
               // for SUBTRACTING count when DRAGGING NODES & COMBO from OUTERMOST COMBO out to GRAPH SPACE
