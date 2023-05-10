@@ -1,23 +1,42 @@
 diff --git a/node_modules/@antv/g6-core/es/graph/controller/item.js b/node_modules/@antv/g6-core/es/graph/controller/item.js
-index 7d7c659..21eab82 100644
+index 7d7c659..1e9ce3a 100644
 --- a/node_modules/@antv/g6-core/es/graph/controller/item.js
 +++ b/node_modules/@antv/g6-core/es/graph/controller/item.js
-@@ -733,6 +733,10 @@ var ItemController = /** @class */function () {
+@@ -385,6 +385,10 @@ var ItemController = /** @class */function () {
+     var children = combo.getChildren();
+     children.nodes.forEach(function (node) {
+       graph.hideItem(node, stack);
++      const nEdges = node.getEdges();
++      nEdges.forEach((edge) => {
++        edge.getModel().collapsedByCombo = true; 
++      });
+     });
+     children.combos.forEach(function (c) {
+       graph.hideItem(c, stack);
+@@ -441,6 +445,7 @@ var ItemController = /** @class */function () {
+     children.nodes.forEach(function (node) {
+       graph.showItem(node, stack);
+       node.getEdges().forEach(function (edge) {
++        edge.getModel().collapsedByCombo = false;
+         return edgeSet.add(edge);
+       });
+     });
+@@ -733,6 +738,10 @@ var ItemController = /** @class */function () {
          children_1.forEach(function (child) {
            var childItem = graph.findById(child.id);
            _this.changeItemVisibility(childItem, visible);
 +          var childEdges = childItem.getEdges();
-+          childEdges.forEach((cEdge) => {
-+            cEdge.getModel().collapsedByCombo = visible; 
-+          });
++          // childEdges.forEach((cEdge) => {
++          //   cEdge.getModel().collapsedByCombo = visible; 
++          // });
          });
        }
        var edges = item.getEdges();
-@@ -743,6 +747,7 @@ var ItemController = /** @class */function () {
+@@ -743,6 +752,7 @@ var ItemController = /** @class */function () {
            return;
          }
          _this.changeItemVisibility(edge, visible);
-+        edge.getModel().collapsedByCombo = visible;
++        // edge.getModel().collapsedByCombo = visible;
        });
      }
      graph.emit('afteritemvisibilitychange', {
@@ -92,31 +111,31 @@ index e46df98..cef7ae1 100644
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
 diff --git a/node_modules/@antv/g6-core/es/item/item.js b/node_modules/@antv/g6-core/es/item/item.js
-index 478ae9d..a2e55da 100644
+index 478ae9d..4d63f7e 100644
 --- a/node_modules/@antv/g6-core/es/item/item.js
 +++ b/node_modules/@antv/g6-core/es/item/item.js
 @@ -690,8 +690,24 @@ var ItemBase = /** @class */function () {
      var group = this.get('group');
      if (visible) {
        group.show();
-+      if (this.getType() === 'edge') {    // <---- ADDED
-+        const source = this.getSource(); // <---- ADDED
-+        const target = this.getTarget(); // <---- ADDED
-+        // add collapsedByCombo only if it's node is in a combo // <---- ADDED
-+        if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) { // <---- ADDED
-+          this.getModel().collapsedByCombo = false;    // <---- ADDED
-+        } // <---- ADDED
-+      }    // <---- ADDED
++      // if (this.getType() === 'edge') {    // <---- ADDED
++      //   const source = this.getSource(); // <---- ADDED
++      //   const target = this.getTarget(); // <---- ADDED
++      //   // add collapsedByCombo only if it's node is in a combo // <---- ADDED
++      //   if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) { // <---- ADDED
++      //     this.getModel().collapsedByCombo = false;    // <---- ADDED
++      //   } // <---- ADDED
++      // }    // <---- ADDED
      } else {
        group.hide();
-+      if (this.getType() === 'edge') {    // <---- ADDED
-+        const source = this.getSource(); // <---- ADDED
-+        const target = this.getTarget(); // <---- ADDED
-+        // add collapsedByCombo only if it's node is in a combo
-+        if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) { // <---- ADDED
-+         this.getModel().collapsedByCombo = true;    // <---- ADDED
-+        }
-+      }    
++      // if (this.getType() === 'edge') {    // <---- ADDED
++      //   const source = this.getSource(); // <---- ADDED
++      //   const target = this.getTarget(); // <---- ADDED
++      //   // add collapsedByCombo only if it's node is in a combo
++      //   if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) { // <---- ADDED
++      //    this.getModel().collapsedByCombo = true;    // <---- ADDED
++      //   }
++      // }    
      }
      this.set('visible', visible);
    };
