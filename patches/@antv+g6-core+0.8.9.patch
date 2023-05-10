@@ -92,31 +92,31 @@ index e46df98..cef7ae1 100644
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
 diff --git a/node_modules/@antv/g6-core/es/item/item.js b/node_modules/@antv/g6-core/es/item/item.js
-index 478ae9d..617853c 100644
+index 478ae9d..a2e55da 100644
 --- a/node_modules/@antv/g6-core/es/item/item.js
 +++ b/node_modules/@antv/g6-core/es/item/item.js
 @@ -690,8 +690,24 @@ var ItemBase = /** @class */function () {
      var group = this.get('group');
      if (visible) {
        group.show();
-+      // if (this.getType() === 'edge') {    // <---- ADDED
-+      //   const source = this.getSource();
-+      //   const target = this.getTarget();
-+      //   // add collapsedByCombo only if it's node is in a combo
-+      //   if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) {
-+      //     this.getModel().collapsedByCombo = false;    // <---- ADDED
-+      //   } 
-+      // }    // <---- ADDED
++      if (this.getType() === 'edge') {    // <---- ADDED
++        const source = this.getSource(); // <---- ADDED
++        const target = this.getTarget(); // <---- ADDED
++        // add collapsedByCombo only if it's node is in a combo // <---- ADDED
++        if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) { // <---- ADDED
++          this.getModel().collapsedByCombo = false;    // <---- ADDED
++        } // <---- ADDED
++      }    // <---- ADDED
      } else {
        group.hide();
-+      // if (this.getType() === 'edge') {    // <---- ADDED
-+      //   const source = this.getSource();
-+      //   const target = this.getTarget();
-+      //   // add collapsedByCombo only if it's node is in a combo
-+      //   if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) {
-+      //    this.getModel().collapsedByCombo = true;    // <---- ADDED
-+      //   }
-+      // }    
++      if (this.getType() === 'edge') {    // <---- ADDED
++        const source = this.getSource(); // <---- ADDED
++        const target = this.getTarget(); // <---- ADDED
++        // add collapsedByCombo only if it's node is in a combo
++        if(source.getModel().comboId !== undefined || target.getModel().comboId !== undefined) { // <---- ADDED
++         this.getModel().collapsedByCombo = true;    // <---- ADDED
++        }
++      }    
      }
      this.set('visible', visible);
    };
