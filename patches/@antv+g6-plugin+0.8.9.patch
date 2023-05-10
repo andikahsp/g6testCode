@@ -12,7 +12,7 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..2630a32 100644
+index b07b81f..402eae6 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -136,7 +136,7 @@ index b07b81f..2630a32 100644
                currentEdgeExistMap_1[edge.id] = true;
              } else if (!exist) {
                currentEdgeExistMap_1[edge.id] = false;
-@@ -369,24 +441,128 @@ var TimeBar = /** @class */function (_super) {
+@@ -369,24 +441,139 @@ var TimeBar = /** @class */function (_super) {
          }
          if (this.get('filterEdge') || filterItemTypes.includes('edge')) {
            originEdges === null || originEdges === void 0 ? void 0 : originEdges.filter(function (edge) {
@@ -149,6 +149,8 @@ index b07b81f..2630a32 100644
                min: minDate_1,
                max: maxDate_1
              }));
+-            var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target];
+-            var shouldShow = hitRange && endsExist;
 +            const hitDates = []; // <---- ADDED
 +            edge.date.forEach((date) => { // <---- ADDED
 +              if(date >= minDate_1 && date <= maxDate_1) hitDates.push(date); // <---- ADDED
@@ -157,12 +159,14 @@ index b07b81f..2630a32 100644
 +            graph.updateItem(graph.findById(edge.id), { frequency: hitDates.length }); // <---- ADDED
 +            const inRangeStatus = dateHit; // <---COUPLE inRange property directly to dateRange, decouple from show/hide item.
 +            edge.inRange = inRangeStatus; // <---- ADDED
-             var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target]; 
--            var shouldShow = hitRange && endsExist;
-+            var shouldShow = hitRange &&  endsExist;
++            //var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target]; 
++            // var shouldShow = hitRange && endsExist;
              var exist = currentEdgeExistMap_1[edge.id];
+-            if (exist && !shouldShow) {
++
 +            
 +            const edgeObject = graph.findById(edge.id);// <---- ADDED
++            const edgeCollapsed = edgeObject.getModel().collapsedByCombo;
 +            const source = edgeObject.getSource(); // <---- ADDED
 +            const target = edgeObject.getTarget(); // <---- ADDED
 +            const ends = [source, target];
@@ -172,9 +176,10 @@ index b07b81f..2630a32 100644
 +              node.getModel().inRange = inRangeStatus;
 +            });
 +            
-             if (exist && !shouldShow) {
++            if (exist && !hitRange) {
                currentEdgeExistMap_1[edge.id] = false;
 -              graph.removeItem(edge.id);
+-            } else if (!exist && shouldShow) {
 +              //graph.removeItem(edge.id);
 +              graph.updateItem(edgeObject, {visible: false}); // <---- change we don't remove the item.
 +
@@ -224,19 +229,27 @@ index b07b81f..2630a32 100644
 +                  }                
 +                }
 +              })
-             } else if (!exist && shouldShow) {
++            } else if (!exist && hitRange) {
                currentEdgeExistMap_1[edge.id] = true;
 -              graph.addItem('edge', edge);
 +              //graph.addItem('edge', edge);
-+              const edgeObject = graph.findById(edge.id); // <---- ADDED
-+              graph.updateItem(edgeObject, {visible: true});
++              console.warn(`${edgeObject.getID()}: `, edgeObject.getModel().collapsedByCombo);
++              if (!edgeObject.getModel().collapsedByCombo || edgeObject.getModel().collapsedByCombo === undefined) {
++                graph.updateItem(edgeObject, {visible: true});
++              }
 +
 +              ends.forEach((node) => {
-+                // show node(end) connected to the edge that's showing. 
-+                graph.updateItem(node, {visible: true});
-+                // update combo related to the nodes connected by the edge
++                //show nodes that are not in combos
++                if(node.getModel().comboId === undefined) {
++                  graph.updateItem(node, {visible: true});
++                }
 +                if (node.getModel().comboId !== undefined) {
 +                  const combo = graph.findById(node.getModel().comboId);
++                  // do not show nodes if their combos are collapsed.
++                  if(!checkComboCollapsed(node, graph)) { 
++                    graph.updateItem(node, {visible: true});
++                  }
++                  // update combo related to the nodes connected by the edge
 +                  const nodesInCombo = getAllNodesInCombo(combo);
 +                  // setting combo's inRange property based on whether nodes inside are still inRange
 +                  const inRangeNodes = nodesInCombo.filter((node) => node.getModel().inRange);
@@ -264,7 +277,8 @@ index b07b81f..2630a32 100644
 +              });
              } 
            });
-+          console.warn('VE', graph.get('vedges'));
++          // LOGGING AREA
++          // console.warn('VE', graph.get('vedges'));
          }
 -      } else {
 +       } else {
