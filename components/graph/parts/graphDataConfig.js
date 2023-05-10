@@ -44,7 +44,7 @@ export function populateNodesEdges (jsonData) {
           inRange: true, 
           date: 
           [
-            1636095540,
+            1636095542,
           ],
         },
         { 

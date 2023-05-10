@@ -12,7 +12,7 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..8c525eb 100644
+index b07b81f..2630a32 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -24,7 +24,7 @@ index b07b81f..8c525eb 100644
        containerCSS: {}
      };
    };
-@@ -269,6 +269,72 @@ var TimeBar = /** @class */function (_super) {
+@@ -269,6 +269,69 @@ var TimeBar = /** @class */function (_super) {
      });
      this.set('timebar', timebar);
    };
@@ -60,15 +60,19 @@ index b07b81f..8c525eb 100644
 +    }
 +  }
 +
-+  function checkComboCollapsed(object, graph) {
-+    const type = object.getType()
-+    switch (type) {
-+      case 'node':
-+        const combo = graph.findById(object.getModel().comboId);
-+        return combo.getModel().collapsed
-+      case 'edge':
-+        const source = object.getSource();
-+        const target = object.getTarget();
++  function checkComboCollapsed(nodeObject, graph) {
++    if (graph.findById(nodeObject.getModel().comboId) !== undefined) {
++      const combo = graph.findById(nodeObject.getModel().comboId);
++      if (combo.getModel().collapsed) {
++        return true;
++      }
++      return false;
++    }
++  }
++
++  function hideSEdgeOnCollapseCombo(edgeObject, graph) {
++        const source = edgeObject.getSource();
++        const target = edgeObject.getTarget();
 +        const ends = [source, target];
 +        let score = 0;
 +        ends.forEach((node) => {
@@ -81,23 +85,16 @@ index b07b81f..8c525eb 100644
 +            return false;
 +          }
 +        });
-+        if (score > 0) {
-+          // if at least 1 end (source of target)'s combo is collapsed, the VE has to be shown
-+          return true
-+        } else {
-+          return false
-+        }
-+      case 'combo':
-+        return combo.getModel().collapsed;
-+      default:
-+        throw 'object type not recognisable node, edge or combo object'
-+    }
++        if (score >= 1) {
++          return true;
++        } 
++        return false; 
 +  }
 +
    TimeBar.prototype.filterData = function (evt) {
      var _a;
      var value = evt.value;
-@@ -331,7 +397,8 @@ var TimeBar = /** @class */function (_super) {
+@@ -331,7 +394,8 @@ var TimeBar = /** @class */function (_super) {
            return currentNodeExistMap_1[node.getID()] = true; 
          });
          graph.getEdges().forEach(function (edge) {
@@ -107,7 +104,7 @@ index b07b81f..8c525eb 100644
          });
          if (filterItemTypes.includes('node')) {
            originNodes === null || originNodes === void 0 ? void 0 : originNodes.forEach(function (node) {
-@@ -342,10 +409,16 @@ var TimeBar = /** @class */function (_super) {
+@@ -342,10 +406,16 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = currentNodeExistMap_1[node.id];
              if (exist && !hitRange) {
@@ -124,7 +121,22 @@ index b07b81f..8c525eb 100644
                currentNodeExistMap_1[node.id] = true;
              }
            });
-@@ -369,24 +442,132 @@ var TimeBar = /** @class */function (_super) {
+@@ -357,10 +427,12 @@ var TimeBar = /** @class */function (_super) {
+             }));
+             var exist = !!graph.findById(edge.id);
+             if (exist && !shouldShow) {
+-              graph.removeItem(edge.id);
++              // graph.removeItem(edge.id);
++              graph.updateItem(graph.findById(edge.id), {visible: false}); 
+               currentEdgeExistMap_1[edge.id] = false;
+             } else if (!exist && shouldShow) {
+-              graph.addItem('edge', edge);
++              //graph.addItem('edge', edge);
++              graph.updateItem(graph.findById(edge.id), {visible: true}); 
+               currentEdgeExistMap_1[edge.id] = true;
+             } else if (!exist) {
+               currentEdgeExistMap_1[edge.id] = false;
+@@ -369,24 +441,128 @@ var TimeBar = /** @class */function (_super) {
          }
          if (this.get('filterEdge') || filterItemTypes.includes('edge')) {
            originEdges === null || originEdges === void 0 ? void 0 : originEdges.filter(function (edge) {
@@ -145,25 +157,19 @@ index b07b81f..8c525eb 100644
 +            graph.updateItem(graph.findById(edge.id), { frequency: hitDates.length }); // <---- ADDED
 +            const inRangeStatus = dateHit; // <---COUPLE inRange property directly to dateRange, decouple from show/hide item.
 +            edge.inRange = inRangeStatus; // <---- ADDED
-             var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target];
-             var shouldShow = hitRange && endsExist;
+             var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target]; 
+-            var shouldShow = hitRange && endsExist;
++            var shouldShow = hitRange &&  endsExist;
              var exist = currentEdgeExistMap_1[edge.id];
-+            
 +            
 +            const edgeObject = graph.findById(edge.id);// <---- ADDED
 +            const source = edgeObject.getSource(); // <---- ADDED
 +            const target = edgeObject.getTarget(); // <---- ADDED
 +            const ends = [source, target];
-+            
-+            console.warn(`${edgeObject.getID()}, beside 1 collapsed combo:`, checkComboCollapsed(edgeObject, graph));
 +
 +            ends.forEach((node) => {
 +              // set inRange status for the 2 nodes of the edge inRange.
 +              node.getModel().inRange = inRangeStatus;
-+              // check if the standard edge is connected to any combo that's collapsed
-+              // if(checkComboCollapsed(edgeObject, graph)) {
-+
-+              // } 
 +            });
 +            
              if (exist && !shouldShow) {
@@ -171,6 +177,7 @@ index b07b81f..8c525eb 100644
 -              graph.removeItem(edge.id);
 +              //graph.removeItem(edge.id);
 +              graph.updateItem(edgeObject, {visible: false}); // <---- change we don't remove the item.
++
 +              ends.forEach((node) => {
 +                const nodeEdges = node.getEdges();
 +                let edgeScore = 0;
@@ -182,40 +189,40 @@ index b07b81f..8c525eb 100644
 +                if(edgeScore === 0) {
 +                  // if all of the nodes edges have isVisible() = false, hide node.
 +                  graph.updateItem(node, {visible: false});
-+                }
-+                // from node, we update the combos, if any,
-+                if(node.getModel().comboId !== undefined) {
-+                  const combo = graph.findById(node.getModel().comboId);
-+                  const nodesInCombo = getAllNodesInCombo(combo);
-+                  // set combo's inRange property based on whether nodes inside are inRange (not visible)
-+                  const inRangeNodes = nodesInCombo.filter((node) => node.getModel().inRange);
-+                  if(inRangeNodes.length === 0){
-+                    combo.getModel().inRange = false;
-+                  } else {
-+                    combo.getModel().inRange = true;
-+                  }
-+                  // set combo's visibility according to whether the nodes inside are still visible.
-+                  const visibleNodes = nodesInCombo.filter((node) => node.getModel().inRange);
-+                  combo.getModel().label = visibleNodes.length;
-+                  if(combo.getModel().label === 0 && combo.isVisible()) {
-+                    graph.updateItem(combo, { visible: false });
-+                    if(combo.getModel().parentId !== undefined) {
-+                      // if the combo is the only child, its parents have to be hidden also. 
-+                      const parents = getAllParents(combo, graph);
-+                      parents.forEach((parent)=>{
-+                        const childNodes = parent.getNodes();
-+                        const childCombos = parent.getCombos();
-+                        const visibleNodes = childNodes.filter((cNode) => {cNode.getModel().inRange});
-+                        const visibleCombos = childCombos.filter((cCombo) => {cCombo.getModel().inRange});
-+                        if(visibleNodes.length === 0 && visibleCombos.length === 0) {
-+                          graph.updateItem(parent, {visible:false});
-+                        }
-+                      });
++                  // from node, we update the combos, if any,
++                  if(node.getModel().comboId !== undefined) {
++                    const combo = graph.findById(node.getModel().comboId);
++                    const nodesInCombo = getAllNodesInCombo(combo);
++                    // set combo's inRange property based on whether nodes inside are inRange (not visible)
++                    const inRangeNodes = nodesInCombo.filter((node) => node.getModel().inRange);
++                    if(inRangeNodes.length === 0){
++                      combo.getModel().inRange = false;
++                    } else {
++                      combo.getModel().inRange = true;
 +                    }
-+                  } else {
-+                    graph.updateCombo(combo);
-+                  }
-+                }                
++                    // set combo's visibility according to whether the nodes inside are still visible.
++                    const visibleNodes = nodesInCombo.filter((node) => node.getModel().inRange);
++                    combo.getModel().label = visibleNodes.length;
++                    if(combo.getModel().label === 0 && combo.isVisible()) {
++                      graph.updateItem(combo, { visible: false });
++                      if(combo.getModel().parentId !== undefined) {
++                        // if the combo is the only child, its parents have to be hidden also. 
++                        const parents = getAllParents(combo, graph);
++                        parents.forEach((parent)=>{
++                          const childNodes = parent.getNodes();
++                          const childCombos = parent.getCombos();
++                          const visibleNodes = childNodes.filter((cNode) => {cNode.getModel().inRange});
++                          const visibleCombos = childCombos.filter((cCombo) => {cCombo.getModel().inRange});
++                          if(visibleNodes.length === 0 && visibleCombos.length === 0) {
++                            graph.updateItem(parent, {visible:false});
++                          }
++                        });
++                      }
++                    } else {
++                      graph.updateCombo(combo);
++                    }
++                  }                
++                }
 +              })
              } else if (!exist && shouldShow) {
                currentEdgeExistMap_1[edge.id] = true;
@@ -223,6 +230,7 @@ index b07b81f..8c525eb 100644
 +              //graph.addItem('edge', edge);
 +              const edgeObject = graph.findById(edge.id); // <---- ADDED
 +              graph.updateItem(edgeObject, {visible: true});
++
 +              ends.forEach((node) => {
 +                // show node(end) connected to the edge that's showing. 
 +                graph.updateItem(node, {visible: true});
@@ -254,8 +262,9 @@ index b07b81f..8c525eb 100644
 +                  }
 +                }
 +              });
-             }
+             } 
            });
++          console.warn('VE', graph.get('vedges'));
          }
 -      } else {
 +       } else {
