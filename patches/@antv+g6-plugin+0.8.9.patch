@@ -12,7 +12,7 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..757b5fb 100644
+index b07b81f..96d14c7 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -166,7 +166,6 @@ index b07b81f..757b5fb 100644
 +
 +            
 +            const edgeObject = graph.findById(edge.id);// <---- ADDED
-+            const edgeCollapsed = edgeObject.getModel().collapsedByCombo;
 +            const source = edgeObject.getSource(); // <---- ADDED
 +            const target = edgeObject.getTarget(); // <---- ADDED
 +            const ends = [source, target];
@@ -253,7 +252,7 @@ index b07b81f..757b5fb 100644
 +                  const nodesInCombo = getAllNodesInCombo(combo);
 +                  // setting combo's inRange property based on whether nodes inside are still inRange
 +                  const inRangeNodes = nodesInCombo.filter((node) => node.getModel().inRange);
-+                  if(inRangeNodes.length === 0){
++                  if ( inRangeNodes.length === 0 ) {
 +                    combo.getModel().inRange = false;
 +                  } else {
 +                    combo.getModel().inRange = true;
@@ -279,6 +278,7 @@ index b07b81f..757b5fb 100644
            });
 +          // LOGGING AREA
 +          // console.warn('VE', graph.get('vedges'));
++          console.warn('node 7 getEdges = ', graph.findById('node7').getEdges());
          }
 -      } else {
 +       } else {
