@@ -26,8 +26,8 @@ export function populateNodesEdges (jsonData) {
          { id: 'node6', ...image, img: imageURLs[6], comboId: 'combo4',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
          { id: 'node7', ...image, img: imageURLs[7], comboId: 'combo4', label: 'node7'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
          { id: 'node8', ...image, img: imageURLs[8], comboId: 'combo4', label: 'node8'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-        //  { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ inRange: true},  
-        //  { id: 'node10', ...image, img: imageURLs[10], label: 'node10'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+         { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ inRange: true},  
+         { id: 'node10', ...image, img: imageURLs[10], label: 'node10'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //  { id: 'node11', ...image, img: imageURLs[11], label: 'node11'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //  { id: 'node12', ...image, img: imageURLs[12], label: 'node12'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //  { id: 'node13', ...image, img: imageURLs[13], label: 'node13'/* `vector` */, /* date: 1636095553 */ inRange: true},
@@ -81,26 +81,32 @@ export function populateNodesEdges (jsonData) {
             1636095552
           ],
         },
-        // { 
-        //   id: 'edge4',
-        //   source: 'node5', 
-        //   target: 'node6', 
-        //   frequency: '11',
-        //   ttp: true, 
-        //   event: 'edge4'
-        // inRange: true,
-        // date: 1636095554
-        // },
-        // { 
-        //   id: 'edge5',
-        //   source: 'node9', 
-        //   target: 'node10', 
-        //   frequency: '15',
-        //   ttp: true, 
-        //   event: 'edge5'
-        // inRange: true, 
-        // date: 1636095552
-        // },
+        { 
+          id: 'edge4',
+          source: 'node5', 
+          target: 'node9', 
+          frequency: 1,
+          ttp: true, 
+          event: 'edge4',
+          inRange: true,
+          date: 
+          [ 
+            1636095554,
+          ]
+        },
+        { 
+          id: 'edge5',
+          source: 'node9', 
+          target: 'node10', 
+          frequency: 1,
+          ttp: true, 
+          event: 'edge5',
+          inRange: true, 
+          date: 
+          [
+            1636095555,
+          ]
+        },
         { 
           id: 'edge6',
           source: 'node0', 
@@ -111,7 +117,7 @@ export function populateNodesEdges (jsonData) {
           inRange: true, 
           date: 
           [
-            1636095544,
+            1636095546,
           ],
         },
         { 
