@@ -12,7 +12,7 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..402eae6 100644
+index b07b81f..757b5fb 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -95,7 +95,7 @@ index b07b81f..402eae6 100644
      var _a;
      var value = evt.value;
 @@ -331,7 +394,8 @@ var TimeBar = /** @class */function (_super) {
-           return currentNodeExistMap_1[node.getID()] = true; 
+           return currentNodeExistMap_1[node.getID()] = true;
          });
          graph.getEdges().forEach(function (edge) {
 -          return currentEdgeExistMap_1[edge.getID()] = true;
@@ -275,7 +275,7 @@ index b07b81f..402eae6 100644
 +                  }
 +                }
 +              });
-             } 
+             }
            });
 +          // LOGGING AREA
 +          // console.warn('VE', graph.get('vedges'));
