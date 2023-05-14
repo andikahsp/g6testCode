@@ -12,7 +12,7 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..07f1f2a 100644
+index b07b81f..9595763 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
@@ -60,26 +60,26 @@ index b07b81f..07f1f2a 100644
 +    }
 +  }
 +
-+  function getOldestVisibleCombo(node, graph) {
++  function getHighestVisibleItem(node, graph) {
 +    let innermostCombo;
 +    if(node.getModel().comboId !== undefined) {
 +      innermostCombo = graph.findById(node.getModel().comboId);
++      if (innermostCombo.isVisible()) {
++        return innermostCombo;
++      } else {
++        // run recursion on parent of innermostCombo
++        return getHighestVisibleCombo(innermostCombo, graph);
++      } 
 +    } else return node
-+    if (innermostCombo.isVisible()) {
-+      return innermostCombo;
-+    } else {
-+      // run recursion on parent of innermostCombo
-+      return findOldestVisibleCombo(innermostCombo, graph);
-+    } 
-+    throw 'error at getOldestVisibleCombo'
++    throw 'error at getHighestVisibleItem'
 +  } 
 +
-+  function findOldestVisibleCombo(combo, graph) {
++  function getHighestVisibleCombo(combo, graph) {
 +    if (combo.isVisible()) {
 +      return combo
 +    } else {
 +      const parentCombo = graph.findById(combo.getModel().parentId)
-+      return findOldestVisibleCombo(parentCombo, graph)
++      return getHighestVisibleCombo(parentCombo, graph)
 +    }
 +  }
 +
@@ -128,7 +128,7 @@ index b07b81f..07f1f2a 100644
                currentEdgeExistMap_1[edge.id] = true;
              } else if (!exist) {
                currentEdgeExistMap_1[edge.id] = false;
-@@ -369,24 +433,107 @@ var TimeBar = /** @class */function (_super) {
+@@ -369,24 +433,125 @@ var TimeBar = /** @class */function (_super) {
          }
          if (this.get('filterEdge') || filterItemTypes.includes('edge')) {
            originEdges === null || originEdges === void 0 ? void 0 : originEdges.filter(function (edge) {
@@ -179,8 +179,26 @@ index b07b81f..07f1f2a 100644
 +            } else if (!hitRange) {
 +              if (edgeObject.getModel().collapsedByCombo) {
 +                // expandCollapse Combo code would have hidden the edge 
-+                if (source.getType() !== 'node' && target.getType() !== 'node') {
++                if(source.getModel().comboId !== undefined && target.getModel().comboId !== undefined ||
++                   source.getModel().comboId === undefined && target.getModel().comboId !== undefined ||
++                   source.getModel().comboId !== undefined && target.getModel().comboId === undefined) {
++                  // get highest visible item of source and target
++                  const c1 = getHighestVisibleItem(source, graph);
++                  const c2 = getHighestVisibleItem(target, graph);
 +
++                  let c1_otherNodes;
++                  let c2_otherNodes;
++                  if (c1.getType() === 'combo') {
++                    c1_otherNodes = getAllNodesInCombo(c1).filter(otherNode => otherNode.getID() !== source.getID());
++                  }
++                  if (c2.getType() === 'combo') {
++                    c2_otherNodes = getAllNodesInCombo(c2).filter(otherNode=> otherNode.getID() !== target.getID());
++                  }
++                  
++                  // for c1 others, if there are neighbors of its nodes in c2 others, it means there are parallel edges between these
++                  //collapsed combos
++
++                  // do we need a function for hitRange?
 +                }
 +              } else if (!edgeObject.getModel().collapsedByCombo || edgeObject.getModel().collapsedByCombo === undefined) {
 +                graph.updateItem(edgeObject, {visible: false}); // <---- hideItem, not removeItem!
