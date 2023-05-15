@@ -1,17 +1,13 @@
 diff --git a/node_modules/@antv/g6-core/es/graph/controller/item.js b/node_modules/@antv/g6-core/es/graph/controller/item.js
-index 7d7c659..ae79cc6 100644
+index 7d7c659..4422e15 100644
 --- a/node_modules/@antv/g6-core/es/graph/controller/item.js
 +++ b/node_modules/@antv/g6-core/es/graph/controller/item.js
-@@ -384,10 +384,14 @@ var ItemController = /** @class */function () {
+@@ -384,10 +384,10 @@ var ItemController = /** @class */function () {
      }
      var children = combo.getChildren();
      children.nodes.forEach(function (node) {
 -      graph.hideItem(node, stack);
 +      graph.hideItem(node, stack, 'c'); // <-------MODIFIED
-+      const nEdges = node.getEdges();     // <------ ADDED
-+      nEdges.forEach((edge) => {      // <------ ADDED
-+        graph.hideItem(edge, stack, 'c'); // <------ ADDED & MODIFIED
-+      }); // <------ ADDED
      });
      children.combos.forEach(function (c) {
 -      graph.hideItem(c, stack);
@@ -19,18 +15,16 @@ index 7d7c659..ae79cc6 100644
      });
    };
    /**
-@@ -439,8 +443,9 @@ var ItemController = /** @class */function () {
+@@ -439,7 +439,7 @@ var ItemController = /** @class */function () {
      var children = combo.getChildren();
      var edgeSet = new Set();
      children.nodes.forEach(function (node) {
 -      graph.showItem(node, stack);
 +      graph.showItem(node, stack, 'c');
        node.getEdges().forEach(function (edge) {
-+        graph.showItem(edge, stack, 'c');       // <------ ADDED
          return edgeSet.add(edge);
        });
-     });
-@@ -686,7 +691,7 @@ var ItemController = /** @class */function () {
+@@ -686,7 +686,7 @@ var ItemController = /** @class */function () {
     * @param {boolean} visible 是否显示
     * @memberof ItemController
     */
@@ -39,7 +33,7 @@ index 7d7c659..ae79cc6 100644
      var _this = this;
      var graph = this.graph;
      if (isString(item)) {
-@@ -701,6 +706,9 @@ var ItemController = /** @class */function () {
+@@ -701,6 +701,9 @@ var ItemController = /** @class */function () {
        visible: visible
      });
      item.changeVisibility(visible);
@@ -49,7 +43,7 @@ index 7d7c659..ae79cc6 100644
      if (item.getType && item.getType() === NODE) {
        var edges = item.getEdges();
        each(edges, function (edge) {
-@@ -709,7 +717,7 @@ var ItemController = /** @class */function () {
+@@ -709,7 +712,7 @@ var ItemController = /** @class */function () {
          if (visible && !(edge.get('source').isVisible() && edge.get('target').isVisible())) {
            return;
          }
@@ -58,7 +52,7 @@ index 7d7c659..ae79cc6 100644
        });
      } else if (item.getType && item.getType() === COMBO) {
        var comboTrees = graph.get('comboTrees');
-@@ -725,14 +733,13 @@ var ItemController = /** @class */function () {
+@@ -725,14 +728,13 @@ var ItemController = /** @class */function () {
              found_3 = true;
              return false; // terminate the traverse
            }
@@ -74,7 +68,7 @@ index 7d7c659..ae79cc6 100644
          });
        }
        var edges = item.getEdges();
-@@ -742,7 +749,7 @@ var ItemController = /** @class */function () {
+@@ -742,7 +744,7 @@ var ItemController = /** @class */function () {
          if (visible && !(edge.get('source').isVisible() && edge.get('target').isVisible())) {
            return;
          }
@@ -84,7 +78,7 @@ index 7d7c659..ae79cc6 100644
      }
      graph.emit('afteritemvisibilitychange', {
 diff --git a/node_modules/@antv/g6-core/es/graph/graph.js b/node_modules/@antv/g6-core/es/graph/graph.js
-index e46df98..1046384 100644
+index e46df98..e207e4c 100644
 --- a/node_modules/@antv/g6-core/es/graph/graph.js
 +++ b/node_modules/@antv/g6-core/es/graph/graph.js
 @@ -790,12 +790,13 @@ var AbstractGraph = /** @class */function (_super) {
@@ -187,3 +181,17 @@ index e46df98..1046384 100644
              cNodesCombos = cNodesCombos.concat(item.getNodes());
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
+@@ -2636,11 +2666,13 @@ var AbstractGraph = /** @class */function (_super) {
+         return true;
+       });
+     });
++    console.warn('cNodesCombos:',cNodesCombos);
+     var addedVEdgeMap = {};
+     edges.forEach(function (edge) {
+       if (edge.isVisible() && !edge.getModel().isVEdge) return;
+       var source = edge.getSource();
+       var target = edge.getTarget();
++      console.warn('target', target);
+       var sourceId = source.get('id');
+       var targetId = target.get('id');
+       var otherEnd = null;
