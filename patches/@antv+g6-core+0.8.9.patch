@@ -78,7 +78,7 @@ index 7d7c659..4422e15 100644
      }
      graph.emit('afteritemvisibilitychange', {
 diff --git a/node_modules/@antv/g6-core/es/graph/graph.js b/node_modules/@antv/g6-core/es/graph/graph.js
-index e46df98..e207e4c 100644
+index e46df98..1631513 100644
 --- a/node_modules/@antv/g6-core/es/graph/graph.js
 +++ b/node_modules/@antv/g6-core/es/graph/graph.js
 @@ -790,12 +790,13 @@ var AbstractGraph = /** @class */function (_super) {
@@ -181,17 +181,3 @@ index e46df98..e207e4c 100644
              cNodesCombos = cNodesCombos.concat(item.getNodes());
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
-@@ -2636,11 +2666,13 @@ var AbstractGraph = /** @class */function (_super) {
-         return true;
-       });
-     });
-+    console.warn('cNodesCombos:',cNodesCombos);
-     var addedVEdgeMap = {};
-     edges.forEach(function (edge) {
-       if (edge.isVisible() && !edge.getModel().isVEdge) return;
-       var source = edge.getSource();
-       var target = edge.getTarget();
-+      console.warn('target', target);
-       var sourceId = source.get('id');
-       var targetId = target.get('id');
-       var otherEnd = null;
