@@ -60,11 +60,11 @@ const TimeBarTrendTrial
         padding: 20,
         type: 'trend',
         tick: {
-        //   tickLabelFormatter: (d) => {
-        //     // convert the data accordingly
-        //    // log(`d => ${JSON.stringify(d, null, 3)}`);
-        //     return getUTCHrMinSec(d.date);
-        // },
+          tickLabelFormatter: (d) => {
+            // convert the data accordingly
+           // log(`d => ${JSON.stringify(d, null, 3)}`);
+            return getUTCHrMinSec(d.date);
+        },
           tickLabelStyle:{ 
             fontSize: 13, 
             fontFamily: 'Segoe UI',
@@ -794,8 +794,8 @@ const TimeBarTrendTrial
             let vedgeId;
             const VEdges = e.item.getEdges();
             for (let r = 0; r < VEdges.length; r++) {
-              if (VEdges[r].getSource() === neighbors[i] || 
-                  VEdges[r].getTarget() === neighbors[i]) { 
+              if (VEdges[r].getSource() === neighbors[i] && VEdges[r].getTarget() === e.item || 
+                  VEdges[r].getTarget() === neighbors[i] && VEdges[r].getSource() === e.item) { 
                     vedgeId = VEdges[r].getID();
                   }
             }
@@ -840,8 +840,8 @@ const TimeBarTrendTrial
                 edges.forEach((edge) => {
                   if (edge.getModel().isVEdge) {
                     if ( // <================
-                      edge.getTarget() === neighbour && edge.getSource() === nodes[i]||
-                      edge.getSource() === neighbour && edge.getTarget() === nodes[i]
+                      edge.getTarget() === neighbour /* && edge.getSource() === nodes[i] */||
+                      edge.getSource() === neighbour /* && edge.getTarget() === nodes[i] */
                     ) {
                       edge.getModel()["ttp"] = ttp;
                       return;
@@ -887,6 +887,7 @@ const TimeBarTrendTrial
                   if (ttp) break;
                 }
                 if (ttp) {
+                  
                   const comboVedges = inCombo.getEdges();
                   for (let j = 0; j < comboVedges.length; j++) {
                     if (
@@ -897,6 +898,7 @@ const TimeBarTrendTrial
                       break;
                     }
                   }
+                  log('>>comboVE on EXPAND =', comboVedges);
                 }
               } else if (
                 neighbours[i].getType() === "combo" &&
@@ -923,6 +925,7 @@ const TimeBarTrendTrial
                   }
                 }
                 if (ttp) {
+                  log('bye')
                   const comboVedges = inCombo.getEdges();
                   for (let j = 0; j < comboVedges.length; j++) {
                     if (
@@ -933,6 +936,7 @@ const TimeBarTrendTrial
                       break;
                     }
                   }
+                  log('## comboVE on EXPAND =', comboVedges);
                 }
               }
             }
@@ -961,6 +965,8 @@ const TimeBarTrendTrial
         }
       }
 
+      // returns true if there is an edge between the node and combo
+      // AND that edge is TTP.
       function checkTTP(node, combo) {
         const nEdges = node.getEdges();
         let x = false;

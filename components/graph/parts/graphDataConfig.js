@@ -17,17 +17,17 @@ export function populateNodesEdges (jsonData) {
      // node and edge definition will be based on backend logic                  
      const data = {
         nodes:[
-          // { id: 'node0', ...circle, /* img: imageURLs[0], */ comboId: 'combo1',  label: /* 'node0' */jsonData.computerName, /* date: jsonData.logsourceTime */ inRange: true },
-          // { id: 'node1', ...image, img: imageURLs[1], comboId: 'combo4',  label: 'node1'/* jsonData.logonProcess */, /* date: jsonData.logsourceTime */ inRange: true},
+        //   { id: 'node0', ...circle, /* img: imageURLs[0], */ comboId: 'combo1',  label: /* 'node0' */jsonData.computerName, /* date: jsonData.logsourceTime */ inRange: true },
+        //   { id: 'node1', ...image, img: imageURLs[1], comboId: 'combo4',  label: 'node1'/* jsonData.logonProcess */, /* date: jsonData.logsourceTime */ inRange: true},
         //  { id: 'node2', ...triangle, /* img: imageURLs[2], */ /* comboId: 'combo3',  */ label: /* 'node2' */jsonData.originatingComputer, /* date: 1636095550 */ inRange: true},    
-         { id: 'node3', ...image, img: imageURLs[3], comboId: 'combo5',  label: 'node3'/* `vector` */, /* date: 1636095551 */ inRange: true},  
-         { id: 'node4', ...image, img: imageURLs[4], comboId: 'combo6',  label: 'node4'/* `vector` */, /* date: 1636095552 */ inRange: true},  
-          //{ id: 'node5', ...image, img: imageURLs[5], /* comboId: 'combo6',   */label: 'node5'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-          //{ id: 'node6', ...image, img: imageURLs[6], comboId: 'combo4',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-          //{ id: 'node7', ...image, img: imageURLs[7], comboId: 'combo4', label: 'node7'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-          //{ id: 'node8', ...image, img: imageURLs[8], comboId: 'combo4', label: 'node8'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-          //{ id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ inRange: true},  
-          //{ id: 'node10', ...image, img: imageURLs[10], label: 'node10'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        { id: 'node3', ...image, img: imageURLs[3], comboId: 'combo5',  label: 'node3'/* `vector` */, /* date: 1636095551 */ inRange: true},  
+        { id: 'node4', ...image, img: imageURLs[4], comboId: 'combo6',  label: 'node4'/* `vector` */, /* date: 1636095552 */ inRange: true},  
+        //   { id: 'node5', ...image, img: imageURLs[5], /* comboId: 'combo6',   */label: 'node5'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        //   { id: 'node6', ...image, img: imageURLs[6], comboId: 'combo4',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        //   { id: 'node7', ...image, img: imageURLs[7], comboId: 'combo4', label: 'node7'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        //   { id: 'node8', ...image, img: imageURLs[8], comboId: 'combo4', label: 'node8'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        //   { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ inRange: true},  
+        //   { id: 'node10', ...image, img: imageURLs[10], label: 'node10'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //  { id: 'node11', ...image, img: imageURLs[11], label: 'node11'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //  { id: 'node12', ...image, img: imageURLs[12], label: 'node12'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //  { id: 'node13', ...image, img: imageURLs[13], label: 'node13'/* `vector` */, /* date: 1636095553 */ inRange: true},
@@ -51,7 +51,8 @@ export function populateNodesEdges (jsonData) {
           id: 'edge2',
           source: 'node3',
           target: 'node4', 
-          ttp: false, 
+          event: 'edge2',//`some other Event`
+          ttp: true, 
           frequency: 6, 
           inRange: true, 
           date: 
@@ -63,7 +64,6 @@ export function populateNodesEdges (jsonData) {
             1636095551,
             1636095552
           ],
-          event: 'edge2',//`some other Event`
         },
         // { 
         //   id: 'edge3',
@@ -150,7 +150,7 @@ export function populateNodesEdges (jsonData) {
           source: 'node4', 
           target: 'node3', 
           frequency: 2,
-          ttp: true, 
+          ttp: false, 
           event: 'edge9',
           inRange: true, 
           date: 
@@ -188,22 +188,24 @@ export function populateNodesEdges (jsonData) {
           id: 'combo5',
              label: 1,
           inRange: true, 
+          parentId: 'combo7'
         },
         {
           id: 'combo6',
           label: 1,
           inRange: true,
+          parentId: 'combo8'
         },
-        // {
-        //   id: 'combo7',
-        //   label: 1,
-          // inRange: true, 
-        // },
-        // {
-        //   id: 'combo8',
-        //   label: 1,
-          // inRange: true, 
-        // },
+        {
+          id: 'combo7',
+          label: 1,
+          inRange: true, 
+        },
+        {
+          id: 'combo8',
+          label: 1,
+          inRange: true, 
+        },
        ]
      } 
      return data;
