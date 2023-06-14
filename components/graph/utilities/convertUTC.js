@@ -1,3 +1,4 @@
+// Events based on epochTime ONLY!!!!
 function getUTCDateObject(logsourceTime) {
     const actualTime = new Date(0);
     actualTime.setUTCSeconds(logsourceTime);
