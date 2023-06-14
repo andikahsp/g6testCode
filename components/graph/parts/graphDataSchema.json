@@ -1,0 +1,51 @@
+{
+  "nodes": [
+    {
+      "id": "",
+      "label": "",
+      "type": "",
+      "comboId": "",
+      "ioc": true,
+      "x": 250.01,
+      "y": 286.15,
+      "visible": true,
+      "inRange": true,
+      "properties": [],
+      "collapsedByCombo": false,
+      "savedID": " something"
+    }
+  ],
+  "edges": [
+    {
+      "id": "",
+      "label": "",
+      "type": "",
+      "source": "",
+      "target": "",
+      "frequency": "",
+      "ttp": true,
+      "date": [1636095547, 1636095548, 1636095549, 1636095550],
+      "visible": true,
+      "pID": [],
+      "inRange": true,
+      "properties": [],
+      "collapsedByCombo": false,
+      "savedID": " something"
+    }
+  ],
+  "combos": [
+    {
+      "id": "",
+      "label": "",
+      "parentId": "",
+      "nodeCount": 6,
+      "x": 250.01,
+      "y": 286.15,
+      "visible": true,
+      "inRange": true,
+      "properties": [],
+      "collapsed": false,
+      "savedID": " something"
+    }
+  ]
+}
