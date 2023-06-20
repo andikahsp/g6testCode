@@ -63,7 +63,8 @@ const TimeBarTrendTrial
           tickLabelFormatter: (d) => {
             // convert the data accordingly
            // log(`d => ${JSON.stringify(d, null, 3)}`);
-            return getUTCHrMinSec(d.date);
+            // return getUTCHrMinSec(d.date);
+            return d
         },
           tickLabelStyle:{ 
             fontSize: 13, 
