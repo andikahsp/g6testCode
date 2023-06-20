@@ -37,6 +37,16 @@ export function populateNodesEdges (jsonData) {
         // set to questionmark icon
         node["img"] = imageURLs[24]
       }
-    })       
+    })  
+    
+    // convert the epoch MS times in dates of edges to secs time
+    jsonData.edges.forEach((edge) => {
+      for(let i = 0; i < edge.date.length; i ++) {
+        edge["date"][i] = Math.floor(edge["date"][i] / 1000);
+      }
+      // edge.date.forEach((time) => {
+      //   time = Math.floor(time/1000);
+      // })
+    })
     return jsonData;
    }
