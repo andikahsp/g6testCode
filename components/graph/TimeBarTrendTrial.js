@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { data as jsonData } from './source';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
-import { populateNodesEdges } from "./parts/graphDataConfig";
+import { populateNodesEdges, getAxisMinMax } from "./parts/graphDataConfig";
 
 let log = console.log; 
 let nodeA = "";
@@ -24,7 +24,7 @@ const TimeBarTrendTrial
       const G6 = require('@antv/g6');
 
       //transform rawQuery jsonData into nodeEdgeData
-      const nodeEdgeData = populateNodesEdges(jsonData);
+      const nodeEdgeData= populateNodesEdges(jsonData);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 45, 'quadratic-custom', 'fund-polyline', undefined);
 
       const container = ref.current;
@@ -33,9 +33,11 @@ const TimeBarTrendTrial
       const timeBarData = [];
 
       const range = 18; // number of units that window will show
-      const axisMin = jsonData.logsourceTime - (range / 2);
-      const axisMax = jsonData.logsourceTime + (range / 2) + 1;
-     
+      // const axisMin = jsonData.logsourceTime - (range / 2);
+      // const axisMax = jsonData.logsourceTime + (range / 2) + 1;
+      const axisMin = 1667778199 - 10;
+      const axisMax = 1667779199 + 10;
+      //const axisMax = 1667520200 + 10;
 
       // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
       // time = 6:59.08 am
@@ -44,7 +46,7 @@ const TimeBarTrendTrial
         //log(`i = ${i}`);
         timeBarData.push({
           date: i,
-          value: Math.round(Math.random() * 200),
+          value: Math.round(Math.random() * 10),
         });
         //log(`${i}seconds, timeString=${timeString}`)
       }
@@ -63,7 +65,7 @@ const TimeBarTrendTrial
           tickLabelFormatter: (d) => {
             // convert the data accordingly
            // log(`d => ${JSON.stringify(d, null, 3)}`);
-            // return getUTCHrMinSec(d["date"]);
+           // return getUTCHrMinSec(d["date"]);
             return d
         },
           tickLabelStyle:{ 
@@ -240,8 +242,9 @@ const TimeBarTrendTrial
         height: height + 55,
         linkCenter: false,
         plugins: [newTimebar],
+        workerEnabled: true, 
         layout: {
-          //type: 'force',
+          type: 'force',
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,

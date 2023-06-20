@@ -29,7 +29,7 @@ export function populateNodesEdges (jsonData) {
     // Add icon settings to graphData from BackEnd
     jsonData.nodes.forEach((node) => {
       node["type"] = 'image';
-      node["size"] = 46;
+      node["size"] = 24;
       const iconType = node["display"]["labels"][0];
       if (iconType){
         node["img"] = imageHash[iconType]
@@ -39,14 +39,27 @@ export function populateNodesEdges (jsonData) {
       }
     })  
     
-    // convert the epoch MS times in dates of edges to secs time
-    jsonData.edges.forEach((edge) => {
-      for(let i = 0; i < edge.date.length; i ++) {
-        edge["date"][i] = Math.floor(edge["date"][i] / 1000);
-      }
-      // edge.date.forEach((time) => {
-      //   time = Math.floor(time/1000);
-      // })
-    })
+/*     jsonData.edges.forEach((edge) => {
+      edge.date.forEach((time) => {
+        const bar = time / 1000;
+        time = bar;  
+      })
+    })  
+ */
+    console.log('jsonData =', jsonData);
     return jsonData;
    }
+
+/*    export function getAxisMinMax(jsonData) {
+    const epochTimes = []
+    // draw out all time values to find start and end of axis
+    jsonData.edges.forEach((edge) => {
+      edge.date.forEach((x)=> {
+        epochTimes.push(x)
+      })
+    })
+    epochTimes.sort((a,b) => a - b);
+    const lastIndx = epochTimes.length - 1;
+    const result = [epochTimes[0], epochTimes[lastIndx]];
+    return result;
+   } */
