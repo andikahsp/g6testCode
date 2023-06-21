@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { data as jsonData } from './source';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
-import { populateNodesEdges, getAxisMinMax } from "./parts/graphDataConfig";
+import { populateNodesEdges } from "./parts/graphDataConfig";
 
 let log = console.log; 
 let nodeA = "";
@@ -32,25 +32,35 @@ const TimeBarTrendTrial
       const height = (container.scrollHeight || 700) - 100;
       const timeBarData = [];
 
-      const range = 18; // number of units that window will show
+      // const range = 18; // number of units that window will show
+      
       // const axisMin = jsonData.logsourceTime - (range / 2);
       // const axisMax = jsonData.logsourceTime + (range / 2) + 1;
-      const axisMin = 1667778199 - 10;
-      const axisMax = 1667779199 + 10;
-      //const axisMax = 1667520200 + 10;
-
+      const timeBarInfo = jsonData["info"]
+      const range = timeBarInfo.firstDate - timeBarInfo.lastDate; // number of units that window will show
+      const axisMin = timeBarInfo["firstDate"] - 5;
+      const axisMax = timeBarInfo["lastDate"] + 5;
       // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
       // time = 6:59.08 am
       // window: 6:58.59am  - 6:59.17 am (60seconds)
       for (let i = axisMin; i < axisMax; i++) {
         //log(`i = ${i}`);
-        timeBarData.push({
-          date: i,
-          value: Math.round(Math.random() * 10),
-        });
+        const keyString = i.toString();
+        if (keyString in timeBarInfo["dateFreq"]) {
+          timeBarData.push({
+            date: i,
+            value: timeBarInfo["dateFreq"][keyString]
+          });
+        } else {
+          timeBarData.push({
+            date: i,
+            value: 0
+          });
+        }
         //log(`${i}seconds, timeString=${timeString}`)
       }
 
+      log("timeBarData = ", timeBarData);
 
       const nodeSize = 24;
       //log(G6.TimeBar);
@@ -65,8 +75,8 @@ const TimeBarTrendTrial
           tickLabelFormatter: (d) => {
             // convert the data accordingly
            // log(`d => ${JSON.stringify(d, null, 3)}`);
-           // return getUTCHrMinSec(d["date"]);
-            return d
+           return getUTCHrMinSec(d.date);
+           //return d
         },
           tickLabelStyle:{ 
             fontSize: 13, 
@@ -94,7 +104,7 @@ const TimeBarTrendTrial
           },
           isArea: true,
           areaStyle:{
-            fill: 'lightgrey', // 'pink'
+            fill: 'orange', // 'pink'
           },
         },
         slider: { 

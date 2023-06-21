@@ -1,4 +1,37 @@
 export const data = {
+  "info": {
+        "type": "timeBarInfo",
+        "dateFreq": {
+              "1667575037": 10,
+              "1667575752": 12,
+              "1667576173": 8,
+              "1667576183": 2,
+              "1667576425": 4,
+              "1667576436": 6,
+              "1667576844": 14,
+              "1667577572": 14,
+              "1667576865": 2,
+              "1667577497": 2,
+              "1667577645": 4,
+              "1667577813": 4,
+              "1667575321": 8,
+              "1667575794": 8,
+              "1667576383": 4,
+              "1667576802": 16,
+              "1667577445": 4,
+              "1667576394": 8,
+              "1667575773": 1,
+              "1667575783": 1,
+              "1667576855": 4,
+              "1667577507": 5,
+              "1667577655": 3,
+              "1667577665": 2,
+              "1667577822": 24,
+              "1667577823": 18
+        },
+        "firstDate": 1667575037,
+        "lastDate": 1667577823
+  },
   "nodes": [
         {
               "id": "1",
@@ -12,13 +45,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Account_Domain": "STELLA.LOCAL",
-                    "Account_Name": "client11",
-                    "User": "STELLA\\client11",
-                    "Title": "STELLA\\client11",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Account_Domain": "STELLA.LOCAL",
+                          "Account_Name": "client11",
+                          "User": "STELLA\\client11",
+                          "Title": "STELLA\\client11",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "2",
@@ -32,11 +67,13 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "ComputerName": "QDS7.stella.local",
-                    "Title": "QDS7.stella.local",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "ComputerName": "QDS7.stella.local",
+                          "Title": "QDS7.stella.local",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "22",
@@ -50,13 +87,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Account_Domain": "STELLA",
-                    "Account_Name": "client5",
-                    "User": "STELLA\\client5",
-                    "Title": "STELLA\\client5",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Account_Domain": "STELLA",
+                          "Account_Name": "client5",
+                          "User": "STELLA\\client5",
+                          "Title": "STELLA\\client5",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "25",
@@ -70,13 +109,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Account_Domain": "STELLA",
-                    "Account_Name": "dennis.r",
-                    "User": "STELLA\\dennis.r",
-                    "Title": "STELLA\\dennis.r",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Account_Domain": "STELLA",
+                          "Account_Name": "dennis.r",
+                          "User": "STELLA\\dennis.r",
+                          "Title": "STELLA\\dennis.r",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "52",
@@ -90,13 +131,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Account_Domain": "Window Manager",
-                    "Account_Name": "DWM-1",
-                    "User": "Window Manager\\DWM-1",
-                    "Title": "Window Manager\\DWM-1",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Account_Domain": "Window Manager",
+                          "Account_Name": "DWM-1",
+                          "User": "Window Manager\\DWM-1",
+                          "Title": "Window Manager\\DWM-1",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "184",
@@ -110,13 +153,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "ComputerName": "QDS7.stella.local",
-                    "OriginatingComputerName": "10.0.5.87",
-                    "path": "C:\\Users\\dennis.r\\AppData\\Local\\Temp\\charlie10.exe",
-                    "Title": "charlie10.exe",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "ComputerName": "QDS7.stella.local",
+                          "OriginatingComputerName": "10.0.5.87",
+                          "path": "C:\\Users\\dennis.r\\AppData\\Local\\Temp\\charlie10.exe",
+                          "Title": "charlie10.exe",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "187",
@@ -130,13 +175,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "ComputerName": "QDS7.stella.local",
-                    "OriginatingComputerName": "10.0.5.87",
-                    "path": "C:\\Windows\\System32\\cmd.exe",
-                    "Title": "cmd.exe",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "ComputerName": "QDS7.stella.local",
+                          "OriginatingComputerName": "10.0.5.87",
+                          "path": "C:\\Windows\\System32\\cmd.exe",
+                          "Title": "cmd.exe",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "203",
@@ -150,13 +197,15 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "ComputerName": "QDS7.stella.local",
-                    "OriginatingComputerName": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\AppData\\Local\\Temp\\charlie10.exe",
-                    "Title": "charlie10.exe",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "ComputerName": "QDS7.stella.local",
+                          "OriginatingComputerName": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\AppData\\Local\\Temp\\charlie10.exe",
+                          "Title": "charlie10.exe",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "215",
@@ -170,15 +219,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\dennis.r\\Downloads",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\dennis.r\\Downloads",
-                    "Title": "Downloads",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\dennis.r\\Downloads",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\dennis.r\\Downloads",
+                          "Title": "Downloads",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "218",
@@ -192,15 +243,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\dennis.r\\Downloads\\newdata.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\dennis.r\\Downloads\\newdata.docx",
-                    "Title": "newdata.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\dennis.r\\Downloads\\newdata.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\dennis.r\\Downloads\\newdata.docx",
+                          "Title": "newdata.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "224",
@@ -214,15 +267,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\dennis.r\\Downloads\\newdata.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\dennis.r\\Downloads\\newdata.docx.enc",
-                    "Title": "newdata.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\dennis.r\\Downloads\\newdata.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\dennis.r\\Downloads\\newdata.docx.enc",
+                          "Title": "newdata.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "230",
@@ -236,15 +291,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020",
-                    "Title": "2020",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020",
+                          "Title": "2020",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "233",
@@ -258,15 +315,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx",
-                    "Title": "april quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx",
+                          "Title": "april quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "239",
@@ -280,15 +339,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads",
-                    "Title": "Downloads",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads",
+                          "Title": "Downloads",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "242",
@@ -302,15 +363,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx.enc",
-                    "Title": "april quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\april quotation.docx.enc",
+                          "Title": "april quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "245",
@@ -324,15 +387,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx",
-                    "Title": "feb quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx",
+                          "Title": "feb quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "251",
@@ -346,15 +411,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx",
-                    "Title": "jan quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx",
+                          "Title": "jan quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "254",
@@ -368,15 +435,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx.enc",
-                    "Title": "feb quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\feb quotation.docx.enc",
+                          "Title": "feb quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "257",
@@ -390,15 +459,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx.enc",
-                    "Title": "jan quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\jan quotation.docx.enc",
+                          "Title": "jan quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "260",
@@ -412,15 +483,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx",
-                    "Title": "july quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx",
+                          "Title": "july quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "263",
@@ -434,15 +507,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx.enc",
-                    "Title": "july quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\july quotation.docx.enc",
+                          "Title": "july quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "269",
@@ -456,15 +531,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx",
-                    "Title": "june quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx",
+                          "Title": "june quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "272",
@@ -478,15 +555,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx.enc",
-                    "Title": "june quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\june quotation.docx.enc",
+                          "Title": "june quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "281",
@@ -500,15 +579,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx.enc",
-                    "Title": "march quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx.enc",
+                          "Title": "march quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "284",
@@ -522,15 +603,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx.enc",
-                    "Title": "may quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx.enc",
+                          "Title": "may quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "287",
@@ -544,15 +627,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx",
-                    "Title": "march quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\march quotation.docx",
+                          "Title": "march quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "290",
@@ -566,15 +651,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx",
-                    "Title": "may quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\2020\\may quotation.docx",
+                          "Title": "may quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "293",
@@ -588,15 +675,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\cost issue.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\cost issue.docx",
-                    "Title": "cost issue.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\cost issue.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\cost issue.docx",
+                          "Title": "cost issue.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "296",
@@ -610,15 +699,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\datasheet.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\datasheet.docx",
-                    "Title": "datasheet.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\datasheet.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\datasheet.docx",
+                          "Title": "datasheet.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "302",
@@ -632,15 +723,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\cost issue.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\cost issue.docx.enc",
-                    "Title": "cost issue.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\cost issue.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\cost issue.docx.enc",
+                          "Title": "cost issue.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "308",
@@ -654,15 +747,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\datasheet.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\datasheet.docx.enc",
-                    "Title": "datasheet.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\datasheet.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\datasheet.docx.enc",
+                          "Title": "datasheet.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "311",
@@ -676,15 +771,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\final quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\final quotation.docx",
-                    "Title": "final quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\final quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\final quotation.docx",
+                          "Title": "final quotation.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "314",
@@ -698,15 +795,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\final quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\final quotation.docx.enc",
-                    "Title": "final quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\final quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\final quotation.docx.enc",
+                          "Title": "final quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "326",
@@ -720,15 +819,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\product manual.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\product manual.docx",
-                    "Title": "product manual.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\product manual.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\product manual.docx",
+                          "Title": "product manual.docx",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "329",
@@ -742,15 +843,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\product manual.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\product manual.docx.enc",
-                    "Title": "product manual.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\product manual.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\product manual.docx.enc",
+                          "Title": "product manual.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "335",
@@ -764,15 +867,17 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\quotation.docx.enc",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\quotation.docx.enc",
-                    "Title": "quotation.docx.enc",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\quotation.docx.enc",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\quotation.docx.enc",
+                          "Title": "quotation.docx.enc",
+                          "tag": ""
+                    }
+              ]
         },
         {
               "id": "338",
@@ -786,94 +891,129 @@ export const data = {
                     ],
                     "tag": ""
               },
-              "properties": {
-                    "Object Name": "C:\\Users\\client5\\Downloads\\quotation.docx",
-                    "Object Type": "File",
-                    "Computer Name": "QDS7.stella.local",
-                    "Originating Computer Name": "10.0.5.87",
-                    "path": "C:\\Users\\client5\\Downloads\\quotation.docx",
-                    "Title": "quotation.docx",
-                    "tag": ""
-              }
+              "properties": [
+                    {
+                          "Object Name": "C:\\Users\\client5\\Downloads\\quotation.docx",
+                          "Object Type": "File",
+                          "Computer Name": "QDS7.stella.local",
+                          "Originating Computer Name": "10.0.5.87",
+                          "path": "C:\\Users\\client5\\Downloads\\quotation.docx",
+                          "Title": "quotation.docx",
+                          "tag": ""
+                    }
+              ]
         }
   ],
   "edges": [
+        {
+              "type": "timeBarInfo",
+              "dateFreq": {
+                    "1667575037": 10,
+                    "1667575752": 12,
+                    "1667576173": 8,
+                    "1667576183": 2,
+                    "1667576425": 4,
+                    "1667576436": 6,
+                    "1667576844": 14,
+                    "1667577572": 14,
+                    "1667576865": 2,
+                    "1667577497": 2,
+                    "1667577645": 4,
+                    "1667577813": 4,
+                    "1667575321": 8,
+                    "1667575794": 8,
+                    "1667576383": 4,
+                    "1667576802": 16,
+                    "1667577445": 4,
+                    "1667576394": 8,
+                    "1667575773": 1,
+                    "1667575783": 1,
+                    "1667576855": 4,
+                    "1667577507": 5,
+                    "1667577655": 3,
+                    "1667577665": 2,
+                    "1667577822": 24,
+                    "1667577823": 18
+              },
+              "firstDate": 1667575037,
+              "lastDate": 1667577823
+        },
         {
               "id": "1-2-Login (Network)",
               "type": "edge",
               "source": "1",
               "target": "2",
               "date": [
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575037000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667575752000,
-                    1667576173000,
-                    1667576173000,
-                    1667576173000,
-                    1667576173000,
-                    1667576173000,
-                    1667576173000,
-                    1667576173000,
-                    1667576173000,
-                    1667576183000,
-                    1667576183000,
-                    1667576425000,
-                    1667576425000,
-                    1667576425000,
-                    1667576425000,
-                    1667576436000,
-                    1667576436000,
-                    1667576436000,
-                    1667576436000,
-                    1667576436000,
-                    1667576436000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667576844000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000,
-                    1667577572000
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575037,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667575752,
+                    1667576173,
+                    1667576173,
+                    1667576173,
+                    1667576173,
+                    1667576173,
+                    1667576173,
+                    1667576173,
+                    1667576173,
+                    1667576183,
+                    1667576183,
+                    1667576425,
+                    1667576425,
+                    1667576425,
+                    1667576425,
+                    1667576436,
+                    1667576436,
+                    1667576436,
+                    1667576436,
+                    1667576436,
+                    1667576436,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667576844,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572,
+                    1667577572
               ],
               "event": "Login (Network)",
               "g": null,
@@ -3826,10 +3966,10 @@ export const data = {
               "source": "22",
               "target": "2",
               "date": [
-                    1667576865000,
-                    1667576865000,
-                    1667577497000,
-                    1667577497000
+                    1667576865,
+                    1667576865,
+                    1667577497,
+                    1667577497
               ],
               "event": "Login (Interactive)",
               "g": null,
@@ -4025,10 +4165,10 @@ export const data = {
               "source": "22",
               "target": "2",
               "date": [
-                    1667577645000,
-                    1667577645000,
-                    1667577813000,
-                    1667577813000
+                    1667577645,
+                    1667577645,
+                    1667577813,
+                    1667577813
               ],
               "event": "Login (CachedInteractive)",
               "g": null,
@@ -4224,10 +4364,10 @@ export const data = {
               "source": "22",
               "target": "2",
               "date": [
-                    1667577645000,
-                    1667577645000,
-                    1667577813000,
-                    1667577813000
+                    1667577645,
+                    1667577645,
+                    1667577813,
+                    1667577813
               ],
               "event": "Login (Unlock)",
               "g": null,
@@ -4419,26 +4559,26 @@ export const data = {
               "source": "25",
               "target": "2",
               "date": [
-                    1667575321000,
-                    1667575321000,
-                    1667575321000,
-                    1667575321000,
-                    1667575794000,
-                    1667575794000,
-                    1667575794000,
-                    1667575794000,
-                    1667576383000,
-                    1667576383000,
-                    1667576383000,
-                    1667576383000,
-                    1667576802000,
-                    1667576802000,
-                    1667576802000,
-                    1667576802000,
-                    1667577445000,
-                    1667577445000,
-                    1667577445000,
-                    1667577445000
+                    1667575321,
+                    1667575321,
+                    1667575321,
+                    1667575321,
+                    1667575794,
+                    1667575794,
+                    1667575794,
+                    1667575794,
+                    1667576383,
+                    1667576383,
+                    1667576383,
+                    1667576383,
+                    1667576802,
+                    1667576802,
+                    1667576802,
+                    1667576802,
+                    1667577445,
+                    1667577445,
+                    1667577445,
+                    1667577445
               ],
               "event": "Login (CachedInteractive)",
               "g": null,
@@ -5318,22 +5458,22 @@ export const data = {
               "source": "25",
               "target": "2",
               "date": [
-                    1667575321000,
-                    1667575321000,
-                    1667575321000,
-                    1667575321000,
-                    1667575794000,
-                    1667575794000,
-                    1667575794000,
-                    1667575794000,
-                    1667576394000,
-                    1667576394000,
-                    1667576394000,
-                    1667576394000,
-                    1667576802000,
-                    1667576802000,
-                    1667576802000,
-                    1667576802000
+                    1667575321,
+                    1667575321,
+                    1667575321,
+                    1667575321,
+                    1667575794,
+                    1667575794,
+                    1667575794,
+                    1667575794,
+                    1667576394,
+                    1667576394,
+                    1667576394,
+                    1667576394,
+                    1667576802,
+                    1667576802,
+                    1667576802,
+                    1667576802
               ],
               "event": "Login (Unlock)",
               "g": null,
@@ -6029,8 +6169,8 @@ export const data = {
               "source": "25",
               "target": "2",
               "date": [
-                    1667575773000,
-                    1667575783000
+                    1667575773,
+                    1667575783
               ],
               "event": "Login Failure",
               "g": null,
@@ -6142,10 +6282,10 @@ export const data = {
               "source": "52",
               "target": "2",
               "date": [
-                    1667576855000,
-                    1667576855000,
-                    1667576855000,
-                    1667576855000
+                    1667576855,
+                    1667576855,
+                    1667576855,
+                    1667576855
               ],
               "event": "Login (Interactive)",
               "g": null,
@@ -6333,10 +6473,10 @@ export const data = {
               "source": "184",
               "target": "184",
               "date": [
-                    1667576394000,
-                    1667576802000,
-                    1667577507000,
-                    1667577655000
+                    1667576394,
+                    1667576802,
+                    1667577507,
+                    1667577655
               ],
               "event": "Create Process",
               "g": null,
@@ -6440,14 +6580,14 @@ export const data = {
               "source": "184",
               "target": "184",
               "date": [
-                    1667576394000,
-                    1667576394000,
-                    1667576802000,
-                    1667576802000,
-                    1667577507000,
-                    1667577507000,
-                    1667577665000,
-                    1667577665000
+                    1667576394,
+                    1667576394,
+                    1667576802,
+                    1667576802,
+                    1667577507,
+                    1667577507,
+                    1667577665,
+                    1667577665
               ],
               "event": "Process Terminated",
               "g": null,
@@ -6655,9 +6795,9 @@ export const data = {
               "source": "184",
               "target": "215",
               "date": [
-                    1667576802000,
-                    1667577507000,
-                    1667577655000
+                    1667576802,
+                    1667577507,
+                    1667577655
               ],
               "event": "Read File",
               "g": null,
@@ -6744,7 +6884,7 @@ export const data = {
               "source": "184",
               "target": "218",
               "date": [
-                    1667576802000
+                    1667576802
               ],
               "event": "Read File",
               "g": null,
@@ -6789,7 +6929,7 @@ export const data = {
               "source": "184",
               "target": "218",
               "date": [
-                    1667576802000
+                    1667576802
               ],
               "event": "Delete File",
               "g": null,
@@ -6839,7 +6979,7 @@ export const data = {
               "source": "184",
               "target": "224",
               "date": [
-                    1667576802000
+                    1667576802
               ],
               "event": "Write File",
               "g": null,
@@ -6884,10 +7024,10 @@ export const data = {
               "source": "187",
               "target": "184",
               "date": [
-                    1667576394000,
-                    1667576802000,
-                    1667577507000,
-                    1667577655000
+                    1667576394,
+                    1667576802,
+                    1667577507,
+                    1667577655
               ],
               "event": "Create Process",
               "g": null,
@@ -6991,7 +7131,7 @@ export const data = {
               "source": "187",
               "target": "203",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Create Process",
               "g": null,
@@ -7035,7 +7175,7 @@ export const data = {
               "source": "203",
               "target": "203",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Create Process",
               "g": null,
@@ -7079,8 +7219,8 @@ export const data = {
               "source": "203",
               "target": "203",
               "date": [
-                    1667577823000,
-                    1667577823000
+                    1667577823,
+                    1667577823
               ],
               "event": "Process Terminated",
               "g": null,
@@ -7150,7 +7290,7 @@ export const data = {
               "source": "203",
               "target": "230",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7195,7 +7335,7 @@ export const data = {
               "source": "203",
               "target": "233",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7240,7 +7380,7 @@ export const data = {
               "source": "203",
               "target": "233",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -7290,7 +7430,7 @@ export const data = {
               "source": "203",
               "target": "239",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7335,7 +7475,7 @@ export const data = {
               "source": "203",
               "target": "242",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -7380,7 +7520,7 @@ export const data = {
               "source": "203",
               "target": "245",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -7430,7 +7570,7 @@ export const data = {
               "source": "203",
               "target": "245",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7475,7 +7615,7 @@ export const data = {
               "source": "203",
               "target": "251",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7520,7 +7660,7 @@ export const data = {
               "source": "203",
               "target": "251",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -7570,7 +7710,7 @@ export const data = {
               "source": "203",
               "target": "254",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -7615,7 +7755,7 @@ export const data = {
               "source": "203",
               "target": "257",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -7660,7 +7800,7 @@ export const data = {
               "source": "203",
               "target": "260",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -7710,7 +7850,7 @@ export const data = {
               "source": "203",
               "target": "260",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7755,7 +7895,7 @@ export const data = {
               "source": "203",
               "target": "263",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -7800,7 +7940,7 @@ export const data = {
               "source": "203",
               "target": "269",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -7845,7 +7985,7 @@ export const data = {
               "source": "203",
               "target": "269",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -7895,7 +8035,7 @@ export const data = {
               "source": "203",
               "target": "272",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -7940,7 +8080,7 @@ export const data = {
               "source": "203",
               "target": "281",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -7985,7 +8125,7 @@ export const data = {
               "source": "203",
               "target": "284",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Write File",
               "g": null,
@@ -8030,7 +8170,7 @@ export const data = {
               "source": "203",
               "target": "287",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -8080,7 +8220,7 @@ export const data = {
               "source": "203",
               "target": "287",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Read File",
               "g": null,
@@ -8125,7 +8265,7 @@ export const data = {
               "source": "203",
               "target": "290",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Read File",
               "g": null,
@@ -8170,7 +8310,7 @@ export const data = {
               "source": "203",
               "target": "290",
               "date": [
-                    1667577822000
+                    1667577822
               ],
               "event": "Delete File",
               "g": null,
@@ -8220,7 +8360,7 @@ export const data = {
               "source": "203",
               "target": "293",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Read File",
               "g": null,
@@ -8270,7 +8410,7 @@ export const data = {
               "source": "203",
               "target": "293",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Delete File",
               "g": null,
@@ -8320,7 +8460,7 @@ export const data = {
               "source": "203",
               "target": "296",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Read File",
               "g": null,
@@ -8365,7 +8505,7 @@ export const data = {
               "source": "203",
               "target": "296",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Delete File",
               "g": null,
@@ -8415,7 +8555,7 @@ export const data = {
               "source": "203",
               "target": "302",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Write File",
               "g": null,
@@ -8460,7 +8600,7 @@ export const data = {
               "source": "203",
               "target": "308",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Write File",
               "g": null,
@@ -8505,7 +8645,7 @@ export const data = {
               "source": "203",
               "target": "311",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Read File",
               "g": null,
@@ -8550,7 +8690,7 @@ export const data = {
               "source": "203",
               "target": "311",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Delete File",
               "g": null,
@@ -8600,7 +8740,7 @@ export const data = {
               "source": "203",
               "target": "314",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Write File",
               "g": null,
@@ -8645,7 +8785,7 @@ export const data = {
               "source": "203",
               "target": "326",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Read File",
               "g": null,
@@ -8690,7 +8830,7 @@ export const data = {
               "source": "203",
               "target": "326",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Delete File",
               "g": null,
@@ -8740,7 +8880,7 @@ export const data = {
               "source": "203",
               "target": "329",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Write File",
               "g": null,
@@ -8785,7 +8925,7 @@ export const data = {
               "source": "203",
               "target": "335",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Write File",
               "g": null,
@@ -8830,7 +8970,7 @@ export const data = {
               "source": "203",
               "target": "338",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Delete File",
               "g": null,
@@ -8880,7 +9020,7 @@ export const data = {
               "source": "203",
               "target": "338",
               "date": [
-                    1667577823000
+                    1667577823
               ],
               "event": "Read File",
               "g": null,
