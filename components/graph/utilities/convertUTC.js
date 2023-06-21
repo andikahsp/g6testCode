@@ -16,8 +16,8 @@ function getUTCDateObject(logsourceTime) {
   }
   
   
-  export function getUTCHrMinSec(logsourceTime) {
-    const dateObjUTC = getUTCDateObject(logsourceTime);
+  export function getUTCHrMinSec(epochTime) {
+    const dateObjUTC = getUTCDateObject(epochTime);
     const hours = dateObjUTC.getUTCHours();
     const minutes = dateObjUTC.getUTCMinutes();
     const seconds = dateObjUTC.getUTCSeconds();
