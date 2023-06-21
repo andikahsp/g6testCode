@@ -49,17 +49,3 @@ export function populateNodesEdges (jsonData) {
     console.log('jsonData =', jsonData);
     return jsonData;
    }
-
-/*    export function getAxisMinMax(jsonData) {
-    const epochTimes = []
-    // draw out all time values to find start and end of axis
-    jsonData.edges.forEach((edge) => {
-      edge.date.forEach((x)=> {
-        epochTimes.push(x)
-      })
-    })
-    epochTimes.sort((a,b) => a - b);
-    const lastIndx = epochTimes.length - 1;
-    const result = [epochTimes[0], epochTimes[lastIndx]];
-    return result;
-   } */
