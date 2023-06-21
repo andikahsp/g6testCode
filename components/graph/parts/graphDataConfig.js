@@ -38,14 +38,7 @@ export function populateNodesEdges (jsonData) {
         node["img"] = imageURLs[24]
       }
     })  
-    
-/*     jsonData.edges.forEach((edge) => {
-      edge.date.forEach((time) => {
-        const bar = time / 1000;
-        time = bar;  
-      })
-    })  
- */
+
     console.log('jsonData =', jsonData);
     return jsonData;
    }

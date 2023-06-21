@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { data as jsonData } from './source';
+import { data as jsonData } from './source2760';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
@@ -39,7 +39,7 @@ const TimeBarTrendTrial
       const timeBarInfo = jsonData["info"]
       const range = timeBarInfo.firstDate - timeBarInfo.lastDate; // number of units that window will show
       const axisMin = timeBarInfo["firstDate"] - 5;
-      const axisMax = timeBarInfo["lastDate"] + 5;
+      const axisMax = /* timeBarInfo["firstDate"] + 18 + 5; */ timeBarInfo["lastDate"] + 5;
       // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
       // time = 6:59.08 am
       // window: 6:58.59am  - 6:59.17 am (60seconds)
@@ -254,7 +254,7 @@ const TimeBarTrendTrial
         plugins: [newTimebar],
         workerEnabled: true, 
         layout: {
-          type: 'force',
+          type: 'force2',
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,
