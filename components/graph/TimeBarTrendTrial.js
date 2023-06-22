@@ -33,13 +33,11 @@ const TimeBarTrendTrial
       const timeBarData = [];
 
       // const range = 18; // number of units that window will show
-      
-      // const axisMin = jsonData.logsourceTime - (range / 2);
-      // const axisMax = jsonData.logsourceTime + (range / 2) + 1;
-      const timeBarInfo = jsonData["info"]
+
+      const timeBarInfo = nodeEdgeData["info"][0]
       const range = timeBarInfo.firstDate - timeBarInfo.lastDate; // number of units that window will show
-      const axisMin = timeBarInfo["firstDate"] - 5;
-      const axisMax = /* timeBarInfo["firstDate"] + 18 + 5; */ timeBarInfo["lastDate"] + 5;
+      const axisMin = timeBarInfo["firstDate"] - 500;
+      const axisMax = /* timeBarInfo["firstDate"] + 18 + 5; */ timeBarInfo["lastDate"] + 500;
       // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
       // time = 6:59.08 am
       // window: 6:58.59am  - 6:59.17 am (60seconds)
@@ -75,8 +73,8 @@ const TimeBarTrendTrial
           tickLabelFormatter: (d) => {
             // convert the data accordingly
            // log(`d => ${JSON.stringify(d, null, 3)}`);
-           return getUTCHrMinSec(d.date);
-           //return d
+           //return getUTCHrMinSec(d.date);
+           return d
         },
           tickLabelStyle:{ 
             fontSize: 13, 
@@ -116,8 +114,8 @@ const TimeBarTrendTrial
             fillOpacity: 0.25,
           }, 
           height: 60,
-          start: 0.01,
-          end: 0.99,
+          start: 0.1,
+          end: 0.9,
           handlerStyle:{
             height: 500, // <===== not working
             width: 2, 
@@ -254,7 +252,7 @@ const TimeBarTrendTrial
         plugins: [newTimebar],
         workerEnabled: true, 
         layout: {
-          type: 'force2',
+          type: 'force',
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,

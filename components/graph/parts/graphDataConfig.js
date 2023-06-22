@@ -1,10 +1,15 @@
 import { imageURLs } from "./imageURLs";
+import clone from 'just-clone';
 
 export function populateNodesEdges (jsonData) {
 
+    const graphData = {
+      info: [],
+      nodes: [],
+      edges: []
+    };
     // This format if we want to customise shapes and sizes according
     // to data
-    
     const image = { type: 'image', 
                      size: 36};
     const circle = { type: 'circle', 
@@ -32,13 +37,21 @@ export function populateNodesEdges (jsonData) {
       node["size"] = 24;
       const iconType = node["display"]["labels"][0];
       if (iconType){
-        node["img"] = imageHash[iconType]
+        node["img"] = imageHash[iconType];
       } else {
         // set to questionmark icon
-        node["img"] = imageURLs[24]
+        node["img"] = imageURLs[24];
       }
+
+      graphData["nodes"].push(node);
     })  
 
-    console.log('jsonData =', jsonData);
-    return jsonData;
+    graphData["info"].push(jsonData["edges"][0])
+    
+    for(let i = 1; i < jsonData["edges"].length; i++ ) {
+      graphData["edges"].push(jsonData["edges"][i])
+    }
+
+    console.log(graphData);
+    return graphData;
    }

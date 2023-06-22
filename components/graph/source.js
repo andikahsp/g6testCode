@@ -1,14 +1,5 @@
 export const data = 
 {
-      "info": {
-            "type": "timeBarInfo",
-            "dateFreq": {
-                  "1667577645": 2,
-                  "1667577813": 2
-            },
-            "firstDate": 1667577645,
-            "lastDate": 1667577813
-      },
       "nodes": [
             {
                   "id": "1",
@@ -55,15 +46,15 @@ export const data =
             }
       ],
       "edges": [
-            // {
-            //       "type": "timeBarInfo",
-            //       "dateFreq": {
-            //             "1667577645": 2,
-            //             "1667577813": 2
-            //       },
-            //       "firstDate": 1667577645,
-            //       "lastDate": 1667577813
-            // },
+            {
+                  "type": "timeBarInfo",
+                  "dateFreq": {
+                        "1667577645": 2,
+                        "1667577813": 2
+                  },
+                  "firstDate": 1667577645,
+                  "lastDate": 1667577813
+            },
             {
                   "id": "1-2-Login (CachedInteractive)",
                   "type": "edge",
