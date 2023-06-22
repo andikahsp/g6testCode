@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { data as jsonData } from './sourceOrg';
 import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
-import { populateNodesEdges } from "./parts/graphDataConfigOrg";
+import { populateNodesEdgesOrg } from "./parts/graphDataConfigOrg";
 
 let log = console.log; 
 let nodeA = "";
@@ -24,7 +24,7 @@ const TimeBarTrend
       const G6 = require('@antv/g6');
 
       //transform rawQuery jsonData into nodeEdgeData
-      const nodeEdgeData = populateNodesEdges(jsonData);
+      const nodeEdgeData = populateNodesEdgesOrg(jsonData);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 45, 'quadratic-custom', 'fund-polyline', undefined);
 
       const container = ref.current;

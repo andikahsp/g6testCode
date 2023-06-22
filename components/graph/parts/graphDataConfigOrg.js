@@ -1,6 +1,6 @@
 import { imageURLs } from "./imageURLs";
 
-export function populateNodesEdges (jsonData) {
+export function populateNodesEdgesOrg (jsonData) {
 
     // This format if we want to customise shapes and sizes according
     // to data

@@ -1,5 +1,4 @@
 import { imageURLs } from "./imageURLs";
-import clone from 'just-clone';
 
 export function populateNodesEdges (jsonData) {
 
@@ -51,7 +50,7 @@ export function populateNodesEdges (jsonData) {
     for(let i = 1; i < jsonData["edges"].length; i++ ) {
       graphData["edges"].push(jsonData["edges"][i])
     }
-
-    console.log(graphData);
+    // CyGraph injects calculated information based on graphData back into it (i.e. coordinates)
+    console.log(graphData); 
     return graphData;
    }
