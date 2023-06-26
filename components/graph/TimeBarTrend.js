@@ -690,7 +690,6 @@ const TimeBarTrend
               // if condition has to work for BOTH COMBO & NODE dragging.
               const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
               otherCombos.forEach((combo, i) => {
-                log('CHECK IT')
                 combo.getModel().label = countNodesInCombo(combo) - countNodesInCombo(dragCombo);
                 if (combo.getModel().label === 0 || countNodesInCombo(combo) === 0) {
                   newGraph.uncombo(combo);
