@@ -63,7 +63,8 @@ const TimeBarTrend
           tickLabelFormatter: (d) => {
             // convert the data accordingly
            // log(`d => ${JSON.stringify(d, null, 3)}`);
-            return getUTCHrMinSec(d.date);
+            // return getUTCHrMinSec(d.date);
+            return d;
         },
           tickLabelStyle:{ 
             fontSize: 13, 
@@ -678,7 +679,7 @@ const TimeBarTrend
 
 
       newGraph.on('combo:mouseup', (e) => {
-        log('combo:mouseup')
+        // log('combo:mouseup')
        
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo !== undefined){ 
           // prevents deletion of orphan combo when dragging across graph space quickly
@@ -712,7 +713,7 @@ const TimeBarTrend
                   const nodeCount= countNodesInCombo(combo);
                   combo.getModel().label = nodeCount;
                   if(combo.getModel().label > 0) {
-                    log(`KEYED, ${combo.getID()}, count: ${nodeCount}`)
+                    // log(`KEYED, ${combo.getID()}, count: ${nodeCount}`)
                     newGraph.setItemState(combo, 'dragleave', false);
                     newGraph.setItemState(combo, 'dragenter', false);
                     newGraph.updateCombo(combo); //===> draggedOVerCombos here CLASH WITH COMBO:DROPS use of DRAGGEDOVER COMBO? 
@@ -722,7 +723,7 @@ const TimeBarTrend
                   }
                 }
               });
-              log('draggedOver combos updated:', draggedOverCombosDisplay);
+              // log('draggedOver combos updated:', draggedOverCombosDisplay);
             }
           }
         }
@@ -814,7 +815,7 @@ const TimeBarTrend
     
     newGraph.on('edge:mouseenter', (e) => {
       newGraph.setItemState(e.item, 'hover', true)
-      // log('EDGE =', e.item.getModel());
+      log('EDGE =', e.item);
     });
 
     newGraph.on('edge:mouseleave', (e) => {
@@ -897,7 +898,7 @@ const TimeBarTrend
                       break;
                     }
                   }
-                  log('>>comboVE on EXPAND =', comboVedges);
+                  // log('>>comboVE on EXPAND =', comboVedges);
                 }
               } else if (
                 neighbours[i].getType() === "combo" &&
@@ -924,7 +925,6 @@ const TimeBarTrend
                   }
                 }
                 if (ttp) {
-                  log('bye')
                   const comboVedges = inCombo.getEdges();
                   for (let j = 0; j < comboVedges.length; j++) {
                     if (
@@ -935,7 +935,7 @@ const TimeBarTrend
                       break;
                     }
                   }
-                  log('## comboVE on EXPAND =', comboVedges);
+                  // log('## comboVE on EXPAND =', comboVedges);
                 }
               }
             }
@@ -999,7 +999,7 @@ const TimeBarTrend
           const allNodesCount = getAllNodesInCombo(combo).length;
          return allNodesCount;
         } 
-        log(`ERROR: comboId is undefined when counting nodes in combo`)
+        console.warn(`ERROR: comboId is undefined when counting nodes in combo`)
       }
 
 
@@ -1048,6 +1048,8 @@ const TimeBarTrend
         log('EDGES:', edges);
         const combos = newGraph.getCombos();
         log('COMBOS:', combos);
+        const vEdges = newGraph.get('vedges');
+        log('VEdges:', vEdges);
         });
 
 

@@ -826,7 +826,7 @@ const TimeBarTrendTrial
     
     newGraph.on('edge:mouseenter', (e) => {
       newGraph.setItemState(e.item, 'hover', true)
-      // log('EDGE =', e.item.getModel());
+      log('EDGE =', e.item);
     });
 
     newGraph.on('edge:mouseleave', (e) => {
@@ -909,7 +909,7 @@ const TimeBarTrendTrial
                       break;
                     }
                   }
-                  log('>>comboVE on EXPAND =', comboVedges);
+                  // log('>>comboVE on EXPAND =', comboVedges);
                 }
               } else if (
                 neighbours[i].getType() === "combo" &&
@@ -936,7 +936,6 @@ const TimeBarTrendTrial
                   }
                 }
                 if (ttp) {
-                  log('bye')
                   const comboVedges = inCombo.getEdges();
                   for (let j = 0; j < comboVedges.length; j++) {
                     if (
@@ -947,7 +946,7 @@ const TimeBarTrendTrial
                       break;
                     }
                   }
-                  log('## comboVE on EXPAND =', comboVedges);
+                  //  log('## comboVE on EXPAND =', comboVedges);
                 }
               }
             }
@@ -1011,7 +1010,7 @@ const TimeBarTrendTrial
           const allNodesCount = getAllNodesInCombo(combo).length;
          return allNodesCount;
         } 
-        log(`ERROR: comboId is undefined when counting nodes in combo`)
+        // log(`ERROR: comboId is undefined when counting nodes in combo`)
       }
 
 
@@ -1060,6 +1059,8 @@ const TimeBarTrendTrial
         log('EDGES:', edges);
         const combos = newGraph.getCombos();
         log('COMBOS:', combos);
+        const vEdges = newGraph.get('vedges');
+        log('VEdges:', vEdges);
         });
 
 
