@@ -108,7 +108,7 @@ const TimeBarTrend
           end: 0.99,
           handlerStyle:{
             height: 500, // <===== not working
-            width: 2, 
+            width: 3, 
             fill:'gray',
             fillOpacity:0.7,
             stroke: 'lightgray',
@@ -1040,16 +1040,22 @@ const TimeBarTrend
       }
 
   
-      // DO NOT DELETE - LESLIE's EXPERIMENTATION
+      // DO NOT DELETE 
       newGraph.on("canvas:click", function (event) {
         const nodes = newGraph.getNodes();
         log('NODES:', nodes);
         const edges = newGraph.getEdges();
         log('EDGES:', edges);
+        edges.forEach((edge) => {
+          log(`     ${edge.getID()} | s= ${edge.getSource().getID()} | t= ${edge.getTarget().getID()}`);
+        })
         const combos = newGraph.getCombos();
         log('COMBOS:', combos);
         const vEdges = newGraph.get('vedges');
         log('VEdges:', vEdges);
+        vEdges.forEach((VEdge) => {
+          log(`     ${VEdge.getID()} | \n          s= ${VEdge.getSource().getID()} | t= ${VEdge.getTarget().getID()}`);
+        })
         });
 
 
