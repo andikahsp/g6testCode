@@ -1047,14 +1047,15 @@ const TimeBarTrend
         const edges = newGraph.getEdges();
         log('EDGES:', edges);
         edges.forEach((edge) => {
-          log(`     ${edge.getID()} | s= ${edge.getSource().getID()} | t= ${edge.getTarget().getID()}`);
+          log(`     ${edge.getID()} | s= ${edge.getSource().getID()}       | t= ${edge.getTarget().getID()}\n           | cBC: ${edge.getModel().collapsedByCombo} | inRange: ${edge.getModel().inRange}\n           | visible: ${edge.isVisible()}`);
+
         })
         const combos = newGraph.getCombos();
         log('COMBOS:', combos);
         const vEdges = newGraph.get('vedges');
         log('VEdges:', vEdges);
         vEdges.forEach((VEdge) => {
-          log(`     ${VEdge.getID()} | \n          s= ${VEdge.getSource().getID()} | t= ${VEdge.getTarget().getID()}`);
+          log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}`);
         })
         });
 
