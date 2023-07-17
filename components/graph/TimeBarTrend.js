@@ -241,7 +241,7 @@ const TimeBarTrend
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
-          //type: 'force',
+          type: 'force2',
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,
@@ -535,13 +535,13 @@ const TimeBarTrend
 
       
       newGraph.on('combo:dragover', (e) => {
-        log('combo:dragover');
+        // log('combo:dragover');
         comboDraggedOver = e.item;
         // for updating node count on combo drag
         if(dragCombo !== undefined) {
           if(e.item._cfg !== null && dragCombo._cfg !== null /* && dragCombo !== undefined */) {
             if(!(draggedOverCombos.includes(e.item)) && !nodeDrag && e.item.getID() !== dragCombo.getID()){
-              log('combo dragged over combo');
+              //log('combo dragged over combo');
               draggedOverCombos.push(e.item);
             }
           }
@@ -549,7 +549,7 @@ const TimeBarTrend
         // for updating node count of combos on node drag
         if (!(draggedOverCombos.includes(e.item))) {
           draggedOverCombos.push(e.item);
-          log('node dragged over combo')
+          //log('node dragged over combo')
         }
         newGraph.setItemState(e.item, 'dragenter', true);
       });
@@ -565,7 +565,7 @@ const TimeBarTrend
         comboDrop = true; 
         //for COMBO: DRAG
         if(!nodeDrag){
-          log('combo dropped into combo')
+          console.debug('combo dropped into combo')
         // GET OUTERMOST COUNTER DETAILS!
          let outerMostCombo = e.item; 
          if (e.item.getModel().parentId !== undefined){
@@ -588,7 +588,7 @@ const TimeBarTrend
          })
        } else {
         // for NODE:drag
-        log('node dropped into combo');
+        console.debug('node dropped into combo');
         
         let combosToUpdate = [];
         e.item.getModel().label = countNodesInCombo(e.item);
