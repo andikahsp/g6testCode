@@ -502,7 +502,14 @@ const TimeBarTrendTrial
               id: newComboId, 
               label: ""
             }, [`${nodeA}`, `${nodeB}`]);
-
+            
+            const newCombo = newGraph.findById(newComboId);
+            if(newCombo) {
+              // count the new number of nodes in the combo
+              const newCount = countNodesInCombo(newCombo);
+              // update the nodeCount display
+              newGraph.updateItem(newCombo,{label: newCount}) ;
+            }
           }
         }
       });
@@ -833,7 +840,7 @@ const TimeBarTrendTrial
       newGraph.setItemState(e.item, 'hover', false)
     });
 
-    
+
     // Expand combo -> starting from VEdge and collapsed combo  
     function comboExpandTTP(combo) {
       const combos = combo.getCombos();

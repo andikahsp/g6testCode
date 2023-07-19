@@ -491,7 +491,14 @@ const TimeBarTrend
               id: newComboId, 
               label: ""
             }, [`${nodeA}`, `${nodeB}`]);
-
+            
+            const newCombo = newGraph.findById(newComboId);
+            if(newCombo) {
+              // count the new number of nodes in the combo
+              const newCount = countNodesInCombo(newCombo);
+              // update the nodeCount display
+              newGraph.updateItem(newCombo,{label: newCount}) ;
+            }
           }
         }
       });
