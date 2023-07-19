@@ -50,7 +50,7 @@ const TimeBarTrend
       }
 
 
-      const nodeSize = 24;
+      const nodeSize = 60;
       //log(G6.TimeBar);
       const newTimebar = new G6.TimeBar({
         x: 0,
@@ -823,7 +823,6 @@ const TimeBarTrend
     });
 
     
-
     // Expand combo -> starting from VEdge and collapsed combo  
     function comboExpandTTP(combo) {
       const combos = combo.getCombos();
@@ -835,23 +834,17 @@ const TimeBarTrend
           neighbours.forEach((neighbour) => {
             if (neighbour.getType() === "combo") {
               ttp = checkTTP(nodes[i], neighbour);
+              console.debug('3) TTP:',ttp);
               if (ttp) {
                 const edges = nodes[i].getEdges();
                 edges.forEach((edge) => {
                   if (edge.getModel().isVEdge) {
                     if ( // <================
-                      edge.getTarget() === neighbour /* && edge.getSource() === nodes[i] */||
-                      edge.getSource() === neighbour /* && edge.getTarget() === nodes[i] */
+                      edge.getTarget() === neighbour || edge.getSource() === neighbour
                     ) {
                       edge.getModel()["ttp"] = ttp;
                       return;
-                    } //<===========
-                    // if( edge.getTarget() === neighbour && edge.getSource() === nodes[i]) {
-
-                    // }
-
-
-
+                    } 
                   }
                 });
                 return;
@@ -872,22 +865,21 @@ const TimeBarTrend
                 let ttp = false;
                 const allCNodes = getAllNodesInCombo(inCombo);
                 for (let j = 0; j < allCNodes.length; j++) {
-                  if (allCNodes[j].getNeighbors() === neighbours[i]) {
+                  if (allCNodes[j].getNeighbors().includes(neighbours[i])) {
                     const CNodeEdges = allCNodes[j].getEdges();
-                    for (let k = 0; k < CNodeEdges.length(); k++) {
+                    for (let k = 0; k < CNodeEdges.length; k++) {
                       if (
-                        CNodeEdges.getSource() === neighbours[i] ||
-                        CNodeEdges.getTarget() === neighbours[i]
+                        CNodeEdges[k].getSource() === neighbours[i] ||
+                        CNodeEdges[k].getTarget() === neighbours[i]
                       ) {
-                        ttp = CNodeEdges.getModel().ttp;
+                        ttp = CNodeEdges[k].getModel().ttp;
                         if (ttp) break;
                       }
                     }
                   }
-                  if (ttp) break;
+                  if (ttp) break; // <=== needs further study.
                 }
                 if (ttp) {
-                  
                   const comboVedges = inCombo.getEdges();
                   for (let j = 0; j < comboVedges.length; j++) {
                     if (
@@ -964,35 +956,57 @@ const TimeBarTrend
         }
       }
 
+      // // returns true if there is an edge between the node and combo
+      // // AND that edge is TTP.
+      // function checkTTP(node, combo) {
+      //   const nEdges = node.getEdges();
+      //   let x = false;
+      //   let combosInCombo = combo.getCombos();
+      //   if (combosInCombo.length > 0) {
+      //     for (let i = 0; i < combosInCombo.length; i++) {
+      //       x = checkTTP(node, combosInCombo[i]);
+      //       if (x) break;
+      //     }
+      //   }
+      //   if (x) return x; 
+      //   let cNodes = combo.getNodes();
+      //   for (let i = 0; i < nEdges.length; i++) {
+      //     if (
+      //       cNodes.includes(nEdges[i].getSource()) ||
+      //       cNodes.includes(nEdges[i].getTarget())
+      //     ) {
+      //       if (nEdges[i].getModel().ttp) {
+      //         x = true;
+      //         break;
+      //       }
+      //     }
+      //   }
+      //   return x;
+      // }
+
       // returns true if there is an edge between the node and combo
       // AND that edge is TTP.
       function checkTTP(node, combo) {
-        const nEdges = node.getEdges();
-        let x = false;
-        let combosInCombo = combo.getCombos();
-        if (combosInCombo.length > 0) {
-          for (let i = 0; i < combosInCombo.length; i++) {
-            x = checkTTP(node, combosInCombo[i]);
-            if (x) break;
-          }
-        }
-        if (x) return x; 
-        let cNodes = combo.getNodes();
-        for (let i = 0; i < nEdges.length; i++) {
-          if (
-            cNodes.includes(nEdges[i].getSource()) ||
-            cNodes.includes(nEdges[i].getTarget())
-          ) {
-            if (nEdges[i].getModel().ttp) {
-              x = true;
+        console.debug('**checkTTP**');
+        let nEdgesInside = [];
+        let ttpStatus = false; 
+        const comboNodes = getAllNodesInCombo(combo);
+        comboNodes.forEach((cNode) => {
+          const cNodeNEdges = cNode.getEdges().filter(nEdge => !nEdge.getModel().isVEdge);
+         nEdgesInside = nEdgesInside.concat(cNodeNEdges);
+        });
+
+        for(let i = 0; i < nEdgesInside.length; i++){
+          if (nEdgesInside[i].getSource().getID() === node.getID() || nEdgesInside[i].getTarget().getID() === node.getID()) {
+            if (nEdgesInside[i].getModel().ttp) {
+              ttpStatus = true;
               break;
-            }
+            } 
           }
         }
-        return x;
+        console.debug('1) ttpStatus', ttpStatus);
+        return ttpStatus; 
       }
-
-
 
       const countNodesInCombo = (combo) => {
         if (combo !== undefined) {
