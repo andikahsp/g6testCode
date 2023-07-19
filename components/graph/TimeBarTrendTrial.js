@@ -252,7 +252,7 @@ const TimeBarTrendTrial
         plugins: [newTimebar],
         workerEnabled: true, 
         layout: {
-          type: 'force',
+          type: 'grid', // force, force2 messes with collapseCombo Edges
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,

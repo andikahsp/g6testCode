@@ -241,7 +241,7 @@ const TimeBarTrend
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
-          type: 'force2',
+          type: 'grid',  // force, force2 messes with collapseCombo Edges
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,
