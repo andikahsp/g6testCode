@@ -137,6 +137,7 @@ const TimeBarTrendTrial
           fill: 'black'
         },
         controllerCfg:{
+          speed: 9.955, // slider playback speed, default = 1, Max = <10 { tickInterval / ((10 - speed) * 1000 / 60) }
           fontFamily: 'Arial',
           fontSize: 10,
           fill: 'transparent',

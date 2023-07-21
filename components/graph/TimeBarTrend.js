@@ -104,8 +104,8 @@ const TimeBarTrend
             fillOpacity: 0.25,
           }, 
           height: 60,
-          start: 0.01,
-          end: 0.99,
+          start: 0.1,
+          end: 0.9,
           handlerStyle:{
             height: 500, // <===== not working
             width: 3, 
@@ -127,6 +127,7 @@ const TimeBarTrend
           fill: 'black'
         },
         controllerCfg:{
+          speed: 2, // slider playback speed, default = 1, Max = <10 { tickInterval / ((10 - speed) * 1000 / 60) }
           fontFamily: 'Arial',
           fontSize: 10,
           fill: 'transparent',
