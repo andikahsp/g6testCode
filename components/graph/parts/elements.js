@@ -29,7 +29,7 @@ export const cCircleComboShape = {
       // **** DIAGNOSTIC ID LABEL
       group.addShape('text', {
         attrs: {
-            text:cfg.id,
+            text:cfg.label || cfg.id,
             x: style.r * 0.50 + 20, 
             y: (style.r - 20) * - 1,
             fontFamily: 'Arial',
@@ -60,7 +60,7 @@ export const cCircleComboShape = {
       // text that goes into the marker/badge
       group.addShape('text', {
         attrs: {
-            text:cfg.label,
+            text:cfg.nodeCount,
             x: style.r - 1,
             y: style.r,
             fontFamily: 'Arial',
@@ -69,7 +69,7 @@ export const cCircleComboShape = {
             stroke: 'white',
         },
         draggable: true, 
-        name: 'combo-marker-label'
+        name: 'combo-marker-nodeCount'
       });
       return circle;
     },
@@ -85,7 +85,7 @@ export const cCircleComboShape = {
       // Find the marker shape in the graphics group of the Combo
       const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
       //Find textLabel shape in the graphics group of the Combo
-      const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-label');
+      const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-nodeCount');
       //Find comboId shape in the graphics group of the Combo
       const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
 
@@ -102,8 +102,8 @@ export const cCircleComboShape = {
       });
       //Update the textlabel
       textLabel.attr({
-        text: cfg.label,
-        x: cfg.label.toString().length === 1 ? style.r * 0.50 - 5.63 : style.r * 0.50 - 10, 
+        text: cfg.nodeCount,
+        x: cfg.nodeCount.toString().length === 1 ? style.r * 0.50 - 5.63 : style.r * 0.50 - 10, 
         y: (style.r - 20) * - 1,
       });
       //Update the idlabel
@@ -242,10 +242,10 @@ export const cCircleComboShape = {
       }
 
 
-      // event
+      // label
       group.addShape('text', {
         attrs: {
-          text: cfg && cfg.event,
+          text: cfg && cfg.label,
           x: startPoint.x + midPointXY.x + markerXOffset + freqMarkerOffset + ttpMarkerOffset,
           y: startPoint.y + midPointXY.y + markerYOffset,
           fontSize: 12,
@@ -255,7 +255,7 @@ export const cCircleComboShape = {
           fill: '#000000D9',
         },
         // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-        name: 'edge-event-text',
+        name: 'edge-label-text',
       });
            
       return line;
@@ -364,10 +364,10 @@ export const cCircleComboShape = {
     }
 
 
-    // event
+    // label
     group.addShape('text', {
       attrs: {
-        text: cfg && cfg.event,
+        text: cfg && cfg.label,
         x: midPointXY.x + markerXOffset + labelXOffset + ttpMarkerOffset,
         y: midPointXY.y + markerYOffset,
         fontSize: 12,
@@ -377,7 +377,7 @@ export const cCircleComboShape = {
         fill: '#000000D9',
       },
       // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-      name: 'quadcurve-event-text',
+      name: 'quadcurve-label-text',
     });
     },
     update: undefined,

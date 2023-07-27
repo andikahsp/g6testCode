@@ -22,8 +22,8 @@ export function populateNodesEdgesOrg (jsonData) {
         //  { id: 'node2', ...triangle, /* img: imageURLs[2], */ /* comboId: 'combo3',  */ label: /* 'node2' */jsonData.originatingComputer, /* date: 1636095550 */ inRange: true},    
         { id: 'node3', ...image, img: imageURLs[3], comboId: 'combo5',  label: 'node3'/* `vector` */, /* date: 1636095551 */ inRange: true},  
         { id: 'node4', ...image, img: imageURLs[4], comboId: 'combo6',  label: 'node4'/* `vector` */, /* date: 1636095552 */ inRange: true},  
-        { id: 'node5', ...image, img: imageURLs[5], comboId: 'combo3',  label: 'node5'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-        //   { id: 'node6', ...image, img: imageURLs[6], comboId: 'combo4',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        { id: 'node5', ...image, img: imageURLs[5], /* comboId: 'combo4',  */ label: 'node5'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        { id: 'node6', ...image, img: imageURLs[6], comboId: 'combo1',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //   { id: 'node7', ...image, img: imageURLs[7], comboId: 'combo4', label: 'node7'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //   { id: 'node8', ...image, img: imageURLs[8], comboId: 'combo4', label: 'node8'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //   { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ inRange: true},  
@@ -40,7 +40,7 @@ export function populateNodesEdgesOrg (jsonData) {
         //   target: 'node1', 
         //   ttp: true,
         //   frequency: '3', 
-        //   event: 'edge1',//`${jsonData.message}`, // <----- LABEL
+        //   label: 'edge1',//`${jsonData.message}`, // <----- LABEL
         //   inRange: true, 
         //   date: 
         //   [
@@ -49,9 +49,9 @@ export function populateNodesEdgesOrg (jsonData) {
         // },
         { 
           id: 'edge2',
-          source: 'node3',
-          target: 'node5', 
-          event: 'edge2',//`some other Event` // <----- LABEL
+          source: 'node4',
+          target: 'node3', 
+          label: 'edge2',//`some other Event` // <----- LABEL
           ttp: true, 
           frequency: 1, 
           inRange: true, 
@@ -65,28 +65,28 @@ export function populateNodesEdgesOrg (jsonData) {
             1636095552
           ],
         },
-        // { 
-        //   id: 'edge3',
-        //   source: 'node4', 
-        //   target: 'node5', 
-        //   frequency: 3,
-        //   ttp: true, 
-        //   event: 'edge3', // <----- LABEL
-        //   inRange: true, 
-        //   date: 
-        //   [
-        //     1636095548,
-        //     1636095550,
-        //     1636095552
-        //   ],
-        // },
+        { 
+          id: 'edge3',
+          source: 'node5', 
+          target: 'node6', 
+          frequency: 3,
+          ttp: true, 
+          label: 'edge3', // <----- LABEL
+          inRange: true, 
+          date: 
+          [
+            1636095548,
+            1636095550,
+            1636095552
+          ],
+        },
         // { 
         //   id: 'edge4',
         //   source: 'node5', 
         //   target: 'node9', 
         //   frequency: 1,
         //   ttp: true, 
-        //   event: 'edge4', // <----- LABEL
+        //   label: 'edge4', // <----- LABEL
         //   inRange: true,
         //   date: 
         //   [ 
@@ -99,7 +99,7 @@ export function populateNodesEdgesOrg (jsonData) {
         //   target: 'node10', 
         //   frequency: 1,
         //   ttp: true, 
-        //   event: 'edge5', // <----- LABEL
+        //   label: 'edge5', // <----- LABEL
         //   inRange: true, 
         //   date: 
         //   [
@@ -112,7 +112,7 @@ export function populateNodesEdgesOrg (jsonData) {
         //   target: 'node6', 
         //   frequency: '1',
         //   ttp: true, 
-        //   event: 'edge6', // <----- LABEL
+        //   label: 'edge6', // <----- LABEL
         //   inRange: true, 
         //   date: 
         //   [
@@ -125,7 +125,7 @@ export function populateNodesEdgesOrg (jsonData) {
         //   target: 'node7', 
         //   frequency: '21',
         //   ttp: true, 
-        //   event: 'edge7', // <----- LABEL
+        //   label: 'edge7', // <----- LABEL
         //   inRange: true, 
         //   date: 
         //   [
@@ -138,7 +138,7 @@ export function populateNodesEdgesOrg (jsonData) {
         //   target: 'node8', 
         //   frequency: '21',
         //   ttp: true, 
-        //   event: 'edge8', // <----- LABEL
+        //   label: 'edge8', // <----- LABEL
         //   inRange: true, 
         //   date: 
         //   [
@@ -151,7 +151,7 @@ export function populateNodesEdgesOrg (jsonData) {
           target: 'node4', 
           frequency: 2,
           ttp: true, 
-          event: 'edge9', // <----- LABEL
+          label: 'edge9', // <----- LABEL
           inRange: true, 
           date: 
           [ 
@@ -161,51 +161,52 @@ export function populateNodesEdgesOrg (jsonData) {
         },
        ],
        combos: [
-        // {
-        //   id: 'combo1', // <----- LABEL
-        //   label: 1,     // <----- nodeCount
-        //   parentId: 'combo2',
-        //   inRange: true, 
-        // },
-        // {
-        //   id: 'combo2',
-        //   label: 1,
-        //   parentId: 'combo3',
-        //   inRange: true, 
-        // },
+        {
+          id: 'combo1', // <----- LABEL
+          nodeCount: 1,     // <----- nodeCount
+          parentId: 'combo2',
+          inRange: true, 
+        },
+        {
+          id: 'combo2',
+          nodeCount: 1,
+          parentId: 'combo3',
+          inRange: true, 
+        },
         {
           id: 'combo3', // <----- LABEL
-          label: 1,     // <----- nodeCount
+          nodeCount: 1,     // <----- nodeCount
           inRange: true, 
           // parentId: '8'
         },
         {
           id: 'combo4', // <----- LABEL
-          label: 1,     // <----- nodeCount
+          nodeCount: 1,     // <----- nodeCount
           inRange: true, 
         },
         {
           id: 'combo5', // <----- LABEL
-          label: 1,     // <----- nodeCount
+          nodeCount: 1,     // <----- nodeCount
           inRange: true, 
           parentId: 'combo4'
         },
         {
           id: 'combo6', // <----- LABEL
-          label: 1,     // <----- nodeCount
+          nodeCount: 1,     // <----- nodeCount
           inRange: true,
           parentId: 'combo8'
         },
         {
           id: 'combo7', // <----- LABEL
-          label: 1,     // <----- nodeCount
+          nodeCount: 1,     // <----- nodeCount
           inRange: true, 
         },
         {
           id: 'combo8', // <----- LABEL
-          label: 1,     // <----- nodeCount
+          nodeCount: 1,     // <----- nodeCount
           inRange: true, 
-          parentId: 'combo7'
+          parentId: 'combo7',
+          collapsed: true
         },
        ]
      } 
