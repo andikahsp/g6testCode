@@ -983,7 +983,7 @@ export const data = {
                     1667577572,
                     1667577572
               ],
-              "event": "Login (Network)",
+              "label": "Login (Network)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -3939,7 +3939,7 @@ export const data = {
                     1667577497,
                     1667577497
               ],
-              "event": "Login (Interactive)",
+              "label": "Login (Interactive)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -4138,7 +4138,7 @@ export const data = {
                     1667577813,
                     1667577813
               ],
-              "event": "Login (CachedInteractive)",
+              "label": "Login (CachedInteractive)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -4337,7 +4337,7 @@ export const data = {
                     1667577813,
                     1667577813
               ],
-              "event": "Login (Unlock)",
+              "label": "Login (Unlock)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -4548,7 +4548,7 @@ export const data = {
                     1667577445,
                     1667577445
               ],
-              "event": "Login (CachedInteractive)",
+              "label": "Login (CachedInteractive)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -5443,7 +5443,7 @@ export const data = {
                     1667576802,
                     1667576802
               ],
-              "event": "Login (Unlock)",
+              "label": "Login (Unlock)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6140,7 +6140,7 @@ export const data = {
                     1667575773,
                     1667575783
               ],
-              "event": "Login Failure",
+              "label": "Login Failure",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6255,7 +6255,7 @@ export const data = {
                     1667576855,
                     1667576855
               ],
-              "event": "Login (Interactive)",
+              "label": "Login (Interactive)",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6446,7 +6446,7 @@ export const data = {
                     1667577507,
                     1667577655
               ],
-              "event": "Create Process",
+              "label": "Create Process",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6557,7 +6557,7 @@ export const data = {
                     1667577665,
                     1667577665
               ],
-              "event": "Process Terminated",
+              "label": "Process Terminated",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6767,7 +6767,7 @@ export const data = {
                     1667577507,
                     1667577655
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6854,7 +6854,7 @@ export const data = {
               "date": [
                     1667576802
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6899,7 +6899,7 @@ export const data = {
               "date": [
                     1667576802
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6949,7 +6949,7 @@ export const data = {
               "date": [
                     1667576802
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -6997,7 +6997,7 @@ export const data = {
                     1667577507,
                     1667577655
               ],
-              "event": "Create Process",
+              "label": "Create Process",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7101,7 +7101,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Create Process",
+              "label": "Create Process",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7145,7 +7145,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Create Process",
+              "label": "Create Process",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7190,7 +7190,7 @@ export const data = {
                     1667577823,
                     1667577823
               ],
-              "event": "Process Terminated",
+              "label": "Process Terminated",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7260,7 +7260,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7305,7 +7305,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7350,7 +7350,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7400,7 +7400,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7445,7 +7445,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7490,7 +7490,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7540,7 +7540,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7585,7 +7585,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7630,7 +7630,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7680,7 +7680,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7725,7 +7725,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7770,7 +7770,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7820,7 +7820,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7865,7 +7865,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7910,7 +7910,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -7955,7 +7955,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8005,7 +8005,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8050,7 +8050,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8095,7 +8095,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8140,7 +8140,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8190,7 +8190,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8235,7 +8235,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8280,7 +8280,7 @@ export const data = {
               "date": [
                     1667577822
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8330,7 +8330,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8380,7 +8380,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8430,7 +8430,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8475,7 +8475,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8525,7 +8525,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8570,7 +8570,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8615,7 +8615,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8660,7 +8660,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8710,7 +8710,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8755,7 +8755,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8800,7 +8800,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8850,7 +8850,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8895,7 +8895,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Write File",
+              "label": "Write File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8940,7 +8940,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Delete File",
+              "label": "Delete File",
               "g": null,
               "ttp": false,
               "inRange": true,
@@ -8990,7 +8990,7 @@ export const data = {
               "date": [
                     1667577823
               ],
-              "event": "Read File",
+              "label": "Read File",
               "g": null,
               "ttp": false,
               "inRange": true,

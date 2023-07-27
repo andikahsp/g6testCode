@@ -92,7 +92,7 @@ export const data =
                       1667572306,
                       1667572425
                 ],
-                "event": "Accept Connection",
+                "label": "Accept Connection",
                 "g": null,
                 "ttp": false,
                 "inRange": true,
@@ -333,7 +333,7 @@ export const data =
                 "date": [
                       1667572431
                 ],
-                "event": "Drop Connection",
+                "label": "Drop Connection",
                 "g": null,
                 "ttp": false,
                 "inRange": true,
@@ -395,7 +395,7 @@ export const data =
                       1667572425,
                       1667572431
                 ],
-                "event": "Listen Port",
+                "label": "Listen Port",
                 "g": null,
                 "ttp": false,
                 "inRange": true,
