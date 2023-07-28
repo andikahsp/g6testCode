@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { data as jsonData } from './sourceOrg';
-import { cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
+import { circleNodeShape, cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdgesOrg } from "./parts/graphDataConfigOrg";
 
@@ -215,17 +215,18 @@ const TimeBarTrend
       };
 
       /*  *********** CUSTOM NODE  ***********   */
-      // G6.registerNode(
-      //   ''
-
-      // );
+      G6.registerNode(
+        'nCircle', // name that we decide for the custom node model shape type
+        circleNodeShape,
+        'circle' // built-in node shape to extend from
+      );
 
       /*  *********** CUSTOM COMBO  ***********   */
       
       G6.registerCombo(
         'cCircle', // name that we decide for the custom Combo model
         cCircleComboShape,
-        'circle', // built-in combo to extend from
+        'circle', // built-in combo shape to extend from
       );
 
       /* ******* CUSTOM EDGES ******* */
@@ -249,7 +250,7 @@ const TimeBarTrend
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
-          type: 'force',  // force, force2 messes with collapseCombo Edges
+          type: 'grid',  // force, force2 messes with collapseCombo Edges
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,
@@ -268,7 +269,7 @@ const TimeBarTrend
         },
         defaultNode: {
           size: nodeSize,
-          type: 'circle',
+          type: 'nCircle',
           style: {
             position: 'top',
             stroke: '#4fdcff', // color of the node ring
