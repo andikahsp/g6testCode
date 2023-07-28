@@ -92,6 +92,7 @@ export const cCircleComboShape = {
       // Update the comboKeyShape
       comboShape.attr({
         r: cfg.collapsed ? 28: style.r,
+        lineWidth: cfg.collapsed ? 4 : 1 
       });
 
 
@@ -136,6 +137,7 @@ export const cCircleComboShape = {
       
       const line = group.addShape('path', {
         attrs: {
+          lineWidth: 2, // for all standard Edges
           stroke,
           path,
           endArrow,
@@ -294,8 +296,8 @@ export const cCircleComboShape = {
           symbol: circleIcon,
           fill: 'orange',
           stroke: 'black',
-          strokeWidth: 3.5,
-          lineWidth: 1.5,
+          strokeWidth: 3.5, 
+          lineWidth: 1.5, 
         },
         draggable: true,
         // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type

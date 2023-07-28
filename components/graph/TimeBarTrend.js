@@ -50,7 +50,8 @@ const TimeBarTrend
       }
 
 
-      const nodeSize = 60;
+      const nodeSize = nodeEdgeData["nodes"][0].size; // originally set in graphDataConfig
+
       //log(G6.TimeBar);
       const newTimebar = new G6.TimeBar({
         x: 0,
@@ -213,10 +214,16 @@ const TimeBarTrend
         });
       };
 
+      /*  *********** CUSTOM NODE  ***********   */
+      // G6.registerNode(
+      //   ''
+
+      // );
+
       /*  *********** CUSTOM COMBO  ***********   */
       
       G6.registerCombo(
-        'cCircle',
+        'cCircle', // name that we decide for the custom Combo model
         cCircleComboShape,
         'circle', // built-in combo to extend from
       );
@@ -264,7 +271,7 @@ const TimeBarTrend
           type: 'circle',
           style: {
             position: 'top',
-            stroke: '#4fdcff',
+            stroke: '#4fdcff', // color of the node ring
             fill: 'transparent',
             lineWidth: 4,
           },
@@ -277,6 +284,16 @@ const TimeBarTrend
               fontSize: 11,
             }
           },
+          icon: {
+            /* whether show the icon, false by default */
+            show: true,
+            /* icon's img address, string type */
+            // img: 'https://cdn.pixabay.com/photo/2012/04/13/00/17/question-mark-31190_960_720.png',
+            img: 'https://cdn.pixabay.com/photo/2013/07/13/12/09/sign-159285_960_720.png',
+            /* icon's size, 20 * 20 by default: */
+            width: 30,
+            height: 30
+          },
         },
         // Set groupByTypes to false to get rendering result with reasonable visual zIndex for combos
         groupByTypes: false,
@@ -288,7 +305,7 @@ const TimeBarTrend
             position:'bottom',
             stroke: 'gray',
             fill: 'transparent',
-            lineWidth: 1.5,
+            // lineWidth: 1.5, // this is to be commented out. handled at elements.js
           },
           labelCfg: {
             style: {
@@ -300,11 +317,11 @@ const TimeBarTrend
           },
         },
 
-        defaultEdge: {
+        defaultEdge: { // this will be used for the parallelEdges
           type: 'fund-polyline',
           style: {
             stroke: '#5f6266',
-            lineWidth: 1.2,
+            lineWidth: 2,
             endArrow: {
               path: G6.Arrow.triangle(6.0, 6.0, 1), // (width, length, offset (wrt d))
               fill: '#5f6466',
@@ -378,8 +395,8 @@ const TimeBarTrend
             lineDash: [6, 18]
           },
           mouseenter: {
-            lineWidth: 6,
-            stroke: 'black',
+            lineWidth: 8,
+            stroke: 'pink',
           }
         },
       });

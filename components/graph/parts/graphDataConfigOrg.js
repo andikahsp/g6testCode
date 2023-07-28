@@ -7,8 +7,15 @@ export function populateNodesEdgesOrg (jsonData) {
     
     const image = { type: 'image', 
                      size: 36};
+
     const circle = { type: 'circle', 
-                     size: 48 };
+                     size: 54, // this will be the default size of all the nodes
+                     style: {
+                      position: 'top',
+                      stroke: '#5f6266',
+                      fill: 'transparent',
+                      lineWidth: 4,
+                    } };
     
     const triangle = { type: 'triangle',
                        size: 20, 
@@ -20,10 +27,10 @@ export function populateNodesEdgesOrg (jsonData) {
         //   { id: 'node0', ...circle, /* img: imageURLs[0], */ comboId: 'combo1',  label: /* 'node0' */jsonData.computerName, /* date: jsonData.logsourceTime */ inRange: true },
         //   { id: 'node1', ...image, img: imageURLs[1], comboId: 'combo4',  label: 'node1'/* jsonData.logonProcess */, /* date: jsonData.logsourceTime */ inRange: true},
         //  { id: 'node2', ...triangle, /* img: imageURLs[2], */ /* comboId: 'combo3',  */ label: /* 'node2' */jsonData.originatingComputer, /* date: 1636095550 */ inRange: true},    
-        { id: 'node3', ...image, img: imageURLs[3], comboId: 'combo5',  label: 'node3'/* `vector` */, /* date: 1636095551 */ inRange: true},  
-        { id: 'node4', ...image, img: imageURLs[4], comboId: 'combo6',  label: 'node4'/* `vector` */, /* date: 1636095552 */ inRange: true},  
-        { id: 'node5', ...image, img: imageURLs[5], /* comboId: 'combo4',  */ label: 'node5'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
-        { id: 'node6', ...image, img: imageURLs[6], comboId: 'combo1',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        { id: 'node3', ...circle, icon: {img: imageURLs[3]}, comboId: 'combo5',  label: 'node3'/* `vector` */, /* date: 1636095551 */ inRange: true},  
+        { id: 'node4', ...circle, icon: {img: imageURLs[4]}, comboId: 'combo6',  label: 'node4'/* `vector` */, /* date: 1636095552 */ inRange: true},  
+        { id: 'node5', ...circle, icon: {img: imageURLs[5]}, /* comboId: 'combo4',  */ label: 'node5'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
+        { id: 'node6', ...circle, icon: {img: imageURLs[6]}, comboId: 'combo1',  label: 'node6'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //   { id: 'node7', ...image, img: imageURLs[7], comboId: 'combo4', label: 'node7'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //   { id: 'node8', ...image, img: imageURLs[8], comboId: 'combo4', label: 'node8'/* `vector` */, /* date: 1636095553 */ inRange: true}, 
         //   { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ inRange: true},  

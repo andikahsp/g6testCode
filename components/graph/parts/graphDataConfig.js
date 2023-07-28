@@ -12,8 +12,16 @@ export function populateNodesEdges (jsonData) {
     // to data
     const image = { type: 'image', 
                      size: 36};
-    const circle = { type: 'circle', 
-                     size: 48 };
+
+    const circle = {  type: 'circle', 
+                      size: 54, // this will be the default size of all the nodes
+                      style: {
+                      position: 'top',
+                      stroke: '#5f6266',
+                      fill: 'transparent',
+                      lineWidth: 4,
+                      } 
+                    };
     
     const triangle = { type: 'triangle',
                        size: 20, 
@@ -34,11 +42,22 @@ export function populateNodesEdges (jsonData) {
     
     // Add icon settings to graphData from BackEnd
     jsonData.nodes.forEach((node) => {
-      node["type"] = 'image';
+      // assign custom modeltype/shape to use
+      node["type"] = 'circle';
       node["size"] = 24;
       const iconType = node["display"]["labels"][0];
       if (Object.keys(imageHash).includes(iconType)){
-        node["img"] = imageHash[iconType];
+        // formating for the icon and the image to be displaye inside the node circle
+        // node["img"] = imageHash[iconType];
+        node = {...node, ...circle};
+        node["icon"] = { 
+                        show: true,
+                        /* icon's img address, string type */
+                        img: imageHash[iconType],
+                        /* icon's size, 20 * 20 by default: */
+                        width: 30,
+                        height: 30,
+                         };
       } else {
         // set to questionmark icon
         node["img"] = imageURLs[25];
@@ -58,8 +77,9 @@ export function populateNodesEdges (jsonData) {
     // push combo data to CyGraph combo data
     if (jsonData["combos"] !== undefined && jsonData["combos"].length > 0) {
       for(let i = 0; i < jsonData["combos"].length; i++ ) {
-        // change type for combo model data to "cCircle" to use custom comboCircle features
+        // assign custom modeltype/shape to use
         jsonData["combos"][i]["type"] = "cCircle";
+        // push
         graphData["combos"].push(jsonData["combos"][i]);
       }
     }
