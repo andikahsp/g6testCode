@@ -243,6 +243,7 @@ const TimeBarTrend
       
       //log(G6.Graph);
       const newGraph = new G6.Graph({
+        type: 'gforce',
         container: ref.current,
         width: width,
         height: height + 55,
@@ -250,7 +251,7 @@ const TimeBarTrend
         linkCenter: false,
         plugins: [newTimebar],
         layout: {
-          type: 'grid',  // force, force2 messes with collapseCombo Edges
+          // type: 'grid',  // force, force2 messes with collapseCombo Edges
           //center: [200, 200],
           center: [800, 340], 
           preventOverlap: true,
@@ -299,7 +300,7 @@ const TimeBarTrend
         // Set groupByTypes to false to get rendering result with reasonable visual zIndex for combos
         groupByTypes: false,
         defaultCombo: {
-          type: 'cCircle',
+          type: 'cCircle', 
           //size: [130], // The minimum size of the Combo
           padding: 20,
           style: {
@@ -461,15 +462,34 @@ const TimeBarTrend
         if (comboDraggedOver !== undefined && e.item.getModel().comboId === undefined) {
           if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
             // log('draggedover combos on node mouseup', draggedOverCombos)
-            // log('node mouseup- dragleaveCombo',dragleaveCombo.getID());
+            // log('node mouseup- dragleaveCombo', dragleaveCombo.getID());
+
+            // // DIAGNOSTIC CONSOLE LOG!
+            // const allNodesInDLCombo = getAllNodesInCombo(dragleaveCombo);
+            // const nodeDisp = [];
+            // allNodesInDLCombo.forEach((node) => nodeDisp.push(node.getID()));
+            // log('node:mouse up DLCombo holds:', nodeDisp );
+
+
+            // for draggin a  node out of nested combo group
             const combosToUpdate = getAllCombosInCombo(dragleaveCombo).concat(dragleaveCombo);
             combosToUpdate.forEach((combo) => {
-              combo.getModel().nodeCount = countNodesInCombo(combo)
+              const allNodesInCombo = getAllNodesInCombo(combo);
+              // combo.getModel().nodeCount = countNodesInCombo(combo)
+              combo.getModel().nodeCount = allNodesInCombo.length;
+              // update NODE COUNT
               if(combo.getModel().nodeCount < 1) {
                 newGraph.uncombo(combo.getID());  
               } else {
+                // we only need to update IOC status if the combo is still displayed
+                // update IOC STATUS
+                let iocStatus = false; 
+                if(allNodesInCombo.some((node) => node.getModel().ioc)) iocStatus = true;
+                combo.getModel().ioc = iocStatus;
                 newGraph.updateCombo(combo);
               }
+
+
             });
           }
         }
@@ -503,18 +523,30 @@ const TimeBarTrend
         (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
           if (nodeA !== "" && nodeB !== nodeA ) { 
             
+            let iocStatus = false;
             const comboCount = newGraph.getCombos().length;
             const last = (comboCount === 0 ? '0' : newGraph.getCombos()[comboCount - 1].getID().substring(5) );
             const newComboId = `combo${parseInt(last) + 1}`
+            
+            if(nodeAModel.ioc || nodeBModel.ioc) iocStatus = true;
+
+            // *ioc status has to be set at the time of comboCreation because drawShape function within
+            // the custom Shape option instance works at shape creation, not post creation.
+            // else will have 'iocBadge' is null error.
             newGraph.createCombo({
               id: newComboId, 
-              nodeCount: ""
+              nodeCount: "",
+              ioc: iocStatus
             }, [`${nodeA}`, `${nodeB}`]);
             
             const newCombo = newGraph.findById(newComboId);
             if(newCombo) {
               // count the new number of nodes in the combo
-              const newCount = countNodesInCombo(newCombo);
+              // const newCount = countNodesInCombo(newCombo);
+              // instead of using countNodesInCombo function here, we use getAllNodesInCombo to prevent from calling the same Fn twice
+              const nodesInCombo = getAllNodesInCombo(newCombo);
+              // count number of nodes in newCombo
+              const newCount = nodesInCombo.length;
               // update the nodeCount display
               newGraph.updateItem(newCombo,{nodeCount: newCount}) ;
             }
@@ -528,18 +560,29 @@ const TimeBarTrend
           const combo = newGraph.findById(comboIdOfNode);
           newGraph.setItemState(e.item, "dragenter", true);
           const currentNodeCount = countNodesInCombo(combo);
-          if (e.item._cfg.model.nodeCount === "") {
+          if (e.item._cfg.model.nodeCount === "") {  // <----- what is this for?
+            log("POOOOOOOOOOOOOT", e.item.getID());
             e.item._cfg.model.nodeCount = currentNodeCount;
           } 
           else {
             if (nodeDrag === true && dragleaveCombo !== undefined) {
+              // when moving nodes between different nested combos and different combos
               //for updating the subtraction of node count from outermost combo
               // see combo drag leave
               if (dragleaveCombo._cfg !== null) {
+                // log("argghh2");
+                // update IOC rating for removing nodes out of combo
+                const nodesInDLCombo = getAllNodesInCombo(dragleaveCombo);
+                if(nodesInDLCombo.some((node) => node.getModel().ioc)) {
+                  newGraph.updateItem(dragleaveCombo, {ioc: true});
+                } else {
+                  newGraph.updateItem(dragleaveCombo, {ioc: false});
+                }
                 newGraph.updateCombo(dragleaveCombo);
               } 
-
               else {
+                // for when the only node is dragged out of combo
+                // log("ARGGGHH 3")
                 newGraph.updateCombo(combo);
               }
             } 
@@ -551,7 +594,6 @@ const TimeBarTrend
             newGraph.setItemState(combo, 'dragenter', false);
           })
       });
-      
 
       newGraph.on(`combo:drag`,(e) => {
         dragCombo = e.item;
@@ -559,9 +601,8 @@ const TimeBarTrend
         newGraph.setItemState(e.item, 'dragleave', false);
       });
 
-      
       newGraph.on('combo:dragover', (e) => {
-        // log('combo:dragover');
+        // log('combo:dragover =', e.item.getID());
         comboDraggedOver = e.item;
         // for updating node count on combo drag
         if(dragCombo !== undefined) {
@@ -575,8 +616,9 @@ const TimeBarTrend
         // for updating node count of combos on node drag
         if (!(draggedOverCombos.includes(e.item))) {
           draggedOverCombos.push(e.item);
-          //log('node dragged over combo')
+          // log('node dragged over combo')
         }
+        // for updating ioc  
         newGraph.setItemState(e.item, 'dragenter', true);
       });
 
@@ -587,9 +629,12 @@ const TimeBarTrend
       });
 
 
+      // for the combo receiving elements that are dropped
+      // when .this is a node or a combo that is being dropped
       newGraph.on('combo:drop', (e) => { 
         comboDrop = true; 
         //for COMBO: DRAG
+        // if a combo is dropped into .this combo
         if(!nodeDrag){
           console.debug('combo dropped into combo')
         // GET OUTERMOST COUNTER DETAILS!
@@ -609,11 +654,13 @@ const TimeBarTrend
           } else {
             newGraph.setItemState(combo, 'dragleave', false);
             newGraph.setItemState(combo, 'dragenter', false);
+            // update combo
             newGraph.updateCombo(combo);
           }
          })
        } else {
         // for NODE:drag
+        // if a node is dropped into .this combo
         console.debug('node dropped into combo');
         
         let combosToUpdate = [];
@@ -674,7 +721,19 @@ const TimeBarTrend
         const updatedCombosDisplay = []
         combosToUpdate.forEach((combo) => {
           updatedCombosDisplay.push(combo.getID())
-          combo.getModel().nodeCount = countNodesInCombo(combo);
+          /* UPDATE IOC */
+          // use getAllNodesInCombo, for IOC assignment and updating nodeCount
+          const nodesInCombo = getAllNodesInCombo(combo);
+          //const iocNodes = nodesInCombo.filter((node) => node.getModel().ioc);
+          if(nodesInCombo.some((node)=> node.getModel().ioc)) {
+            // log("sneeze");
+            combo.getModel().ioc = true;
+          } else {
+            // log("ah choo =", combo.getID());
+            combo.getModel().ioc = false;
+          }
+          /* UPDATE NODE COUNT */
+          combo.getModel().nodeCount = nodesInCombo.length;
           newGraph.setItemState(combo, 'dragleave', false);
           newGraph.setItemState(combo, 'dragenter', false);
           if(combo.getModel().nodeCount < 1) {
@@ -685,15 +744,17 @@ const TimeBarTrend
         })
         // log('updated combos =', updatedCombosDisplay);
        }
-       // draggedOverCombos = [];
+       // draggedOverCombos = []; // DO NOT UNCOMMENT!
       });
 
 
       newGraph.on('combo:dragleave', (e) => {
-        //log('dragleave');
-        dragleaveCombo = e.item;
+        // log('combo: dragleave');
+        dragleaveCombo = e.item; // <--- active and assigned whilst nodeDrag = true.
+        const nodeCountNmbr= countNodesInCombo(dragleaveCombo);
+        newGraph.updateItem(dragleaveCombo, {nodeCount: nodeCountNmbr});
         newGraph.setItemState(e.item, 'dragleave', true);
-      
+
       });
 
       newGraph.on('combo:mouseenter',(e) => {
@@ -704,17 +765,17 @@ const TimeBarTrend
       });
 
 
+      // for .this combo that is being dropped
       newGraph.on('combo:mouseup', (e) => {
         // log('combo:mouseup')
-       
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo !== undefined){ 
           // prevents deletion of orphan combo when dragging across graph space quickly
           // (dragged Combo id can become dragleave combo id)
           if(dragleaveCombo._cfg !== null && dragleaveCombo.getID() !== dragCombo.getID()) {
             // to graph space
+            // for SUBTRACTING count when DRAGGING NODES & COMBO from OUTERMOST COMBO out to GRAPH SPACE
+            // the IF condition has to work for BOTH COMBO & NODE dragging.
             if(!comboDrop) {
-              // for SUBTRACTING count when DRAGGING NODES & COMBO from OUTERMOST COMBO out to GRAPH SPACE
-              // if condition has to work for BOTH COMBO & NODE dragging.
               const otherCombos = Array.from(draggedOverCombos.filter(combo => combo.getID() !== dragCombo.getID()));
               otherCombos.forEach((combo, i) => {
                 combo.getModel().nodeCount = countNodesInCombo(combo) - countNodesInCombo(dragCombo);
@@ -762,6 +823,8 @@ const TimeBarTrend
         newGraph.uncombo(comboId);
         });
       
+      // for user's action on expanding and collapsing combo
+      // target elements: combos & VEdges
       newGraph.on("combo:click", (e) => {
       const combo = e.item;
       const comboModel = e.item.getModel()
@@ -841,7 +904,7 @@ const TimeBarTrend
     
     newGraph.on('edge:mouseenter', (e) => {
       newGraph.setItemState(e.item, 'hover', true)
-      log('EDGE =', e.item);
+      // log('EDGE =', e.item);
     });
 
     newGraph.on('edge:mouseleave', (e) => {
