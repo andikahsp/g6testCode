@@ -73,42 +73,55 @@ export const cCircleComboShape = {
       draggable: true, 
       name: 'combo-marker-nodeCount'
     });
-    if(cfg.ioc && cfg.ioc !== undefined) {
-       // Add the IOC badge shape
-       group.addShape('marker', {
-        attrs: {
-          ...style,
-          opacity: 1,
-          x: 0 - 25,
-          y: 0 + (-1 * style.r + 5) ,
-          r: 10,
-          symbol: circleIcon,
-          fill: 'orange',
-          stroke: 'black',
-          lineWidth: 2
-        },
-        draggable: true,
-        // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-        name: 'combo-ioc-badge',
-      });
-      // text that goes into the marker/badge
-      group.addShape('text', {
-        attrs: {
-            text:"I", //<--- change text here
-            x: 0  - 28,
-            y: 0 + (-1 * style.r + 14),
-            fontFamily: 'TimesNewRoman',
-            fontSize: 17,
-            fill: 'white',
-            stroke: 'white',
-        },
-        draggable: true, 
-        name: 'combo-ioc-glyph-text'
-      });
+
+    let badgeFillColor = 'transparent';
+    let badgeStrokeColor = 'transparent';
+    let textFillColor = 'transparent';
+    let textStrokeColor = 'transparent';
+
+    if(cfg.ioc !== undefined && cfg.ioc) {
+      badgeFillColor = 'orange';
+      badgeStrokeColor = 'black';
+      textFillColor = 'white';
+      textStrokeColor = 'white';
     }
 
+    // because iocBadge must !== null, when creating Combo & when adding or deleting nodes, 
+    // we must draw the shape first, and then only change colors according to state. 
+    // Add the IOC badge shape
+    group.addShape('marker', {
+      attrs: {
+        ...style,
+        opacity: 1,
+        x: 0 - 25,
+        y: 0 + (-1 * style.r + 5) ,
+        r: 10,
+        symbol: circleIcon,
+        fill: badgeFillColor,
+        stroke: badgeStrokeColor,
+        lineWidth: 2
+      },
+      draggable: true,
+      // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+      name: 'combo-ioc-badge',
+    });
+    // text that goes into the marker/badge
+    group.addShape('text', {
+      attrs: {
+          text:"I", //<--- change text here
+          x: 0  - 28,
+          y: 0 + (-1 * style.r + 14),
+          fontFamily: 'TimesNewRoman',
+          fontSize: 17,
+          fill: textFillColor,
+          stroke: textStrokeColor,
+      },
+      draggable: true, 
+      name: 'combo-ioc-glyph-text'
+    });
     return circle;
   },
+
   // Define the updating logic for the marker (after Collapsed)
   afterUpdate: function afterUpdate(cfg, combo) {
     const self = this;
@@ -124,6 +137,15 @@ export const cCircleComboShape = {
     const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-nodeCount');
     // Find comboId shape in the graphics group of the Combo
     const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
+    // Find ioc badge shape 
+    const iocBadge = group.find((ele) => ele.get('name') === 'combo-ioc-badge');
+    // Find ioc glyph text
+    const iocText = group.find((ele) => ele.get('name') === 'combo-ioc-glyph-text');
+    // colors if ioc is false; 
+    let badgeFillColor = 'transparent';
+    let badgeStrokeColor = 'transparent';
+    let textFillColor = 'transparent';
+    let textStrokeColor = 'transparent';
 
     // Update the comboKeyShape
     comboShape.attr({
@@ -148,24 +170,27 @@ export const cCircleComboShape = {
       y: (style.r - 20) * - 1,
     });
 
-    if(cfg.ioc && cfg.ioc !== undefined) {
-      // Find ioc badge shape 
-      const iocBadge = group.find((ele) => ele.get('name') === 'combo-ioc-badge');
-      // Find ioc glyph text
-      const iocText = group.find((ele) => ele.get('name') === 'combo-ioc-glyph-text');
+    if(cfg.ioc !== undefined && cfg.ioc) {
+      badgeFillColor = 'orange';
+      badgeStrokeColor = 'black';
+      textFillColor = 'white';
+      textStrokeColor = 'white';
+    }
       // update the ioc badge position when the combo is expanded
       iocBadge.attr({
         x: style.r * 0.50 * -1, 
-        y: (style.r - 10) * - 1
+        y: (style.r - 10) * - 1,
+        fill: badgeFillColor,
+        stroke: badgeStrokeColor,
       })
       // update the ioc glyph text position when the combo is expanded
       iocText.attr({
         x: (style.r * 0.50 * -1 ) - 3,
-        y: ((style.r - 10) * -1 ) + 9
+        y: ((style.r - 10) * -1 ) + 9,
+        fill: textFillColor,
+        stroke: textStrokeColor,
       })
-    }
 
-    
   },
 }; 
 
