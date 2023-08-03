@@ -424,6 +424,7 @@ const TimeBarTrendTrial
 
       window.addEventListener("contextmenu", e => e.preventDefault());
 
+
       newGraph.on('node:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
         //turn on node highlight
@@ -909,6 +910,7 @@ const TimeBarTrendTrial
        } 
          else {
           comboExpandTTP(e.item);
+          handleIOC(e.item, newGraph);
        } 
     });
 
@@ -934,12 +936,12 @@ const TimeBarTrendTrial
           neighbours.forEach((neighbour) => {
             if (neighbour.getType() === "combo") {
               ttp = checkTTP(nodes[i], neighbour);
-              console.debug('3) TTP:',ttp);
+              // console.debug('3) TTP:',ttp);
               if (ttp) {
                 const edges = nodes[i].getEdges();
                 edges.forEach((edge) => {
                   if (edge.getModel().isVEdge) {
-                    if ( // <================
+                    if ( 
                       edge.getTarget() === neighbour || edge.getSource() === neighbour
                     ) {
                       edge.getModel()["ttp"] = ttp;
@@ -1039,6 +1041,25 @@ const TimeBarTrendTrial
     }
 
 
+    function handleIOC(combo, graph) {
+      let outerMostCombo;
+      // find the outermost combo. 
+      const allParents = getAllParents(combo, graph)
+      if (allParents.length > 0) {
+        outerMostCombo = allParents[allParents.length - 1];
+      } else {
+        outerMostCombo = combo
+      }
+      // from outermost combo, search inwards and find all combos
+      const allCombos = getAllCombosInCombo(outerMostCombo).concat(outerMostCombo);
+      allCombos.forEach((combo) => {
+        const cNodes = getAllNodesInCombo(combo);
+        if (cNodes.some((cNode) => cNode.getModel().ioc)) graph.updateItem(combo, {ioc: true});
+        log(`${combo.getID()} ioc: ${combo.getModel().ioc}`);
+      })
+    }
+    
+
       function getAllParents(childCombo, graph) {
         let arr = []
         grabParents(childCombo, arr, graph);
@@ -1087,7 +1108,7 @@ const TimeBarTrendTrial
       // returns true if there is an edge between the node and combo
       // AND that edge is TTP.
       function checkTTP(node, combo) {
-        console.debug('**checkTTP**');
+        // console.debug('**checkTTP**');
         let nEdgesInside = [];
         let ttpStatus = false; 
         const comboNodes = getAllNodesInCombo(combo);
@@ -1104,7 +1125,7 @@ const TimeBarTrendTrial
             } 
           }
         }
-        console.debug('1) ttpStatus', ttpStatus);
+        // console.debug('1) ttpStatus', ttpStatus);
         return ttpStatus; 
       }
 
@@ -1141,7 +1162,7 @@ const TimeBarTrendTrial
       function grabAllCombos(combo, array) {
         let cCombos = combo.getCombos();
         if(cCombos === []){
-          array.push(combo)
+          array.push(combo) // <---- ERRONEOUS!
           return array;
         } else {
           for(let i = 0; i < cCombos.length; i++) {
@@ -1158,6 +1179,10 @@ const TimeBarTrendTrial
       newGraph.on("canvas:click", function (event) {
         const nodes = newGraph.getNodes();
         log('NODES:', nodes);
+        nodes.forEach((node) => {
+          log(`     ${node.getID()} | cBC: ${node.getModel().collapsedByCombo} | inRange: ${node.getModel().inRange}\n           | visible: ${node.isVisible()}`);
+
+        })
         const edges = newGraph.getEdges();
         log('EDGES:', edges);
         edges.forEach((edge) => {
@@ -1169,11 +1194,9 @@ const TimeBarTrendTrial
         const vEdges = newGraph.get('vedges');
         log('VEdges:', vEdges);
         vEdges.forEach((VEdge) => {
-          log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}`);
+          log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}\n         | ttp: ${VEdge.getModel().ttp}`);
         })
         });
-      
-
 
       // RESIZING
       if (typeof window !== 'undefined')
