@@ -841,72 +841,11 @@ const TimeBarTrendTrial
       const combo = e.item;
       const comboModel = e.item.getModel()
 
-      const selfNodes = getAllNodesInCombo(combo);
-      //log('selfNodes =', selfNodes);
+
  
       // all actions to take when combo is collapsed. 
       if (comboModel.collapsed) {
-        let ttpCheck = false;
-        const neighbors = combo.getNeighbors();
-        for (let i = 0; i < neighbors.length; i ++) {
-          if (neighbors[i].getType() === "node"){
-            const edgesOfNeighbor = neighbors[i].getEdges();
-            
-            for (let j = 0; j < edgesOfNeighbor.length; j++) {
-              for (let k = 0; k < selfNodes.length; k++) {
-                if (edgesOfNeighbor[j].getSource() === selfNodes[k] && edgesOfNeighbor[j].getTarget() === neighbors[i]  ||
-                    edgesOfNeighbor[j].getTarget() === selfNodes[k] && edgesOfNeighbor[j].getSource() === neighbors[i]
-                  ) {
-                      if (edgesOfNeighbor[j].getModel().ttp) {
-                        ttpCheck = true; 
-                        // log('neighborNodes ttpCheck =', ttpCheck);
-                      }  
-                  }
-              }
-            }
-          } else if (neighbors[i].getType() === "combo") {
-
-              const neighborNodes = getAllNodesInCombo(neighbors[i]);
-              // log('neighborNodes =', neighborNodes);
-
-              for (let j = 0; j < selfNodes.length; j++) {
-                const selfNodeNeighbors = selfNodes[j].getNeighbors();
-                for (let k = 0; k < selfNodeNeighbors.length; k++) {
-
-                  if (neighborNodes.includes(selfNodeNeighbors[k])) {
-                    const edges = selfNodeNeighbors[k].getEdges();
-                    for(let m = 0; m < edges.length; m ++) {
-                      if (neighborNodes.includes(edges[m].getSource()) || neighborNodes.includes(edges[m].getTarget())) {
-                        if(edges[m].getModel().ttp){
-                          ttpCheck = true
-                          // log('selfNodeNeighbors[k] comboId:', selfNodeNeighbors[k].getModel().comboId )
-                          // log('selfNodes[j] comboId:',selfNodes[j].getModel().comboId);
-                        }
-                      }
-                    }                   
-                  }
-                }
-              }
-          } else {
-            throw 'ERROR: neighbor is not a node or a combo'
-          }
-
-          if (ttpCheck) {
-            let vedgeId;
-            const VEdges = e.item.getEdges();
-            for (let r = 0; r < VEdges.length; r++) {
-              if (VEdges[r].getSource() === neighbors[i] && VEdges[r].getTarget() === e.item || 
-                  VEdges[r].getTarget() === neighbors[i] && VEdges[r].getSource() === e.item) { 
-                    vedgeId = VEdges[r].getID();
-                  }
-            }
-            newGraph.findById(vedgeId).getModel()['ttp'] = ttpCheck;
-            // VEdges.forEach((vedge) => {
-            //   log('%%%%%% ',vedge.getModel());
-            // });
-            // log('selected vedgeID=', newGraph.findById(vedgeId).getModel());
-          }
-        }
+        comboCollapseTTP(combo) 
        } 
          else {
           comboExpandTTP(e.item);
@@ -924,6 +863,64 @@ const TimeBarTrendTrial
       newGraph.setItemState(e.item, 'hover', false)
     });
 
+    function comboCollapseTTP(combo) {
+      // 1) grab all the VE from .this combo that is being collapsed
+      // 2) grab all the nodes inside this combo
+      // 3) from the nodes, find all the possible standard edges
+      // 4) create a VE to edge map for all the VE of this collapsed combo
+      // 5) transfer the VE label over if the nEdge is still inRange
+      let allEdgesInRange = [];
+      let veMap = {};
+      const cVEdges = combo.getEdges();
+      const cNodes = getAllNodesInCombo(combo);
+      cNodes.forEach((node) => {
+        const nodeEdgesInRange = node.getEdges().filter((edge) => !edge.getModel().isVEdge && edge.getModel().inRange);
+        allEdgesInRange = allEdgesInRange.concat(nodeEdgesInRange);
+      });
+      
+      const allEdgesDisp = [];
+      allEdgesInRange.forEach((edge) => allEdgesDisp.push(edge.getID()));
+      console.log('allEdges =', allEdgesDisp);
+
+      cVEdges.forEach((vEdge) => { 
+        // create empty array for holding standard edges
+        veMap[vEdge.getID()] = [];
+      })
+      for (let i = 0; i< cVEdges.length; i++) {
+        let veSourceNodeIds = [];
+        let veTargetNodeIds = [];
+        const veSource = cVEdges[i].getSource();
+        const veTarget = cVEdges[i].getTarget();
+        if(veSource.getType() === 'combo') {
+          const vSourceNodes = getAllNodesInCombo(veSource);
+          vSourceNodes.forEach((sNode) => {
+            veSourceNodeIds.push(sNode.getID());
+          });
+         }
+         if(veTarget.getType() === 'combo') {
+          const vTargetNodes = getAllNodesInCombo(veTarget);
+          vTargetNodes.forEach((vTarget) => {
+            veTargetNodeIds.push(vTarget.getID())
+          });
+        }
+
+        for(let j = 0; j < allEdgesInRange.length; j++) {
+          const source = allEdgesInRange[j].getSource();
+          const target = allEdgesInRange[j].getTarget();
+          if((veSource.getID() === source.getID() || veSourceNodeIds.includes(source.getID()) ) && 
+          (veTarget.getID() === target.getID() || veTargetNodeIds.includes(target.getID()) ) 
+          ) {
+           veMap[cVEdges[i].getID()].push(allEdgesInRange[j]);
+          }
+        }
+      }
+      cVEdges.forEach((vEdge) => {
+        const edgesRepresented = veMap[vEdge.getID()];
+        if (edgesRepresented.some((edge) => edge.getModel().ttp)) {
+          newGraph.updateItem(vEdge, {ttp: true});
+        }
+      });
+    }
     
     // Expand combo -> starting from VEdge and collapsed combo  
     function comboExpandTTP(combo) {
