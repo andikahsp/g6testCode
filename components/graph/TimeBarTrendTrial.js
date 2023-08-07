@@ -1037,7 +1037,6 @@ const TimeBarTrendTrial
       }
     }
 
-
     function handleIOC(combo, graph) {
       let outerMostCombo;
       // find the outermost combo. 
@@ -1049,14 +1048,19 @@ const TimeBarTrendTrial
       }
       // from outermost combo, search inwards and find all combos
       const allCombos = getAllCombosInCombo(outerMostCombo).concat(outerMostCombo);
+      let allCombosDisp = []
       allCombos.forEach((combo) => {
+        allCombosDisp.push(combo.getID())
+        let cNodesInRange = []
         const cNodes = getAllNodesInCombo(combo);
-        if (cNodes.some((cNode) => cNode.getModel().ioc)) graph.updateItem(combo, {ioc: true});
-        log(`${combo.getID()} ioc: ${combo.getModel().ioc}`);
+        cNodes.forEach((node) => {
+          const nodeEdges = node.getEdges((edge) => !edge.getModel().VEdge);
+          if(nodeEdges.some((edge) => edge.getModel().inRange)) cNodesInRange.push(node);
+        })
+        if (cNodesInRange.some((cNode) => cNode.getModel().ioc)) graph.updateItem(combo, {ioc: true});
       })
     }
     
-
       function getAllParents(childCombo, graph) {
         let arr = []
         grabParents(childCombo, arr, graph);
