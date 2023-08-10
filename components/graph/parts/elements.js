@@ -229,7 +229,7 @@ export const circleNodeShape = {
       name: 'node-id-label'
     }); */
 
-    if(cfg.ioc && cfg.ioc !== undefined) {
+    if(cfg.ioc !== undefined && cfg.ioc) {
       // Add the IOC badge shape
       group.addShape('marker', {
         attrs: {
