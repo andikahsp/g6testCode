@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { data as jsonData } from './sourceOrg';
-import { circleNodeShape, cCircleComboShape, fundPolyline, customQuadratic} from "./parts/elements";
+import {  cCircleComboShape, circleNodeShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdgesOrg } from "./parts/graphDataConfigOrg";
 
@@ -231,7 +231,11 @@ const TimeBarTrend
 
       /* ******* CUSTOM EDGES ******* */
 
-      G6.registerEdge('fund-polyline', fundPolyline );
+      G6.registerEdge(
+        'fund-polyline', 
+        customQuadratic,
+        'line'
+      );
 
       G6.registerEdge(
         'quadratic-custom',
@@ -301,12 +305,12 @@ const TimeBarTrend
         groupByTypes: false,
         defaultCombo: {
           type: 'cCircle', 
-          size: [50], // The minimum size of the Combo
+          size: 40, // The minimum size of the Combo
           padding: 10,
           style: {
             position:'bottom',
             stroke: 'gray',
-            fill: 'transparent',
+            // fill: 'transparent', // commented out. handled at elements.js
             // lineWidth: 1.5, // this is to be commented out. handled at elements.js
           },
           labelCfg: {
@@ -314,7 +318,7 @@ const TimeBarTrend
               position: 'bottom',
               fill: 'transparent',
               fontFamily: 'Arial',
-              fontSize: 11
+              fontSize: 12
             }
           },
         },
@@ -323,7 +327,7 @@ const TimeBarTrend
           type: 'fund-polyline',
           style: {
             stroke: '#5f6266',
-            lineWidth: 2,
+            // lineWidth: 2,
             endArrow: {
               path: G6.Arrow.triangle(6.0, 6.0, 1), // (width, length, offset (wrt d))
               fill: '#5f6466',
@@ -338,9 +342,13 @@ const TimeBarTrend
           },
           labelCfg: {
             autoRotate: false, 
-            position: 'top-right',
+            position: 'left', // top, bottom, left, right, center
             style: {
-              fill: '#000000A6',
+              fontSize: 12,
+              fontWeight: 300,
+              textAlign: 'left',
+              textBaseline: 'middle',
+              fill: '#000000D9',
               fontFamily: 'Arial',
               fontSize: 11
             }
@@ -377,16 +385,29 @@ const TimeBarTrend
         nodeStateStyles: {
           hover: {
             stroke: 'orange',
-            lineWidth: 4.5,
+            lineWidth: 4,
+          },
+          click: {
+            stroke: 'orange',
+            lineWidth: 5,
+            fill: 'white',
           }
         },
-        edgeStateStyles: { // <========== doesnt work anymore with custom edges
+        edgeStateStyles: {
           hover: {
-            stroke: 'blue',
-            lineWidth: 3
+            stroke: 'orange',
+            lineWidth: 4
+          },
+          click: {
+            stroke: 'orange',
+            lineWidth: 5
           }
         },
         comboStateStyles: {
+          hover: {
+            lineWidth: 8,
+            stroke: 'pink',
+          },
           dragenter: {
             lineWidth: 6,
             stroke: '#00E100',
@@ -395,10 +416,6 @@ const TimeBarTrend
             lineWidth: 4,
             stroke: '#FF5349',
             lineDash: [6, 18]
-          },
-          mouseenter: {
-            lineWidth: 8,
-            stroke: 'pink',
           }
         },
       });
@@ -412,6 +429,7 @@ const TimeBarTrend
 
       window.addEventListener("contextmenu", e => e.preventDefault());
 
+      let selectedId = null;
 
       newGraph.on('node:mouseenter', (e) => {
         newGraph.setItemState(e.item, 'hover', true)
@@ -436,26 +454,34 @@ const TimeBarTrend
         nodeA = e.item._cfg.id;
       })
 
-      newGraph.on('node:mouseleave', (e) => {
-        newGraph.setItemState(e.item, 'hover', false)
+      newGraph.on('node:mouseleave', (e) => {    
+        // newGraph.setItemState(e.item, 'hover', false)
         // turn off node highlight
-        newGraph.updateItem(e.item, {
-          labelCfg:{
-            style:{
-              fontFamily: 'Arial',
-              fontWeight: 'normal',
-              fontSize: 11, 
-              fill:'black',
-              background:{
-                fill: 'transparent',
-                padding:  [0, 0, 0, 0], // [top, right, bottom, left]
-                stroke: 'transparent',
-                lineWidth: 0,
-                radius: 0,
-              }
-            }
+        if (isSelected(e.item)) highlightSelected(e.item, true)
+        else highlightSelected(e.item, false);
+      })
+
+
+      newGraph.on('node:click', (e) => {
+        if ( e.item.get('states').includes('click')) {
+          // clear node highlight
+          highlightSelected(e.item, false);
+          // clear selected Id
+          selectedId = null;
+        }
+        else {
+          // highlight node!
+          /* CODE TO GET AND DISPLAY ALL NODE PROPERTIES! */
+          if(e.item.getModel().properties !== undefined) log('node properties =', e.item.getModel().properties);
+
+          highlightSelected(e.item, true);
+          if (selectedId !== null) {
+            // deactivate highlight on previously selected graph element
+            const element = newGraph.findById(selectedId);
+            highlightSelected(element, false);
           }
-        });
+          selectedId = e.item.getID();
+        } 
       })
 
       newGraph.on('node:mouseup', (e) => {
@@ -494,6 +520,57 @@ const TimeBarTrend
           }
         }
         newGraph.setItemState(e.item, 'hover', false)
+      })
+
+      newGraph.on('edge:mouseenter', (e) => {
+        newGraph.setItemState(e.item, 'hover', true)
+        newGraph.updateItem(e.item, {
+          labelCfg:{
+            style:{
+              fontFamily: 'Arial',
+              fontWeight: 'bold',
+              fontSize: 13,
+              fill:'white',
+              background:{
+                fill: 'gray',
+                padding: [5, 6, 5, 6], // [top, right, bottom, left]
+                stroke: 'black',
+                radius: 8,
+                lineWidth: 2.5,
+              }
+            }
+          }
+        });
+        // log('EDGE =', e.item);
+      });
+  
+      newGraph.on('edge:mouseleave', (e) => {
+        //newGraph.setItemState(e.item, 'hover', false)
+        // turn off edge highlight
+        if(isSelected(e.item)) highlightSelected(e.item, true)
+        else highlightSelected(e.item, false);
+      });
+  
+      newGraph.on('edge:click', (e) => {
+        if(e.item.get('states').includes('click')) {
+          // clear edge highlight
+          highlightSelected(e.item, false);
+          // clear selected Id
+          selectedId = null; 
+        }
+        else {
+          // highlight edge
+          /* CODE TO DISPLAY ALL EDGE PROPERTIES */
+          if(e.item.getModel().properties !== undefined) log('edge properties =', e.item.getModel().properties);
+          if(!e.item.getModel().isVEdge) highlightSelected(e.item, true);
+          if(selectedId !== null) {
+            // deactivate highlight on previously selected graph element
+            const element = newGraph.findById(selectedId);
+            highlightSelected(element, false);
+          }
+          selectedId = e.item.getID();
+        }
+        
       })
 
       newGraph.on('node:drag', (e) => {
@@ -758,10 +835,10 @@ const TimeBarTrend
       });
 
       newGraph.on('combo:mouseenter',(e) => {
-        newGraph.setItemState(e.item, 'mouseenter', true);
+        newGraph.setItemState(e.item, 'hover', true);
       });
       newGraph.on('combo:mouseleave',(e) => {
-        newGraph.setItemState(e.item, 'mouseenter', false);
+        newGraph.setItemState(e.item, 'hover', false);
       });
 
 
@@ -838,15 +915,6 @@ const TimeBarTrend
        } 
     });
 
-    
-    newGraph.on('edge:mouseenter', (e) => {
-      newGraph.setItemState(e.item, 'hover', true)
-      // log('EDGE =', e.item);
-    });
-
-    newGraph.on('edge:mouseleave', (e) => {
-      newGraph.setItemState(e.item, 'hover', false)
-    });
 
     function comboCollapseTTP(combo) {
       // 1) grab all the VE from .this combo that is being collapsed
@@ -1162,6 +1230,87 @@ const TimeBarTrend
         }
       }
 
+      function highlightSelected(element, boolean) {
+        if (boolean) {
+          // Highlight this node keyshape
+          newGraph.setItemState(element, 'click', true)
+          //turn on node highlight
+          newGraph.updateItem(element, {
+            style:{
+              fill: 'white',
+            },
+            labelCfg:{
+              style:{
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                fontSize: 13,
+                fill:'black',
+                background:{
+                  fill: 'orange',
+                  padding: [5, 6, 5, 6], // [top, right, bottom, left]
+                  stroke: 'orange',
+                  radius: 8,
+                  lineWidth: 2.5,
+                }
+              }
+            }
+          });
+        } 
+        else {
+          // Turn Off node click 
+          newGraph.setItemState(element, 'click', false)
+          newGraph.setItemState(element, 'hover', false)
+          // turn off node highlight
+          newGraph.updateItem(element, {
+            labelCfg:{
+              style:{
+                fontFamily: 'Arial',
+                fontWeight: 'normal',
+                fontSize: 11, 
+                fill:'black',
+                background:{
+                  fill: 'transparent',
+                  padding:  [0, 0, 0, 0], // [top, right, bottom, left]
+                  stroke: 'transparent',
+                  lineWidth: 0,
+                  radius: 0,
+                }
+              }
+            }
+          });
+        }
+      }
+
+      function isSelected(element) {
+        if (element.get('states').includes('click')){
+          return true
+        }
+        return false
+      }
+
+      function nodeClearHighlight(node) {
+        // clear all states on keyshape 
+        node.clearStates()
+        // restore formatting of label
+        newGraph.updateItem(node, {
+          labelCfg:{
+            style:{
+              fontFamily: 'Arial',
+              fontWeight: 'normal',
+              fontSize: 11, 
+              fill:'black',
+              background:{
+                fill: 'transparent',
+                padding: [0, 0, 0, 0], // [top, right, bottom, left]
+                stroke: 'transparent',
+                radius: 0,
+                lineWidth: 0,
+              }
+            }
+          }
+        });
+      }
+      
   
       // DO NOT DELETE 
       newGraph.on("canvas:click", function (event) {

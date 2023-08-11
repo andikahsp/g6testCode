@@ -149,6 +149,7 @@ export const cCircleComboShape = {
 
     // Update the comboKeyShape
     comboShape.attr({
+      fill: cfg.collapsed ? 'white' : 'transparent',
       r: cfg.collapsed ? 28 : style.r,
       lineWidth: cfg.collapsed ? 4 : 1 
     });
@@ -268,7 +269,7 @@ export const circleNodeShape = {
 
 /* config for standard edges and vEdges */
 export const fundPolyline = {
-  itemType: 'edge',
+  // itemType: 'edge',
   draw: function draw(cfg, group) {
 
     const startPoint = cfg.startPoint;
@@ -286,7 +287,7 @@ export const fundPolyline = {
     const endArrow = cfg?.style && cfg.style.endArrow ? cfg.style.endArrow : false;
     //if (isObject(endArrow)) endArrow.fill = stroke; // isObject: G6 function
     
-    const line = group.addShape('path', {
+    const line2 = group.addShape('path', {
       attrs: {
         lineWidth: 2, // for all standard Edges
         stroke,
@@ -408,16 +409,15 @@ export const fundPolyline = {
       // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
       name: 'edge-label-text',
     });
-          
-    return line;
+    return line2;
   },
 };
+
 
 
 /* config for parallel edges */
 export const customQuadratic =  {
   afterDraw(cfg, group) { 
-
     const style = cfg.style
 
     // get the first shape in the graphics group of this edge, it is the path of the edge here
@@ -427,10 +427,11 @@ export const customQuadratic =  {
     
     const markerXOffset = 0;
     const markerYOffset = 0;
-    const labelXOffset = 15;
+    const labelXOffset = -35;
+    const labelYOffSet = 0;
     let ttpMarkerOffset = 0;
 
-  if (cfg.ttp === true) {
+  if (cfg.ttp) {
 
     // distance in pixels that edge frequency marker and message label needs to move to the right
     ttpMarkerOffset = 18;
@@ -440,8 +441,8 @@ export const customQuadratic =  {
       attrs: {
         ...style,
         opacity: 1,
-        x: midPointXY.x + markerXOffset,
-        y: midPointXY.y + markerYOffset - 1.5,
+        x: midPointXY.x + markerXOffset + labelXOffset,
+        y: midPointXY.y + markerYOffset - 1.5 + labelYOffSet,
         r: 10,
         symbol: circleIcon,
         fill: 'orange',
@@ -458,8 +459,8 @@ export const customQuadratic =  {
     group.addShape('text', {
       attrs: {
         text: 'T',
-        x: midPointXY.x + markerXOffset - 4.85,
-        y: midPointXY.y + markerYOffset,
+        x: midPointXY.x + markerXOffset - 4.85 + labelXOffset,
+        y: midPointXY.y + markerYOffset + labelYOffSet,
         fontFamily: 'Arial',
         fontWeight: "bold",
         fontSize: 14.5,
@@ -475,14 +476,14 @@ export const customQuadratic =  {
     ttpLabel.toFront();
   }
   
-  if (cfg.frequency !== undefined) {
+  if (cfg.frequency !== undefined && cfg.frequency > 1) {
     // FREQUENCY Add the circular marker on the bottom
     group.addShape('marker', {
       attrs: {
         ...style,
         opacity: 1,
-        x: midPointXY.x + markerXOffset + ttpMarkerOffset,
-        y: midPointXY.y + markerYOffset - 1.5,
+        x: midPointXY.x + markerXOffset + ttpMarkerOffset + labelXOffset,
+        y: midPointXY.y + markerYOffset - 1.5 + labelYOffSet,
         r: 10,
         symbol: circleIcon,
         fill: '#63666A',
@@ -495,14 +496,14 @@ export const customQuadratic =  {
       name: 'quadcurve-frequency-shape',
     });   
 
-    const freqTextXCoord =  midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5;
+    const freqTextXCoord =  midPointXY.x + markerXOffset + ttpMarkerOffset - 3.5 + labelXOffset;
       
     // freqency -text 
     group.addShape('text', {
       attrs: {
         text: cfg && cfg.frequency,
-        x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 4,
-        y: midPointXY.y + markerYOffset - 1,
+        x: cfg.frequency.toString().length === 1 ? freqTextXCoord : freqTextXCoord - 4 + labelXOffset,
+        y: midPointXY.y + markerYOffset - 1 + labelYOffSet,
         fontSize: 14,
         textAlign: 'left',
         textBaseline: 'middle',
@@ -515,24 +516,33 @@ export const customQuadratic =  {
     frequencyLabel.toFront();
   }
 
-
-  // label
-  group.addShape('text', {
-    attrs: {
-      text: cfg && cfg.label,
-      x: midPointXY.x + markerXOffset + labelXOffset + ttpMarkerOffset,
-      y: midPointXY.y + markerYOffset,
-      fontSize: 12,
-      fontWeight: 300,
-      textAlign: 'left',
-      textBaseline: 'middle',
-      fill: '#000000D9',
-    },
-    // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-    name: 'quadcurve-label-text',
-  });
+  // label - original font label config
+  // group.addShape('text', {
+  //   attrs: {
+  //     text: cfg && cfg.label,
+  //     x: midPointXY.x + markerXOffset + labelXOffset + ttpMarkerOffset,
+  //     y: midPointXY.y + markerYOffset,
+  //     fontSize: 12,
+  //     fontWeight: 300,
+  //     textAlign: 'left',
+  //     textBaseline: 'middle',
+  //     fill: '#000000D9',
+  //   },
+  //   // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+  //   name: 'quadcurve-label-text',
+  // });
   },
-  update: undefined,
+  update: undefined
+  // update(cfg, edge) {
+  //   const self = this; 
+  //   const style = self.getShapeStyle(cfg);
+  //   const group = edge.get('group');
+
+  //   const edgeShape = group.find((ele) => ele.get('name') === 'edge-shape');
+  //   console.log('this edge', this);
+  //   console.log('edgeShape', edgeShape);
+  //   console.log('group:', group);
+  // }
 };
 
 
