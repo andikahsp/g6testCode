@@ -1,5 +1,5 @@
 // cyvestigo keylines graph: 64093b97e04b179fc89811f6
-// CyGraph : 64c27a55476dd514701b2889
+// CyGraph : 64d49cfb9a3410a1fb56b631
 export const data =
 {
       "nodes": [
@@ -13,6 +13,7 @@ export const data =
                         "labels": [
                               "Process"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -37,7 +38,8 @@ export const data =
                               "Title": "charlie10.exe",
                               "tag": ""
                         }
-                  ]
+                  ],
+                  "ioc": false
             },
             {
                   "id": "2",
@@ -49,6 +51,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -61,7 +64,8 @@ export const data =
                               "Title": "newdata.docx.enc",
                               "tag": ""
                         }
-                  ]
+                  ],
+                  "ioc": false
             },
             {
                   "id": "4",
@@ -73,6 +77,7 @@ export const data =
                         "labels": [
                               "Process"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -97,7 +102,8 @@ export const data =
                               "Title": "charlie10.exe",
                               "tag": ""
                         }
-                  ]
+                  ],
+                  "ioc": false
             },
             {
                   "id": "5",
@@ -109,6 +115,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -122,6 +129,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo1"
             },
             {
@@ -134,6 +142,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -147,6 +156,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo1"
             },
             {
@@ -159,6 +169,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -172,6 +183,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo1"
             },
             {
@@ -184,6 +196,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -197,6 +210,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo1"
             },
             {
@@ -209,6 +223,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -222,6 +237,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo1"
             },
             {
@@ -234,6 +250,7 @@ export const data =
                         "labels": [
                               "Process"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -258,7 +275,8 @@ export const data =
                               "Title": "charlie10.exe",
                               "tag": ""
                         }
-                  ]
+                  ],
+                  "ioc": false
             },
             {
                   "id": "20",
@@ -270,6 +288,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -283,6 +302,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -295,6 +315,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -308,6 +329,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -320,6 +342,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -333,6 +356,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -345,6 +369,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -358,6 +383,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -370,6 +396,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -383,6 +410,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -395,6 +423,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -408,6 +437,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -420,6 +450,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -433,6 +464,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -445,6 +477,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -458,6 +491,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -470,6 +504,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -483,6 +518,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -495,6 +531,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -508,6 +545,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -520,6 +558,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -533,6 +572,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             },
             {
@@ -545,6 +585,7 @@ export const data =
                         "labels": [
                               "File"
                         ],
+                        "score_ioc": null,
                         "tag": ""
                   },
                   "properties": [
@@ -558,6 +599,7 @@ export const data =
                               "tag": ""
                         }
                   ],
+                  "ioc": false,
                   "comboId": "combo2"
             }
       ],
