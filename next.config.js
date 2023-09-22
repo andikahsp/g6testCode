@@ -2,11 +2,11 @@
 const nodeExternals = require('webpack-node-externals');
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
 }
 
 module.exports = {
-  reactStrictMode: true, 
+  reactStrictMode: false, 
   // webpack: (config) => {
   //   config.cache.buildDependencies.mydeps = ['/path/to/lockfile'];
   //   return config;
