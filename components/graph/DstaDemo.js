@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // import { data as jsonData } from './sourceActiveDirLog';
 // import { data as jsonData } from './sourceCheckPointLog';
 // import { data as jsonData } from './sourceWinLog';
-import { data as jsonData } from './sourceWinLog2';
+import { data as jsonData } from './graph-data/sourceWinLog2';
 //import { data as jsonData } from './sourceIocTtp';
 import { cCircleComboShape, circleNodeShape, fundPolyline, customQuadratic,} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";

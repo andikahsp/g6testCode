@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { data as jsonData } from './sourceOrg';
+import { data as jsonData } from './graph-data/sourceOrg';
 import {  cCircleComboShape, circleNodeShape, fundPolyline, customQuadratic} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdgesOrg } from "./parts/graphDataConfigOrg";
