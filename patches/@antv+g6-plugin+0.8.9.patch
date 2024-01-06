@@ -12,9 +12,18 @@ index 1ebc924..a7f60de 100644
      shouldIgnore?: (itemType: 'node' | 'edge', model: any, dateRage: {
          min: number;
 diff --git a/node_modules/@antv/g6-plugin/es/timeBar/index.js b/node_modules/@antv/g6-plugin/es/timeBar/index.js
-index b07b81f..d550003 100644
+index b07b81f..109248d 100644
 --- a/node_modules/@antv/g6-plugin/es/timeBar/index.js
 +++ b/node_modules/@antv/g6-plugin/es/timeBar/index.js
+@@ -46,7 +46,7 @@ import Base from '../base';
+ import TrendTimeBar from './trendTimeBar';
+ import TimeBarSlice from './timeBarSlice';
+ import { VALUE_CHANGE } from './constant';
+-import { isString, throttle } from '@antv/util';
++import { get, isString, throttle } from '@antv/util';
+ // simple 版本默认高度
+ var DEFAULT_SIMPLE_HEIGHT = 4;
+ // trend 版本默认高度
 @@ -101,7 +101,7 @@ var TimeBar = /** @class */function (_super) {
        },
        textStyle: {},
@@ -24,69 +33,334 @@ index b07b81f..d550003 100644
        containerCSS: {}
      };
    };
-@@ -269,6 +269,61 @@ var TimeBar = /** @class */function (_super) {
+@@ -269,6 +269,7 @@ var TimeBar = /** @class */function (_super) {
      });
      this.set('timebar', timebar);
    };
 +
-+  function getAllNodesInCombo(combo) {  // ---ADDED
-+    let arr = []; // ---ADDED
-+    return grabAllNodes(combo, arr); // ---ADDED 
-+  }
-+
-+  function grabAllNodes(combo, array) { // ---ADDED
-+    let combos = combo.getCombos();  // ---ADDED
-+    let childNodes = combo.getNodes();  // ---ADDED
-+    
-+    combos.forEach((inCombo) => { array.concat(grabAllNodes(inCombo, array)); }); // ---ADDED
-+    childNodes.forEach((node) => { array.push(node); }); // ---ADDED
-+    return array;
-+  }
-+
-+  function getAllParents(childCombo, graph) {
-+    let arr = []
-+    grabParents(childCombo, arr, graph);
-+    return arr;
-+  }
-+
-+  function grabParents(combo, array, graph) {
-+    if (combo.getModel().parentId === undefined) {
-+      return 
-+    } else {
-+      const parentID = combo.getModel().parentId
-+      const parentCombo = graph.findById(parentID);
-+      array.push(parentCombo);
-+      grabParents(parentCombo, array, graph);
-+    }
-+  }
-+
-+  function getHighestVisibleItem(node, graph) {
-+    let innermostCombo;
-+    if(node.getModel().comboId !== undefined) {
-+      innermostCombo = graph.findById(node.getModel().comboId);
-+      if (innermostCombo.isVisible()) {
-+        return innermostCombo;
-+      } else {
-+        // run recursion on parent of innermostCombo
-+        return getHighestVisibleCombo(innermostCombo, graph);
-+      } 
-+    } else return node
-+    throw 'error at getHighestVisibleItem'
-+  } 
-+
-+  function getHighestVisibleCombo(combo, graph) {
-+    if (combo.isVisible()) {
-+      return combo
-+    } else {
-+      const parentCombo = graph.findById(combo.getModel().parentId)
-+      return getHighestVisibleCombo(parentCombo, graph)
-+    }
-+  }
-+
    TimeBar.prototype.filterData = function (evt) {
      var _a;
      var value = evt.value;
-@@ -331,7 +386,8 @@ var TimeBar = /** @class */function (_super) {
+@@ -294,6 +295,309 @@ var TimeBar = /** @class */function (_super) {
+       console.warn('请配置 TimeBar 组件的数据');
+       return;
+     }
++
++    // HELPER FUNCTION - CustodioTech
++    function getAllNodesInCombo(combo) {  // ---ADDED
++      if(combo.getType() === 'combo') {
++        let arr = []; // ---ADDED
++        return grabAllNodes(combo, arr); // ---ADDED 
++      } else throw 'getAllNodesInCombo - element not a combo!'
++    }
++      // HELPER FUNCTION - CustodioTech
++    function grabAllNodes(combo, array) { // ---ADDED
++      // console.warn('grabAllNodes, combo type:', combo.getType());
++      if(combo.getType() === 'combo') {
++        let combos = combo.getCombos();  // ---ADDED
++        let childNodes = combo.getNodes();  // ---ADDED
++        combos.forEach((inCombo) => { array.concat(grabAllNodes(inCombo, array)); }); // ---ADDED
++        childNodes.forEach((node) => { array.push(node); }); // ---ADDED
++        return array;
++      } else throw "grabAllNodes - element is not a combo!"
++    }
++    // HELPER FUNCTION - CustodioTech
++    function getAllParents(childCombo) {
++      let arr = []
++      grabParents(childCombo, arr);
++      // console.warn('parents Array =', arr);
++      return arr;
++    }
++        // HELPER FUNCTION - CustodioTech
++    function grabParents(combo, array) {
++      if (combo.getModel().parentId === undefined) {
++        return;
++      } else {
++        const parentID = combo.getModel().parentId
++        const parentCombo = graph.findById(parentID);
++        array.push(parentCombo);
++        grabParents(parentCombo, array, graph);
++      }
++    }
++        // HELPER FUNCTION - CustodioTech
++    function reversedVEdgeInRange(VEdge, VEMap){
++      // check if reversedVE present in VEMap
++      let allVEs = []
++      let reversedVE;
++      if (reversedVEdgePresent (VEdge, VEMap)) {
++        const allVEids = Array.from(Object.keys(VEMap));
++        allVEids.forEach((VEid) => {
++          allVEs.push(graph.findById(VEid));
++        })
++        for (let i = 0; i < allVEs.length; i++) {
++          if (allVEs[i].getSource().getID() === VEdge.getTarget().getID() && allVEs[i].getTarget().getID() === VEdge.getSource().getID()) {
++            reversedVE = allVEs[i];
++          }
++        }
++        const reversedEdgesInRange = VEMap[reversedVE.getID()].filter((nEdge) => nEdge.getModel().inRange);
++        if(reversedEdgesInRange.length > 0) {
++          return true;
++        } else {
++          return false;
++        }
++      } else {
++        console.warn("timeBar/index.js/reversedVEdgeInRange: REVERSED VE not present!")
++      }
++    }     
++     // HELPER FUNCTION - CustodioTech
++     function reversedVEdgePresent(VEdge, VEMap){
++      // check if reversedVE present in VEMap
++      let allVEs = []
++      const allVEids = Array.from(Object.keys(VEMap));
++      allVEids.forEach((VEid) => {
++        allVEs.push(graph.findById(VEid));
++      })
++      const match = allVEs.filter((VE) => VE.getSource().getID() === VEdge.getTarget().getID() && VE.getTarget().getID() === VEdge.getSource().getID());
++      if(match.length > 0) {
++        // console.warn("REVERSED VE PRESENT")
++        return true;
++      } else {
++        // console.warn("REVERSED VE ABSENT")
++        return false;
++      }
++    }
++
++    //HELPER FUNCTION - Custodiotech
++    function parallelEdgesPresent(edges) {
++      let result = false;
++      // for normal edges (non-VE) array only
++      for(let i = 1; i < edges.length; i++) {
++        if(edges[0].getSource().getID() === edges[i].getSource().getID() ||
++           edges[0].getSource().getID() === edges[i].getTarget().getID()
++        ) {
++          console.warn('PARALLEL EDGES PRESENT!')
++          result = true;
++          break;
++        } else {
++          const lastElement = edges.shift();
++          edges = edges.push(lastElement);
++        }
++      }
++      return result
++    }
++
++    // HELPER FUNCTION - CustodioTech
++    function getVEdgeOwner(combo) {
++      // console.warn('getVEdgeOwner running on... ', combo.getID());
++      if (combo.getType() === 'combo') {
++        // searches for the combo layer that the VEs belong to, from inside to outside
++        if (combo.getEdges().length > 0) { 
++          return combo;
++        } else {
++          if(combo.getModel().parentId !== undefined) {
++            const parent = graph.findById(combo.getModel().parentId);
++            return getVEdgeOwner(parent)
++          } 
++          else {
++            console.error(`ERROR | FN: getVEdgeOwner |: VEdge disconnected from: ${combo.getID()}`);
++            return combo; 
++          }
++        }
++      } else {
++        console.error('ERROR | FN: getVEdgeOwner |: element provided is not a combo!')
++      }
++    } 
++    // HELPER FUNCTION - CustodioTech
++    // C = c1 or c2 | Cedges = c1 or c2 edges | node = source/target of .this node 
++    function getCxCedgesAllVEdges(source, allVEdges){
++      let cGroupEdges = [];
++      let newVEdges = [];
++      // cGroup(or c1/c2 ) is the combo which would have VEdges
++      const cGroup = getVEdgeOwner(graph.findById(source.getModel().comboId));
++      // pull all non-VE edges coming out/in from cGroup(c1/c2)  
++      const cNodes = getAllNodesInCombo(cGroup);
++      cNodes.forEach((node) => {
++        const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++        cGroupEdges = cGroupEdges.concat(nodeEdges);
++      })
++      // collate relevant VEdges from cGroup(c1/c2);
++      // as c2 is generated after c1, allVEdges should not hold repeated VE 
++      const cGroupVEs = cGroup.getEdges();
++      cGroupVEs.forEach((VEdge) => {
++        if (!allVEdges.includes(VEdge)) newVEdges.push(VEdge);
++      })
++      const updatedVEs = allVEdges.concat(newVEdges);
++
++      return [cGroup, cGroupEdges, updatedVEs];
++    }
++    // HELPER FUNCTION - CustodioTech
++    function nodeInRange(node) {
++      // std edges = normal edges (nEdges)
++      const nodeStdEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++      if(nodeStdEdges.some((edge) => edge.getModel().inRange)) return true;
++      else return false;
++    } 
++    //HELPER FUNCITION - Custodiotech
++    // IOC, and nodeCount   
++    function updateThisCombo(combo) {
++      if(combo.getType() === 'combo') {
++        let nodesInRange = [];
++        let iocStatus = false;
++        const allNodes = getAllNodesInCombo(combo);
++        let nodesInRangeDisp = []
++        //inRange nodeCount
++        allNodes.forEach((node) => {
++          const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().VEdge);
++          if(nodeEdges.some((edge) => edge.getModel().inRange )) {
++            nodesInRange.push(node);
++            nodesInRangeDisp.push(node.getID());
++          }
++        })
++        console.warn('this combo = ', combo.getID())
++        console.warn('bang, nodesInRangeDisp =', nodesInRangeDisp)
++        combo.getModel().nodeCount = nodesInRange.length; 
++        //ioc
++        if(nodesInRange.some((node) => node.getModel().ioc)) iocStatus = true;
++        combo.getModel().ioc = iocStatus;
++      
++        if(nodesInRange.length > 0) {
++          combo.getModel().inRange = true;
++          if (!combo.getModel().collapsedByCombo) graph.updateItem(combo, {visible: true});
++        } 
++        else {
++          combo.getModel().inRange = false;
++          if (!combo.getModel().collapsedByCombo) graph.updateItem(combo, {visible:false});
++        }
++        graph.updateCombo(combo);
++      }
++      else {
++        throw 'ERROR: index.js, Fn: updateThisCombo: item is not a combo'
++      }
++    }
++    
++    // HELPER FUNCTION - CustodioTech
++    //true false visibility based on node still having at least 1 edge in range 
++    // udpates nodeCount, IOC and visibility
++    function updateParentCombos(childCombo) {
++      console.warn('BUMP')
++      // Update nodeCount(int), visibility(bool)
++      const allParents = getAllParents(childCombo);
++      allParents.forEach((parent) => {
++        let nodesInRange = 0;
++        const pNodes = getAllNodesInCombo(parent);
++        pNodes.forEach((node) => {
++          const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++          if(nodeEdges.some((edge) => edge.getModel().inRange)) nodesInRange++
++        })
++
++        if (nodesInRange === 0) {
++          // set inRange to false
++          parent.getModel().inRange = false;
++          // set visibility to false
++          graph.updateItem(parent, {visible: false});
++        } 
++        else { 
++        // set inRange to true
++        parent.getModel().inRange = true;
++        // nodeCount
++        parent.getModel().nodeCount = nodesInRange;
++        // iocStatus
++        if(pNodes.some((node) => node.getModel().ioc)) parent.getModel().ioc = true;
++        else parent.getModel().ioc = false;
++        // visibility
++        graph.updateItem(parent, {visible: true});
++        // update Combo in the end;
++        graph.updateCombo(parent);
++        }
++      })
++    }
++
++    // HELPER FUNCTION - CustodioTech
++    // returns all the child combos inside a combo
++    function getAllCombosInCombo(outerMostCombo) {
++      let arr = [];
++      grabAllCombos(outerMostCombo, arr);
++      return arr; 
++    }
++    // HELPER FUNCTION - CustodioTech
++    function grabAllCombos(combo, array) {
++      let cCombos = combo.getCombos();
++      if (cCombos.length > 0) {
++        for(let i = 0; i < cCombos.length; i++) {
++          array.push(cCombos[i]);
++          if(cCombos[i].getCombos().length > 0) array.concat(grabAllCombos(cCombos[i], array))
++        }
++      } 
++      else {
++        return array;
++      }     
++    }
++    // HELPER FUNCTION - CustodioTech
++    // updates all child combos inside a combo when they are hidden/colalpsed by .this combo
++    // for nodeCount and IOC only
++    function updateChildCombos(collapsedCombo) {
++      const allcCombos = getAllCombosInCombo(collapsedCombo);
++      allcCombos.forEach((combo) => {
++        //update the nodeCount, and IOC for each combo
++        let nodesInRange = 0;
++        let iocStatus = false; 
++        const allcNodes = getAllNodesInCombo(combo);
++        // IOC
++        if(allcNodes.some((node) => node.getModel().ioc)) iocStatus = true;
++        // nodeCount
++        allcNodes.forEach((node) => {
++          // check if node still has atleast 1 edge inRange
++          const nodeEdges = node.getEdges();
++          if(nodeEdges.some((edge) => edge.getModel().inRange)) nodesInRange++
++        })        
++        combo.getModel().ioc = iocStatus;
++        combo.getModel().nodeCount = nodesInRange;
++        graph.updateCombo(combo);
++      })
++    }
++    // HELPER FUNCTION  - CustodioTech
++    function getThisVEandVEMap (allVEdges, insideEdges, source, target) {
++      let thisVE;
++      let vEdgeMap = {};
++
++      allVEdges.forEach((vEdge) => {
++        vEdgeMap[vEdge.getID()] = [];
++      })
++      for(let i = 0; i < allVEdges.length; i++) { 
++        let veSourceNodes = [];
++        let veTargetNodes = [];
++        const veSource = allVEdges[i].getSource();
++        const veTarget = allVEdges[i].getTarget();
++        if(veSource.getType() === 'combo') veSourceNodes = getAllNodesInCombo(veSource);
++        if(veTarget.getType() === 'combo') veTargetNodes = getAllNodesInCombo(veTarget);
++        
++        //step3: locate thisVE
++        if((veSource === source || veSourceNodes.includes(source)) && 
++           (veTarget === target || veTargetNodes.includes(target))) {
++            thisVE = allVEdges[i]; 
++        }                  
++
++        for(let j = 0; j < insideEdges.length; j++) {
++          const edgeSource = insideEdges[j].getSource();
++          const edgeTarget = insideEdges[j].getTarget();
++          // step4: MAP inside edges to available VE.
++          if((veSource === edgeSource || veSourceNodes.includes(edgeSource)) && 
++              (veTarget === edgeTarget || veTargetNodes.includes(edgeTarget))) {
++              vEdgeMap[allVEdges[i].getID()].push(insideEdges[j]);
++          }
++        }
++      }
++      return [thisVE, vEdgeMap];
++    }
++
+     var rangeChange = this.get('rangeChange');
+     var graph = this.get('graph');
+     var min = Math.round(trendData.length * value[0]);
+@@ -303,6 +607,8 @@ var TimeBar = /** @class */function (_super) {
+     var tickLabelFormatter = (_a = this._cfgs.tick) === null || _a === void 0 ? void 0 : _a.tickLabelFormatter;
+     var minText = tickLabelFormatter ? tickLabelFormatter(trendData[min]) : trendData[min].date;
+     var maxText = tickLabelFormatter ? tickLabelFormatter(trendData[max]) : trendData[max].date;
++    // console.log(`minText: ${minText.date}, Vmin: ${minText.value} | maxText: ${maxText.date}, Vmax: ${maxText.value}`); //< == ADDED
++    console.log(`maxText: ${maxText.date}, Vmax: ${maxText.value}`); //< == ADDED
+     if (type !== 'tick') {
+       var timebar = this.get('timebar');
+       timebar.setText(minText, maxText);
+@@ -331,7 +637,8 @@ var TimeBar = /** @class */function (_super) {
            return currentNodeExistMap_1[node.getID()] = true;
          });
          graph.getEdges().forEach(function (edge) {
@@ -96,7 +370,7 @@ index b07b81f..d550003 100644
          });
          if (filterItemTypes.includes('node')) {
            originNodes === null || originNodes === void 0 ? void 0 : originNodes.forEach(function (node) {
-@@ -342,10 +398,16 @@ var TimeBar = /** @class */function (_super) {
+@@ -342,10 +649,16 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = currentNodeExistMap_1[node.id];
              if (exist && !hitRange) {
@@ -113,7 +387,7 @@ index b07b81f..d550003 100644
                currentNodeExistMap_1[node.id] = true;
              }
            });
-@@ -357,10 +419,12 @@ var TimeBar = /** @class */function (_super) {
+@@ -357,10 +670,12 @@ var TimeBar = /** @class */function (_super) {
              }));
              var exist = !!graph.findById(edge.id);
              if (exist && !shouldShow) {
@@ -128,19 +402,15 @@ index b07b81f..d550003 100644
                currentEdgeExistMap_1[edge.id] = true;
              } else if (!exist) {
                currentEdgeExistMap_1[edge.id] = false;
-@@ -369,24 +433,187 @@ var TimeBar = /** @class */function (_super) {
+@@ -369,24 +684,734 @@ var TimeBar = /** @class */function (_super) {
          }
          if (this.get('filterEdge') || filterItemTypes.includes('edge')) {
            originEdges === null || originEdges === void 0 ? void 0 : originEdges.filter(function (edge) {
 -            var date = +((getDate_1 === null || getDate_1 === void 0 ? void 0 : getDate_1(edge)) || edge.date);
 -            var hitRange = date >= minDate_1 && date <= maxDate_1 || (shouldIgnore_1 === null || shouldIgnore_1 === void 0 ? void 0 : shouldIgnore_1('edge', edge, {
-+            var date = +((getDate_1 === null || getDate_1 === void 0 ? void 0 : getDate_1(edge)) || edge.date); // <--- NOT USED ANYMORE
-+            const dates = edge.date; // <---- ADDED
-+            const dateHit = dates.some((date) => (date >= minDate_1 && date <= maxDate_1)); // <---- ADDED
-+            var hitRange = /* date >= minDate_1 && date <= maxDate_1 */ dateHit || (shouldIgnore_1 === null || shouldIgnore_1 === void 0 ? void 0 : shouldIgnore_1('edge', edge, {
-               min: minDate_1,
-               max: maxDate_1
-             }));
+-              min: minDate_1,
+-              max: maxDate_1
+-            }));
 -            var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target];
 -            var shouldShow = hitRange && endsExist;
 -            var exist = currentEdgeExistMap_1[edge.id];
@@ -150,176 +420,730 @@ index b07b81f..d550003 100644
 -            } else if (!exist && shouldShow) {
 -              currentEdgeExistMap_1[edge.id] = true;
 -              graph.addItem('edge', edge);
-+            const hitDates = []; // <---- ADDED
++            // var date = +((getDate_1 === null || getDate_1 === void 0 ? void 0 : getDate_1(edge)) || edge.date); // <--- NOT USED ANYMORE
++            var dates = edge.date; // <---- ADDED
++            var dateHit = dates.some((date) => (date >= minDate_1 && date <= maxDate_1)); // <---- ADDED
++            // COMMENTED OUT BY RH - to improve response of hitRange ↓↓
++            // var hitRange = /* date >= minDate_1 && date <= maxDate_1 */ dateHit || (shouldIgnore_1 === null || shouldIgnore_1 === void 0 ? void 0 : shouldIgnore_1('edge', edge, {
++            //   min: minDate_1,
++            //   max: maxDate_1
++            // }));
++            var hitRange = dateHit;
++            const hitDates = []; 
 +            edge.date.forEach((date) => { // <---- ADDED
 +              if(date >= minDate_1 && date <= maxDate_1) hitDates.push(date); // <---- ADDED
 +            }); // <---- ADDED
 +            graph.findById(edge.id).getModel().frequency = hitDates.length; // <---- ADDED
-+            if(edge.id === 'edge2') {
-+              console.warn('edge2 frequency inRange', graph.findById(edge.id).getModel().frequency);
-             }
 +            graph.updateItem(graph.findById(edge.id), { frequency: hitDates.length }); // <---- ADDED
-+            const inRangeStatus = dateHit; // <---COUPLE inRange property directly to dateRange, decouple from show/hide item.
-+            edge.inRange = inRangeStatus; // <---- ADDED
-+            //var endsExist = currentNodeExistMap_1[edge.source] && currentNodeExistMap_1[edge.target]; 
-+            // var shouldShow = hitRange && endsExist;
-+            // var exist = currentEdgeExistMap_1[edge.id]; // NOT USED  // currentEdgeExistMap is set by line 376, by isVisible()! 
-+
-+            
++            const inRangeStatus = dateHit; // <---- ADDED => couple inRange property directly to dateRange, decouple from show/hide item.
++            edge.inRange = inRangeStatus; // <---- ADDED => this.edge.inRange already set by inRangeStatus
 +            const edgeObject = graph.findById(edge.id);// <---- ADDED
 +            const source = edgeObject.getSource(); // <---- ADDED
 +            const target = edgeObject.getTarget(); // <---- ADDED
 +            const ends = [source, target];
 +
-+            ends.forEach((node) => {
-+              // set inRange status for the 2 nodes of the edge inRange.
-+              node.getModel().inRange = inRangeStatus;
++            // we can't set the inRange nodes of the standard edge without conditional checks
++            //  -> each node might have other edges inRange
++            //  -> each node might have parallel or reversed parallel edges!
++            ends.forEach((node) => {                                        // <---- TO AMEND & MOVE?
++              // set inRange status for the 2 nodes of the edge inRange.    
++              graph.updateItem(node, {inRange:inRangeStatus});              // <---- TO AMEND & MOVE?
 +            });
++            // // ↓↓DIAGNOSTIC CONSOLE LOG↓↓
++            //if(edge.id === 'edge2') console.log(`>>> ${edge.id}        ${source.getID()}  | ${target.getID()} \n          inRange:${source.getModel().inRange} | inRange:${target.getModel().inRange}\n          M0delvis:${source.getModel().visible} | M0delvis:${target.getModel().visible} \n          visible:${source.isVisible()} | visible:${target.isVisible()}`);
++
 +            
 +            //TOGGLE SHOW or HIDE items
 +            if (hitRange) {
++              if (edgeObject.getModel().collapsedByCombo) { 
++                // expandCollapse Combo code would have hidden .this edge automatically
++                // all elements visible = false, but hitRange = true
++                // LOGIC FLOW:  timeBarTriggeredNormalEdge -> source|target -> comboOfNode ->.thisVE
++                //              .thisVe -> ttpLabels -> combosOfVE -> nodesOfCombos -> nodeCounters
 +
++                // Step 1: - Locate all VEs and edges between the 2 nodes (for std edges) and 2 spaces (c1, c2)
++                //         - c1 / c2 = node or combo layer where the VE is generated
++                let c1; 
++                let c2; 
++                let c1Edges = [];
++                let c2Edges = [];
++                let allVEdges = [] ;
++                let insideEdges = [];
++
++
++
++                if(source.getModel().comboId !== undefined && (graph.findById(source.getModel().comboId).getModel().collapsed ||
++                   graph.findById(source.getModel().comboId).getModel().collapsedByCombo)
++                ) {
++                  [c1, c1Edges, allVEdges ] = getCxCedgesAllVEdges(source, allVEdges);
++                  // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                  // // c1 is the combo which would have VEdges
++                  // c1 = getVEdgeOwner(graph.findById(source.getModel().comboId));
++                  // // pull all non-VE edges coming out/in from c1  
++                  // const c1Nodes = getAllNodesInCombo(c1);
++                  // c1Nodes.forEach((node) => {
++                  //   const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                  //   c1Edges = c1Edges.concat(nodeEdges);
++                  // })
++                  // // collate relevant VEdges from c1; 
++                  // allVEdges = allVEdges.concat(c1.getEdges());
++
++                } else { 
++                  // c1 is an orphan node
++                  c1 = source; 
++                  c1Edges = c1Edges.concat(c1.getEdges());
++                }
++
++                if(target.getModel().comboId !== undefined && (graph.findById(target.getModel().comboId).getModel().collapsed ||
++                   graph.findById(target.getModel().comboId).getModel().collapsedByCombo) 
++                ) {
++
++                  [ c2, c2Edges, allVEdges ] = getCxCedgesAllVEdges(target, allVEdges);
++                  // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                  // // c2 is the combo which would have VEdges
++                  // c2 = getVEdgeOwner(graph.findById(target.getModel().comboId));
++                  // // pull all non-VE edges coming out/in from c1  
++                  // const c2Nodes = getAllNodesInCombo(c2);
++                  // c2Nodes.forEach((node) => {
++                  //   const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                  //   c2Edges = c2Edges.concat(nodeEdges);
++                  // })
++                  // // collate relevant VEdges from c2;
++                  // const c2Vedges = c2.getEdges();
++                  // if(c2Vedges.length > 0) {
++                  //   c2Vedges.forEach((vEdge) => {
++                  //     if(!allVEdges.includes(vEdge)) {
++                  //       allVEdges.push(vEdge);
++                  //     }
++                  //   })
++                  // }
++                } else {
++                  // c2 is an orphan node 
++                  c2 = target;
++                  c2Edges = c2Edges.concat(c2.getEdges());
++                } 
++
++                // console.warn('SHOW, after allVEdges =', allVEdges);
++
++                // STEP 2: - populate insideEdges: all nEdges between c1 and c2
++                //         - code excludes .this edge
++                for (let i = 0; i < c1Edges.length; i++) {
++                  for(let j = 0; j < c2Edges.length; j++) {
++                    if (c1Edges[i].getID() === c2Edges[j].getID() && 
++                        c1Edges[i].getID() !== edge.id &&
++                        c2Edges[j].getID() !== edge.id 
++                    ) {
++                      insideEdges.push(c1Edges[i]);
++                    }
++                  }
++                }
++                // add back .this edge into insideEdges
++                insideEdges.push(graph.findById(edge.id));
++                
++                
++                // Step 3: Locate .thisVE 
++                let thisVE;
++                // Step 4: MAP inside edges to available VE.              
++                let vEdgeMap = {};
++
++                [thisVE, vEdgeMap] = getThisVEandVEMap(allVEdges, insideEdges, source, target);
++                // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                // allVEdges.forEach((vEdge) => {
++                //   vEdgeMap[vEdge.getID()] = [];
++                // })
++                // for(let i = 0; i < allVEdges.length; i++) { 
++                //   let veSourceNodes = [];
++                //   let veTargetNodes = [];
++                //   const veSource = allVEdges[i].getSource();
++                //   const veTarget = allVEdges[i].getTarget();
++                //   if(veSource.getType() === 'combo') veSourceNodes = getAllNodesInCombo(veSource);
++                //   if(veTarget.getType() === 'combo') veTargetNodes = getAllNodesInCombo(veTarget);
++                  
++                //   //step3: locate thisVE
++                //   if((veSource === source || veSourceNodes.includes(source)) && 
++                //      (veTarget === target || veTargetNodes.includes(target))) {
++                //       thisVE = allVEdges[i]; 
++                //   }                  
++
++                //   for(let j = 0; j < insideEdges.length; j++) {
++                //     const edgeSource = insideEdges[j].getSource();
++                //     const edgeTarget = insideEdges[j].getTarget();
++                //     // step4: MAP inside edges to available VE.
++                //     if((veSource === edgeSource || veSourceNodes.includes(edgeSource)) && 
++                //         (veTarget === edgeTarget || veTargetNodes.includes(edgeTarget))) {
++                //         vEdgeMap[allVEdges[i].getID()].push(insideEdges[j]);
++                //     }
++                //   }
++                // }
++
++                // console.warn("S: mapped vEdgeMap = ", vEdgeMap);
++
++                // Step 5: after thisVE is found and all the standard edges are mapped to the VEs, 
++                //         act(SHOW) on related elements.
++                if(thisVE !== undefined) {
++                  // update inRange and visibility of the VE
++                  thisVE.getModel().inRange = true;
++                  graph.updateItem(thisVE, {visible: true});
++
++                  // update the ttp label display based on if edges inRange are ttp or not
++                  const nEdgesInRange = vEdgeMap[thisVE.getID()].filter((nEdge) => nEdge.getModel().inRange);
++                  const ttpEdgesInRange = nEdgesInRange.filter((nEdges) => nEdges.getModel().ttp);
++                  if (ttpEdgesInRange.length > 0) {
++                    graph.updateItem(thisVE, {ttp: true});
++                  }
++
++                  // Step 5: locate the source and Target of the VE, make those visible. 
++                  // work on the ends (source|target)
++                  const thisVEnds = [thisVE.getSource(), thisVE.getTarget()];
++                  thisVEnds.forEach((vEnd) => {
++                    if (vEnd.getType() === 'combo') {
++                      // make the combo visible
++                      vEnd.getModel().inRange = true;
++                      graph.updateItem(vEnd, {visible: true});
++                      graph.updateCombo(vEnd);
++
++                      //update the nodeCounter label based on how many nodes it has that are inRange?
++                      const cNodesInRange = getAllNodesInCombo(vEnd).filter((cNode)=> cNode.getModel().inRange);
++                      vEnd.getModel().nodeCount = cNodesInRange.length;
++                      graph.updateCombo(vEnd);
++
++                      //for the nodes in Combo that are inRange, are there IOC nodes?
++                      let iocStatus = false;
++                      const cNodesInRangeIOC = cNodesInRange.filter((cNode) => cNode.getModel().ioc);
++                      // update IOC label for combo
++                      if(cNodesInRangeIOC.length > 0) iocStatus = true;
++                      vEnd.getModel().ioc = iocStatus;
++                      graph.updateCombo(vEnd);
++
++                      // if the combo has child combo/s, update the combo node count
++                      if (vEnd.getCombos().length > 0) {
++                        updateChildCombos(vEnd);
++                         // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                        // const allcCombos = getAllCombosInCombo(vEnd);
++                        // allcCombos.forEach((combo) => {
++                        //   //update the nodeCount, and IOC for each combo
++                        //   let nodesInRange = 0;
++                        //   let iocStatus = false; 
++                        //   const allcNodes = getAllNodesInCombo(combo);
++                        //   // IOC
++                        //   if(allcNodes.some((node) => node.getModel().ioc)) iocStatus = true;
++                        //   // nodeCount
++                        //   allcNodes.forEach((node) => {
++                        //     // check if node still has atleast 1 edge inRange
++                        //     const nodeEdges = node.getEdges();
++                        //     if(nodeEdges.some((edge) => edge.getModel().inRange)) nodesInRange++
++                        //   })
++                          
++                        //   combo.getModel().ioc = iocStatus;
++                        //   combo.getModel().nodeCount = nodesInRange;
++                        //   graph.updateCombo(combo);
++                        // })
++                      }
++                      // if the combo has a parent, or grandparents make them visible;
++                      if (vEnd.getModel().parentId !== undefined) {
++                        updateParentCombos(vEnd);
++                         // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                        // const comboParents = getAllParents(vEnd);
++                        // comboParents.forEach((parent) => {
++                        //   graph.updateCombo(parent);
++                        //   parent.getModel().inRange = true;
++                        //   // update IOC label for combo parent
++                        //   let iocStatus = false;
++                        //   const parentNodes = getAllNodesInCombo(parent);
++                        //   const pNodesInRange = parentNodes.filter((pNodes) => pNodes.getModel().inRange);
++                        //   const pNodesInRangeIOC = pNodesInRange.filter((pNodes) => pNodes.getModel().ioc);
++                        //   if(pNodesInRangeIOC.some((pNode)=>pNode.getModel().ioc)) iocStatus = true; 
++                        //   graph.updateItem(parent, {visible: true, ioc: iocStatus}); 
++                        // }); 
++                      }
++                    } else if (vEnd.getType() === 'node') {
++                      // make the node visible
++                      vEnd.getModel().inRange = true;
++                      graph.updateItem(vEnd, {visible: true});
++
++                      // if node has a combo parent, then make it visible too. 
++                      if (vEnd.getModel().comboId !== undefined) {
++                        const nCombo = graph.findById(vEnd.getModel().comboId);
++                        updateThisCombo(nCombo);
++                        // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                        // const nCombo = graph.findById(vEnd.getModel().comboId);
++                        // // make the node's parent visible
++                        // nCombo.getModel().inRange = true;
++                        // graph.updateItem(nCombo, {visible: true});
++                        // // update the nodeCounter on combo; 
++                        // const nodesInRange = getAllNodesInCombo(nCombo).filter((node) => node.getModel().inRange);
++                        // nCombo.getModel().nodeCount = nodesInRange.length;
++                        // graph.updateCombo(nCombo);
++                        if(nCombo.getModel().parentId !== undefined) {
++                          const nComboParents = getAllParents(nCombo);
++                          nComboParents.forEach((parent) => {
++                            updateParentCombos(parent);
++                            // graph.updateCombo(parent);
++                            // parent.getModel().inRange = true;
++                            // graph.updateItem(parent, {visible: true});
++                          })
++                        }
++                      }
++                    } 
++                  });
++                }
++              } else if (!edgeObject.getModel().collapsedByCombo || edgeObject.getModel().collapsedByCombo === undefined) {
++                // update visibility of .this edge which is not collapsedByCombo
++                graph.updateItem(edgeObject, {visible: true}); // <---- showItem, not addItem!
++                edgeObject.getModel().visible = true;
++
++                // source and target of .this edge should appear. 
++                // if at least 1 edge of a node becomes visible, the node should be visible
++                ends.forEach((end) => {
++                  graph.updateItem(end, {visible: true});
++                  if(end.getModel().comboId !== undefined) {
++                    // if the end becomes visible, its parent/combo should become visible.
++                    const combo = graph.findById(end.getModel().comboId);
++                    const allCNodesInRange = getAllNodesInCombo(combo).filter((cNode) => cNode.getModel().inRange);
++                    // update nodeCount on combo model  to reflect nodes that are inRange
++                    combo.getModel().nodeCount = allCNodesInRange.length;
++                    const cNodesInRangeIOC = allCNodesInRange.filter((node) => node.getModel().ioc);
++
++                    // update IOC glyph on combo based on whether it contains at least 1 node that is IOC
++                    if (cNodesInRangeIOC.length > 0) combo.getModel().ioc = true;
++                    else combo.getModel().ioc = false;
++                    // update the combo in graph to reflect changes
++                    graph.updateCombo(combo);
++                    // set immediate parentcombo model  inRange again since its node is inRange and make combo appear
++                    graph.updateItem(combo, {inRange: true, visible: true});
++                    
++                    // if the direct combo of the end becomes visible, its parents and grandparents should become visible
++                    if(combo.getModel().parentId !== undefined) {
++                      const parents = getAllParents(combo);
++                      parents.forEach((parent) => {
++                        // need to assign ioc badge to each parent as well
++                        // only need to look into the nodes inside each combo layer
++                        const nodesInParent = getAllNodesInCombo(parent);
++                        const inRangePNodes = nodesInParent.filter((node) => node.getModel().inRange);
++                        const iocNodesInRange = inRangePNodes.filter((node) => node.getModel().ioc);
++                        if(iocNodesInRange.length > 0) {
++                          parent.getModel().ioc = true;
++                        } else {
++                          parent.getModel().ioc = false; 
++                        }
++                        parent.getModel().inRange = true;
++                        graph.updateItem(parent, {visible:true, nodeCount: inRangePNodes.length});
++                        graph.updateCombo(parent);
++                      })
++                    } 
++                  }
++                });
++              }
 +            } else if (!hitRange) {
-+              if (edgeObject.getModel().collapsedByCombo) {
-+                // expandCollapse Combo code would have hidden .this edge automatically*
-+                // if(source.getModel().comboId !== undefined && target.getModel().comboId !== undefined ||
-+                //    source.getModel().comboId === undefined && target.getModel().comboId !== undefined ||
-+                //    source.getModel().comboId !== undefined && target.getModel().comboId === undefined) {
-+                  // get highest visible item of source and target
-+                  const c1 = getHighestVisibleItem(source, graph);
-+                  const c2 = getHighestVisibleItem(target, graph);
++                if (edgeObject.getModel().collapsedByCombo) {
++                  // expandCollapse Combo code would have hidden .this edge automatically*
 +
-+                  let c1Nodes;
++                  // Step 1: - Locate all VEs and edges between the 2 nodes (for std edges) and 2 spaces (c1, c2)
++                  //         - c1 / c2 = node or combo layer where the VE is generated
++                  let c1;
++                  let c2;
 +                  let c1Edges = [];
-+                  let c2Nodes;
 +                  let c2Edges = [];
-+                  if (c1.getType() === 'combo') {
-+                    // if c1 is a combo
-+                    // get all nodes inside c1 excluding the source of .this edge* that should be hidden
-+                    c1Nodes = getAllNodesInCombo(c1);/* .filter(otherNode => otherNode.getID() !== source.getID()); */
-+                    // grab all edges that are connected to this highest item
-+                    c1Nodes.forEach((node) => {c1Edges = c1Edges.concat(node.getEdges())});
-+                  } else {
-+                    // if c1 is a node, 
++                  let allVEdges = []; // has to be kept as an array -> there can be different events that happen at the SAME TIMES
++                  let insideEdges = [];
++
++                  if( source.getModel().comboId !== undefined && ( graph.findById(source.getModel().comboId).getModel().collapsed ||
++                      graph.findById(source.getModel().comboId).getModel().collapsedByCombo ) 
++                  ) { 
++                    [c1, c1Edges, allVEdges] = getCxCedgesAllVEdges(source, allVEdges);
++                    // // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                    // // c1 is the combo which would have VEdges
++                    // c1 = getVEdgeOwner(graph.findById(source.getModel().comboId));
++                    // // pull all non-VE edges coming out/in from c1  
++                    // const c1Nodes = getAllNodesInCombo(c1);
++                    // c1Nodes.forEach((node) => {
++                    //   const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                    //   c1Edges = c1Edges.concat(nodeEdges);
++                    // })
++                    // // collate relevant VEdges from c1; 
++                    // allVEdges = allVEdges.concat(c1.getEdges());
++                  } 
++                  else {
++                    c1 = source;
 +                    c1Edges = c1Edges.concat(c1.getEdges());
 +                  }
-+                  
 +
-+                  if (c2.getType() === 'combo') {
-+                    // if c2 is a combo
-+                    // get all nodes inside c2 excluding the target of .this edge* that should be hidden
-+                    c2Nodes = getAllNodesInCombo(c2); /* .filter(otherNode=> otherNode.getID() !== target.getID()) */
-+                    // grab all edges that are connected to this highest item
-+                    c2Nodes.forEach((node) => {c2Edges = c2Edges.concat(node.getEdges())});
++                  if( target.getModel().comboId !== undefined && ( graph.findById(target.getModel().comboId).getModel().collapsed ||
++                      graph.findById(target.getModel().comboId).getModel().collapsedByCombo )
++                  ) { 
++                    [c2, c2Edges, allVEdges] = getCxCedgesAllVEdges(target, allVEdges);
++                    // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                    // // c2 is the combo which would have VEdges
++                    // c2 = getVEdgeOwner(graph.findById(target.getModel().comboId));
++                    // // pull all non-VE edges coming out/in from c1  
++                    // const c2Nodes = getAllNodesInCombo(c2);
++                    // c2Nodes.forEach((node) => {
++                    //   const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                    //   c2Edges = c2Edges.concat(nodeEdges);
++                    // })
++                    // // collate relevant VEdges from c2;
++                    // const c2Vedges = c2.getEdges();
++                    // // console.warn('HIDE: c2Vedges ', c2Vedges );
++                    // if(c2Vedges.length > 0) {
++                    //   c2Vedges.forEach((vEdge) => {
++                    //     if(!allVEdges.includes(vEdge)) {
++                    //       allVEdges.push(vEdge);
++                    //     }
++                    //   })
++                    // }
 +                  } else {
-+                    // if c2 is a node
++                    c2 = target;
 +                    c2Edges = c2Edges.concat(c2.getEdges());
 +                  }
-+                  // FOR PARALLEL EDGES
-+                  // 1. are there any other parallel edges between c1 and c2?, based on comparing edges between their nodes inside?
-+                  let parallelEdges = [];
++
++                  // STEP 2: - populate insideEdges: all nEdges between c1 and c2
++                  //         - code excludes .this edge
 +                  for (let i = 0; i < c1Edges.length; i++) {
 +                    for(let j = 0; j < c2Edges.length; j++) {
 +                      if (c1Edges[i].getID() === c2Edges[j].getID() && 
 +                          c1Edges[i].getID() !== edge.id &&
-+                          c2Edges[j].getID() !== edge.id /* exclude source or target away */
++                          c2Edges[j].getID() !== edge.id 
 +                      ) {
-+                        parallelEdges.push(c1Edges[i]);
++                        insideEdges.push(c1Edges[i]);
 +                      }
 +                    }
 +                  }
-+                  console.warn('parallelEdges =', parallelEdges);
-+                  let ttpEdgeCount= 0;
-+                  let inRangeEdgeCount = 0;
-+                  if (parallelEdges.length > 0) {
-+                    for(let i = 0; i < parallelEdges.length; i++) {
-+                      if (parallelEdges[i].getModel().ttp) {
-+                        ttpEdgeCount++
-+                      }
-+                      if(parallelEdges[i].getModel().date.some((day) => (day >= minDate_1 && day <= maxDate_1))) {
-+                        inRangeEdgeCount++
-+                      }
-+                    }
-+                  }
-+                  // 1.1 Handling VE for Parallel Edges
-+                  // grab the VE of .this edge
-+                  const c1VEdges = c1.getEdges();
-+                  for (let i = c1VEdges; i < c1VEdges.length; i++) {
-+                    if (c1VEdges[i].getSource().getID() === c1.getID() && c1VEdges[i].getTarget().getID() === c2.getID() && 
-+                        c1VEdges[i].getSource().getID() === c2.getID() && c1VEdges[i].getTarget().getID() === c1.getID()
-+                      ) {
-+                      // when the VE has no more standard edges inRange
-+                      if(inRangeEdgeCount === 0) {
-+                        // HIDE VE of .this edge if all its edges are no longer in range
-+                        graph.removeItem(c1VEdges[i]);
-+                      } else {
-+                        if (ttpEdgeCount === 0) {
-+                          // if VE still has remaining edges inRange but they are all not TTP, 
-+                          graph.updateItem(c1VEdges[i], {ttp: false});
-+                        }
-+                      }
-+                    }
-+                  }
++                  // add back .this edge into insideEdges
++                  insideEdges.push(edgeObject);
++                  
++                  // // DIAGNOSTIC CONSOLE LOGS
++                  //console.warn(`H: _thisEdge: ${edge.id} | source: ${source.getID()} | target: ${target.getID()}`);
++                  //console.warn(`H: thisVE: ${thisVE.getID()} | source: ${thisVE.getSource().getID()} | target: ${thisVE.getTarget().getID()}`)
++                  // const insideEdgesDisp = [];
++                  // insideEdges.forEach((insideEdge) => insideEdgesDisp.push(insideEdge.getID()));
++                  // console.warn('insideEdges =', insideEdgesDisp);
++                  
++                  // Step 3: Locate .thisVE
++                  let thisVE;
++                  
++                  // Step 4: MAP inside edges to available VE.              
++                  let vEdgeMap = {};
 +
-+                // }
++                  [thisVE, vEdgeMap] = getThisVEandVEMap(allVEdges, insideEdges, source, target);
++                  // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                  // allVEdges.forEach((vEdge) => {
++                  //   vEdgeMap[vEdge.getID()] = [];
++                  // })
++                  // for(let i = 0; i < allVEdges.length; i++) { 
++                  //   let veSourceNodes = [];
++                  //   let veTargetNodes = [];
++                  //   const veSource = allVEdges[i].getSource();
++                  //   const veTarget = allVEdges[i].getTarget();
++                  //   if(veSource.getType() === 'combo') veSourceNodes = getAllNodesInCombo(veSource);
++                  //   if(veTarget.getType() === 'combo') veTargetNodes = getAllNodesInCombo(veTarget);
++                    
++                  //   // step3: Locate .thisVE
++                  //   if((veSource === source || veSourceNodes.includes(source)) && 
++                  //   (veTarget === target || veTargetNodes.includes(target))
++                  //      ){
++                  //       thisVE = allVEdges[i];
++                  //   }
++
++                  //   for(let j = 0; j < insideEdges.length; j++) {
++                  //     const edgeSource = insideEdges[j].getSource();
++                  //     const edgeTarget = insideEdges[j].getTarget();
++
++                  //     // step4: MAP inside edges to available VE.    
++                  //     if((veSource === edgeSource || veSourceNodes.includes(edgeSource)) && 
++                  //        (veTarget === edgeTarget || veTargetNodes.includes(edgeTarget))
++                  //        ) {
++                  //         vEdgeMap[allVEdges[i].getID()].push(insideEdges[j]);
++                  //     }
++                  //   }
++                  // }
++
++                  // // DIAGNOSTIC CONSOLE LOGS
++                  // const vEdgeMapID = {}
++                  // const vMapKeys = Object.keys(vEdgeMap);
++                  // vMapKeys.forEach((key)=>{
++                  //   let listOfEdgeIds = []
++                  //   vEdgeMap[key].forEach((edge) => {
++                  //     listOfEdgeIds.push(edge.getID());
++                  //   })
++                  //   vEdgeMapID[key] = listOfEdgeIds
++                  // });
++
++                  // Step 5: after thisVE is found and all the standard edges are mapped to the VEs, 
++                  //         act(HIDE) on related elements.
++                  if(thisVE !== undefined) {
++                    const insideEdgesInRange = vEdgeMap[thisVE.getID()].filter(nEdge => nEdge.getModel().inRange);
++                    // check if there's a reversed version of the VE present:
++                    if(insideEdgesInRange.length === 0) { 
++                      // hide the VE and ALL nodes and Combos associated IF there's no Reversed version of .this VE
++                      thisVE.getModel().inRange = false; 
++                      graph.updateItem(thisVE, {visible: false});
++                      if( !reversedVEdgeInRange(thisVE, vEdgeMap) ) {
++                        const vEnds = [thisVE.getSource(), thisVE.getTarget()];
++                        vEnds.forEach((vEnd) => {
++                          if(vEnd.getType() === 'combo') {
++                            let vEndNodeScore = 0;
++                            const vEndNodes = getAllNodesInCombo(vEnd);
++                            vEndNodes.forEach((node) => {
++                              if(nodeInRange(node)) vEndNodeScore++;
++                              else graph.updateItem(node, {visible: false}); // <-- hide the specific node in the combo end. 
++                            })
++                            if(vEndNodeScore === 0) {
++                              vEnd.getModel().inRange = false; 
++                              graph.updateItem(vEnd, {visible: false});
++                              if(vEnd.getModel().parentId !== undefined) {
++                                updateParentCombos(vEnd);
++                                 // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                                // const comboParents = getAllParents(vEnd);
++                                // comboParents.forEach((parent) => {
++                                //   const inRangeChildNodes = parent.getNodes().filter((node)=>node.getModel().inRange);
++                                //   const inRangeChildCombos = parent.getCombos().filter((combo)=>combo.getModel().inRange);
++                                //   const inRangeChildVEs = parent.getEdges().filter((vEdge) => vEdge.getModel().inRange);
++
++                                //   if(inRangeChildNodes.length === 0 && inRangeChildCombos.length === 0 && inRangeChildVEs.length === 0) {
++                                //     // HIDE parent and ancestor combos
++                                //     parent.getModel().inRange = false;
++                                //     graph.updateItem(parent, {visible: false});
++                                //   }
++                                // });
++                              }
++                            } else {
++                              // IF inRangeNodes.length more than 0
++                              // UPDATE NODE COUNT
++                              vEnd.getModel().nodeCount = vEndNodeScore; // gets in the way of other code
++                              graph.updateCombo(vEnd);
++                              //for the nEdges represented by the VE which are inRange, find how many are still ttp = true;
++                              const inRangeEdges = vEdgeMap[thisVE.getID()].filter((nEdge) => nEdge.getModel().inRange);
++                              const inRangeTTPedges = inRangeEdges.filter((nEdge) => nEdge.getModel().ttp);
++                              if(inRangeTTPedges.length === 0) {
++                                graph.updateItem(thisVE, {ttp: false});
++                              }
++                              // update the child combos if childCombos are present
++                              if(vEnd.getCombos().length > 0) updateChildCombos(vEnd);
++
++                              // update the parent combos if parent/parents are present
++                              if(vEnd.getModel().parentId !== undefined) {
++                                const allParentCombos = getAllParents(vEnd);
++                                allParentCombos.forEach((parentCombo) => updateThisCombo(parentCombo)); //<---- important
++                              }
++                            }
++                          } else if ( vEnd.getType() === 'node') {
++                            const edgesInRange = vEnd.getEdges().filter((edge) => edge.getModel().inRange);
++                            if(edgesInRange.length === 0) {
++                              vEnd.getModel().inRange = false;
++                              graph.updateItem(vEnd, {visible: false});
++                            }
++                            if (vEnd.getModel().comboId !== undefined) {
++                              const nCombo = graph.findById(vEnd.getModel().comboId);
++                              let vEndComboNodeScore = 0; 
++                              const nComboNodes = getAllNodesInCombo(nCombo);
++                              nComboNodes.forEach((cNode) => {
++                                // sort and get only the standard |normal edges(nEDges)
++                                const cNodeNedges = cNode.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                                const cNodeNedgesInRange = cNodeNedges.filter((nEdge) => nEdge.getModel().inRange);
++                                if(cNodeNedgesInRange.length > 0) vEndComboNodeScore++;
++                              });
++                              if (vEndComboNodeScore === 0) {
++                                nCombo.getModel().inRange = false;
++                                graph.updateItem(nCombo, {visible: false});
++                              } else {
++                                nCombo.getModel().nodeCount =  vEndComboNodeScore; //<--- gets in the way of other code for nodeCounter calculation
++                                graph.updateCombo(nCombo);
++                              }
++                              if (nCombo.getModel().parentId !== undefined) {
++                                const nCAncestors = getAllParents(nCombo);
++                                nCAncestors.forEach((ancestor) => updateThisCombo(ancestor))
++                                 // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                                //   const childNodesInRange = parent.getNodes().filter((cNode) => cNode.getModel().inRange);
++                                //   const childCombosInRange = parent.getCombos().filter((cCombo) => cCombo.getModel().inRange);
++                                //   if(childNodesInRange.length === 0 && childCombosInRange.length === 0 ) {
++                                //     parent.getModel().inRange = false;
++                                //     graph.updateItem(parent, {visible: false});
++                                //   } else {
++                                //     //parent.getModel().nodeCount = childNodesInRange.length; //<--- gets in the way of other code for nodeCounter calculation. needs further tests
++                                //     graph.updateCombo(parent);
++                                //   }
++                                // });
++                              }
++                            }
++                          }
++                        });
++                      } else {
++                        // if reversedVE is present 
++                        if(reversedVEdgeInRange(thisVE, vEdgeMap)) {
++                          // if there's reversedVEdge present, if it's inRange do not hide the same combos or nodes
++                          graph.updateItem(thisVE, {visible: false});
++                        } 
++                      }
++                    } else if (insideEdgesInRange.length > 0){  
++                      //update the ttp label & the associated nodeCounters
++                      // console.warn("HIDE: UPDATE TTP LABELS")
++                      // check the insideEdgesInRange
++                      const inRangeEdgesTTP = insideEdgesInRange.filter((nEdges) => nEdges.getModel().ttp);
++                      if(inRangeEdgesTTP.length === 0) {
++                        graph.updateItem(thisVE, {ttp: false});
++                      }
++                      //update the combos if there are any attached to the VE
++                      const thisVEnds = [thisVE.getSource(), thisVE.getTarget()];
++                      thisVEnds.forEach((VEnd) => {
++                        if(VEnd.getType() === 'combo') {
++                          // update the nodeCounter of the combo to reflect number of nodes inRange
++                          updateThisCombo(VEnd);
++                           // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                          // // update IOC status for vEnd
++                          // const insideNodesInRange = getAllNodesInCombo(VEnd).filter((node)=> node.getModel().inRange);
++                          // const inRangeNodesIOC = insideNodesInRange.filter((node) => node.getModel().ioc);
++                          // let iocStatus = false;
++                          // if(inRangeNodesIOC.length > 0) {
++                          //   iocStatus = true;
++                          // } else {
++                          //   iocStatus = false;
++                          // }
++                          // graph.updateItem(VEnd, {ioc: iocStatus});
++                          // graph.updateCombo(VEnd);
++
++
++                          // update vEnd parent combos if they are present
++                          if(VEnd.getModel().parentId !== undefined) {
++                            console.warn('small Bang')
++                            // updateParentCombos(VEnd);
++                            const allParentCombos = getAllParents(VEnd);
++                            allParentCombos.forEach((parent) => updateThisCombo(parent)); 
++                             // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                            // allParents.forEach((parent) => {
++                            //   //const pNodesInRange = getAllNodesInCombo(parent).filter((node)=> node.getModel().inRange);
++                            //   //parent.getModel().nodeCount = pNodesInRange.length;  //<--- gets in the way of other code for nodeCounter calculation
++                            //   // update parent's IOC status
++                            //   const pNodesInRange = getAllNodesInCombo(parent).filter((node) => node.getModel().inRange);
++                            //   const inRangePNodesIOC = pNodesInRange.filter((node) => node.getModel().ioc);
++                            //   let iocStatus = false;
++                            //   if(inRangePNodesIOC.length > 0) {
++                            //     iocStatus = true;
++                            //   } else {
++                            //     iocStatus = false;
++                            //   }
++                            //   graph.updateItem(parent, {ioc: iocStatus});
++                            //   graph.updateCombo(parent);
++                            // })
++                          }
++                        }
++                      });
++                    }
++                  }
 +              } else if (!edgeObject.getModel().collapsedByCombo || edgeObject.getModel().collapsedByCombo === undefined) {
++                // update visibility of .this edge which is not collapsedByCombo
 +                graph.updateItem(edgeObject, {visible: false}); // <---- hideItem, not removeItem!
++
++                // find all the parallel edges | inside edges
++                // if paralleledges are present insideEdges.length = 2 
++                let insideEdges = [];
++                
++                const n1Edges = source.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                n1Edges.forEach((n1Edge) => {
++                  // collate all parallel edges, same direction or reversed direction 
++                  if ((n1Edge.getTarget().getID() === target.getID() || n1Edge.getSource().getID() === target.getID()) && n1Edge.getID() !== edge.id) {
++                    insideEdges.push(n1Edge);
++                  }
++                })
++                const insideEdgesInRange = insideEdges.filter((edge) => edge.getModel().inRange);
++                
 +                // HIDE linked nodes & combos which are !inRange
++                // node here = source or target object
 +                ends.forEach((node) => {
-+                  const nodeEdges = node.getEdges();
++                  const nodeEdges = node.getEdges().filter((edge) => !edge.getModel().isVEdge);
++                  //console.log('ParallelEdges Check:', parallelEdgesPresent(nodeEdges));
 +                  let edgeScore = 0;
 +                  nodeEdges.forEach((edge) => {
 +                    if(edge.isVisible()) edgeScore++;
 +                  });
-+                  if(edgeScore === 0) {
++                  if(edgeScore === 0 ) {
 +                    // if all of the nodes edges !isVisible(), hide node.
-+                    graph.updateItem(node, {visible: false});
++                    if(insideEdgesInRange.length === 0) graph.updateItem(node, {visible: false});
++                    else graph.updateItem(node, {visible: true})
++
 +                    // from node, we update the combos, if any,
 +                    if(node.getModel().comboId !== undefined) {
 +                      const combo = graph.findById(node.getModel().comboId);
-+                      const nodesInCombo = getAllNodesInCombo(combo);
-+                      // set combo's inRange property based on whether nodes inside are inRange (not visible)
-+                      const inRangeNodes = nodesInCombo.filter((node) => node.getModel().inRange);
-+                      if(inRangeNodes.length === 0){
-+                        combo.getModel().inRange = false;
-+                      } else {
-+                        combo.getModel().inRange = true;
++                      // update the combo of the node
++                      updateThisCombo(combo);
++
++                      if (combo.getModel().parentId !== undefined) {
++                        const allParentCombos = getAllParents(combo);
++                        allParentCombos.forEach((parent) => updateThisCombo(parent));
 +                      }
-+                      // set combo's visibility according to whether the nodes inside are still inRange.
-+                      // we don't use visible as combo can still be collapsed
-+                      combo.getModel().label = inRangeNodes.length;
-+                      if(combo.getModel().label === 0 && combo.isVisible()) {
-+                        // HIDE the combo
-+                        graph.updateItem(combo, { visible: false });
-+                        if(combo.getModel().parentId !== undefined) {
-+                          // if the combo is the only child, its parents have to be hidden also. 
-+                          const parents = getAllParents(combo, graph);
-+                          parents.forEach((parent)=>{
-+                            const childNodes = parent.getNodes();
-+                            const childCombos = parent.getCombos();
-+                            const inRangeNodes_p = childNodes.filter((cNode) => {cNode.getModel().inRange});
-+                            const inRangeCombos_p = childCombos.filter((cCombo) => {cCombo.getModel().inRange});
-+                            if(inRangeNodes_p.length === 0 && inRangeCombos_p.length === 0) {
-+                              // HIDE parents and ancestor combos
-+                              graph.updateItem(parent, {visible:false});
-+                            }
-+                          });
-+                        }
-+                      } else {
-+                        // only update the node count of the combo. 
-+                        graph.updateCombo(combo);
-+                      }
++                      // /* BELOW CODE ONLY TO BE DELETED AFTER ALL EDGE CASES TESTED */
++                      // const nodesInCombo = getAllNodesInCombo(combo);
++                      // // set combo's inRange property based on whether nodes inside are inRange (not visible)
++                      // // we don't use visible as combo can still be collapsed
++                      // const inRangeNodes = nodesInCombo.filter((node) => node.getModel().inRange);
++                      // if(inRangeNodes.length === 0){
++                      //   combo.getModel().inRange = false;
++                      // } else {
++                      //   combo.getModel().inRange = true;
++                      // }
++                      // // update the combo's nodeCounter according to whether node is inRange.
++                      // combo.getModel().nodeCount = inRangeNodes.length;
++
++                      // // of the inRange nodes, which ones are IOC?
++                      // const inRangeIOCNodes = inRangeNodes.filter((node) => node.getModel().ioc);
++                      // if(inRangeIOCNodes.length > 0) {
++                      //   graph.updateItem(combo, { ioc: true });
++                      // } else {
++                      //   graph.updateItem(combo, { ioc: false });
++                      // }
++                      // // update .the
++                      // graph.updateCombo(combo);
++
++                      // if(combo.getModel().nodeCount === 0 && combo.isVisible()) {
++                      //   // HIDE the combo
++                      //   graph.updateItem(combo, { visible: false });
++                      //   if(combo.getModel().parentId !== undefined) {
++                      //     // if the combo is the only child, its parents have to be hidden also. 
++                      //     const parents = getAllParents(combo);
++                      //     parents.forEach((parent)=>{
++                      //       const allPNodes = getAllNodesInCombo(parent);
++                      //       const pNodesInRange = allPNodes.filter((node) => node.getModel().inRange);
++                      //       const childNodes = parent.getNodes();
++                      //       const childCombos = parent.getCombos();
++                      //       const inRangeNodes_p = childNodes.filter((cNode) => {cNode.getModel().inRange});
++                      //       const inRangeCombos_p = childCombos.filter((cCombo) => {cCombo.getModel().inRange});
++                            
++                      //       if(inRangeNodes_p.length === 0 && inRangeCombos_p.length === 0) {
++                      //         // HIDE parents and ancestor combos
++                      //         parent.getModel().inRange = false;
++                      //         graph.updateItem(parent, {visible:false});
++                      //       } 
++                      //       else {
++                      //         //  update nodeCounter if we can't hide them.
++                      //         parent.getModel().nodeCount = pNodesInRange.length;
++                      //         graph.updateCombo(parent);
++                      //       }
++                      //     });
++                      //   }
++                      // } else {
++                      //   console.log('others', combo.getID());
++                      //   // only update the node count of the combo. 
++                      //   graph.updateCombo(combo);
++                      //   if(combo.getModel().parentId !== undefined) {
++                      //     const parents = getAllParents(combo);
++                      //     parents.forEach((parent) => {
++                      //       const pNodes = getAllNodesInCombo(parent);
++                      //       const pNodesInRange = pNodes.filter((node) => node.getModel().inRange );
++                      //       // update parent's nodeCount in model
++                      //       parent.getModel().nodeCount = pNodesInRange.length;
++                      //       // update parent combo's ioc label 
++                      //       if(pNodesInRange.some((node) => node.getModel().ioc));
++                      //       parent.getModel().ioc = true;
++                            
++                      //       // update the parent combo:
++                      //       graph.updateCombo(parent);
++                      //     });
++                      //   }
++                      // }
 +                    }                
 +                  }
 +                })
-+              } else if (edgeObject.getModel().collapsedByCombo === undefined) {
-+
-+              } else if (edgeObject.getModel().collapsedByCombo === null){
-+                // if edgeObject.getModel().collapsedByCombo is a null or void value?
-+
-+              }
-+            }
-+            
++              } 
+             }     
            });
 +         
          }
@@ -328,3 +1152,25 @@ index b07b81f..d550003 100644
          if (filterItemTypes.includes('node')) {
            graph.getNodes().forEach(function (node) {
              var model = node.getModel();
+diff --git a/node_modules/@antv/g6-plugin/es/timeBar/trendTimeBar.js b/node_modules/@antv/g6-plugin/es/timeBar/trendTimeBar.js
+index d31139e..9f1f316 100644
+--- a/node_modules/@antv/g6-plugin/es/timeBar/trendTimeBar.js
++++ b/node_modules/@antv/g6-plugin/es/timeBar/trendTimeBar.js
+@@ -167,7 +167,7 @@ var TrendTimeBar = /** @class */function () {
+     this.ticks = tick.ticks;
+     this.trendCfg = trendCfg;
+     this.controllerCfg = controllerCfg;
+-    this.currentSpeed = controllerCfg.speed || 1;
++    this.currentSpeed = controllerCfg.speed || 1; // <--- slider playback speed
+     this.tickLabelFormatter = tick.tickLabelFormatter;
+     // style
+     if (type === 'trend') {
+@@ -710,7 +710,7 @@ var TrendTimeBar = /** @class */function () {
+         width = _a.width;
+       var speed = _this.currentSpeed;
+       var tickInterval = width / ticks.length;
+-      var offsetX = tickInterval / ((10 - speed) * 1000 / 60);
++      var offsetX = tickInterval / ((10 - speed) * 1000 / 60); // <-- how speed is set
+       var offsetXRange = _this.adjustOffsetRange(offsetX / _this.width);
+       _this.updateStartEnd(offsetXRange);
+       _this.updateUI();

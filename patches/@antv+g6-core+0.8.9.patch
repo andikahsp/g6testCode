@@ -1,5 +1,5 @@
 diff --git a/node_modules/@antv/g6-core/es/graph/controller/item.js b/node_modules/@antv/g6-core/es/graph/controller/item.js
-index 7d7c659..4422e15 100644
+index 7d7c659..02bb896 100644
 --- a/node_modules/@antv/g6-core/es/graph/controller/item.js
 +++ b/node_modules/@antv/g6-core/es/graph/controller/item.js
 @@ -384,10 +384,10 @@ var ItemController = /** @class */function () {
@@ -15,16 +15,35 @@ index 7d7c659..4422e15 100644
      });
    };
    /**
-@@ -439,7 +439,7 @@ var ItemController = /** @class */function () {
+@@ -439,8 +439,9 @@ var ItemController = /** @class */function () {
      var children = combo.getChildren();
      var edgeSet = new Set();
      children.nodes.forEach(function (node) {
 -      graph.showItem(node, stack);
-+      graph.showItem(node, stack, 'c');
++      graph.showItem(node, stack, 'e'); // <---  changed
        node.getEdges().forEach(function (edge) {
++        // console.warn('item.js X', edge.getModel());
          return edgeSet.add(edge);
        });
-@@ -686,7 +686,7 @@ var ItemController = /** @class */function () {
+     });
+@@ -448,13 +449,15 @@ var ItemController = /** @class */function () {
+       if (c.getModel().collapsed) {
+         c.show();
+       } else {
+-        graph.showItem(c, stack);
++        graph.showItem(c, stack, 'e'); // <---  changed
+       }
+       c.getEdges().forEach(function (edge) {
++        // console.warn('item.js Y');
+         return edgeSet.add(edge);
+       });
+     });
+     edgeSet.forEach(function (edge) {
++      // console.warn('item.js Z', edge.getModel());
+       return edge.refresh();
+     });
+   };
+@@ -686,7 +689,7 @@ var ItemController = /** @class */function () {
     * @param {boolean} visible 是否显示
     * @memberof ItemController
     */
@@ -33,26 +52,51 @@ index 7d7c659..4422e15 100644
      var _this = this;
      var graph = this.graph;
      if (isString(item)) {
-@@ -701,6 +701,9 @@ var ItemController = /** @class */function () {
+@@ -700,16 +703,42 @@ var ItemController = /** @class */function () {
+       item: item,
        visible: visible
      });
-     item.changeVisibility(visible);
++
+     item.changeVisibility(visible); 
++
++    // collapsedByCombo ! to track graph item visibility when influenced by AbstractGraph.expandCollapseCombo
 +    if(option === 'c') {  // <------ ADDED
-+      item.getModel().collapsedByCombo = !visible; // <------ ADDED
-+    } // <------ ADDED
++      item.getModel().collapsedByCombo = true; // <------ ADDED
++    } else if (option === 'e') { // <------ ADDED
++      if (item.getType() === 'edge') {  // <------ ADDED
++        if (!item.getSource().getModel().collapsedByCombo && !item.getTarget().getModel().collapsedByCombo ) {  // <------ ADDED
++          item.getModel().collapsedByCombo = false;  // <------ ADDED
++        }
++      } 
++      item.getModel().collapsedByCombo = false; // <------ ADDED LATER
++      if (item.getType() === 'node') {
++        if(!item.getModel().inRange && !item.getModel().collapsedByCombo && visible) item.changeVisibility(false)
++        else if (item.getModel().inRange && !item.getModel().collapsedByCombo && !item.isVisible() ) item.changeVisibility(true)
++      }
++    }
++
      if (item.getType && item.getType() === NODE) {
        var edges = item.getEdges();
        each(edges, function (edge) {
-@@ -709,7 +712,7 @@ var ItemController = /** @class */function () {
++         // need to add collapsedByCombo adaptation here too.
++        if(option === 'c') {  // <------ ADDED
++          edge.getModel().collapsedByCombo = true; // <------ ADDED
++        } else if (option === 'e') { // <------ ADDED
++          if (!edge.getSource().getModel().collapsedByCombo && !edge.getTarget().getModel().collapsedByCombo ) { // <------- ADDED
++            edge.getModel().collapsedByCombo = false; // <------- ADDED
++          } // <------ ADDED
++        }// <------ ADDED
+         // 若隐藏节点，则将与之关联的边也隐藏
+         // 若显示节点，则将与之关联的边也显示，但是需要判断边两端的节点都是可见的
          if (visible && !(edge.get('source').isVisible() && edge.get('target').isVisible())) {
            return;
-         }
+         } 
 -        _this.changeItemVisibility(edge, visible);
 +        _this.changeItemVisibility(edge, visible, option); // <------ MODIFIED
        });
      } else if (item.getType && item.getType() === COMBO) {
        var comboTrees = graph.get('comboTrees');
-@@ -725,14 +728,13 @@ var ItemController = /** @class */function () {
+@@ -725,24 +754,30 @@ var ItemController = /** @class */function () {
              found_3 = true;
              return false; // terminate the traverse
            }
@@ -68,7 +112,16 @@ index 7d7c659..4422e15 100644
          });
        }
        var edges = item.getEdges();
-@@ -742,7 +744,7 @@ var ItemController = /** @class */function () {
+       each(edges, function (edge) {
++        if(option === 'c') {  // <------ ADDED
++          edge.getModel().collapsedByCombo = true; // <------ ADDED
++        } else if (option === 'e') { // <------ ADDED
++          if (!edge.getSource().getModel().collapsedByCombo && !edge.getTarget().getModel().collapsedByCombo ) { // <------- ADDED
++            edge.getModel().collapsedByCombo = false; // <------- ADDED
++          } // <------ ADDED
++        }// <------ ADDED
+         // 若隐藏 combo，则将与 combo 本身关联的边也隐藏
+         // 若显示 combo，则将与 combo 本身关联的边也显示，但是需要判断边两端的节点都是可见的
          if (visible && !(edge.get('source').isVisible() && edge.get('target').isVisible())) {
            return;
          }
@@ -78,7 +131,7 @@ index 7d7c659..4422e15 100644
      }
      graph.emit('afteritemvisibilitychange', {
 diff --git a/node_modules/@antv/g6-core/es/graph/graph.js b/node_modules/@antv/g6-core/es/graph/graph.js
-index e46df98..1631513 100644
+index e46df98..41e0e95 100644
 --- a/node_modules/@antv/g6-core/es/graph/graph.js
 +++ b/node_modules/@antv/g6-core/es/graph/graph.js
 @@ -790,12 +790,13 @@ var AbstractGraph = /** @class */function (_super) {
@@ -115,7 +168,15 @@ index e46df98..1631513 100644
      if (stack && this.get('enabledStack')) {
        var id = object.getID();
        var type = object.getType();
-@@ -2505,17 +2509,28 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2495,6 +2499,7 @@ var AbstractGraph = /** @class */function (_super) {
+       action: 'expand',
+       item: combo
+     });
++    console.log('hello');
+     var comboModel = combo.getModel();
+     var itemController = this.get('itemController');
+     itemController.collapseCombo(combo, stack);
+@@ -2505,17 +2510,28 @@ var AbstractGraph = /** @class */function (_super) {
      var cNodesCombos = [];
      var comboTrees = this.get('comboTrees');
      var found = false;
@@ -148,7 +209,93 @@ index e46df98..1631513 100644
              cNodesCombos = cNodesCombos.concat(item.getNodes());
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
-@@ -2620,15 +2635,30 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2530,6 +2546,11 @@ var AbstractGraph = /** @class */function (_super) {
+         _b = _a.size,
+         size = _b === void 0 ? 1 : _b;
+       if (edge.isVisible() && !isVEdge) return;
++      // the code needs to work when the edge is !isVisible();
++      // now the edge is not visible, so the code gets to work, but why is it not catching edgeInfo to generate vedge?
++      // and the combo doesn't hold the vedge details anymore
++      //---> 1) should we  flip the positions of the code so it acts on the edges first?
++      //---> 2) 
+       var source = edge.getSource();
+       var target = edge.getTarget();
+       var otherEnd = null;
+@@ -2544,31 +2565,53 @@ var AbstractGraph = /** @class */function (_super) {
+         otherEndIsSource = true;
+       }
+       if (otherEnd) {
+-        if (isVEdge) {
++ 
++        // RH: removes VE of a combo if there is already a VE attached. !!         
++        if (isVEdge) { // to remove repeats if a VE is already present from the otherEnd
+           _this.removeItem(edge, false);
+           return;
+         }
+-        var otherEndModel = otherEnd.getModel();
+-        while (!otherEnd.isVisible()) {
+-          var otherEndPId = otherEndModel.parentId,
+-            otherEndCId = otherEndModel.comboId;
+-          var otherEndParentId = otherEndPId || otherEndCId;
+-          otherEnd = _this.findById(otherEndParentId);
+-          if (!otherEnd || !otherEndParentId) return; // all the ancestors are hidden, then ignore the edge
+-          otherEndModel = otherEnd.getModel();
++        
++        // * before collapseCombo, standard edge will always be touching nodes
++        // var otherEndModel = otherEnd.getModel(); 
++
++        // Determine the otherEnd where the new VE should connect to // <===== LESLIE
++        var otherEndC = otherEnd // <===== LESLIE
++        if(otherEnd.getModel().comboId !== undefined){ // <===== LESLIE
++          // traversal: node to combo
++          var otherEndP = _this.findById(otherEnd.getModel().comboId); // <===== LESLIE
++          // collapsed or not, 
++          // if collapsed, set otherEnd to combo (see below code)
++          if(otherEndP.getModel().collapsed) otherEndC = otherEndP // <===== LESLIE
++          // while combo has parents, traverse to parents, 
++          while(otherEndP.getModel().parentId !== undefined){ // <===== LESLIE
++            // traversal to parent
++            otherEndP=_this.findById(otherEndP.getModel().parentId); // <===== LESLIE
++            // if parent is collapsed, set otherEnd to combo parent.
++            if(otherEndP.getModel().collapsed) otherEndC = otherEndP; // <===== LESLIE
++          }
+         }
+-        var otherEndId = otherEndModel.id;
++
++        var otherEndId = otherEndC.getModel().id  // <===== LESLIE
++
++        var edgeInRangeStatus = edge.getModel().inRange;
++
+         var vEdgeInfo = otherEndIsSource ? {
+           source: otherEndId,
+           target: comboModel.id,
+           size: size,
+-          isVEdge: true
++          isVEdge: true,
++          visible: edgeInRangeStatus,
++          inRange: edgeInRangeStatus
+         } : {
+           source: comboModel.id,
+           target: otherEndId,
+           size: size,
+-          isVEdge: true
++          isVEdge: true,
++          visible: edgeInRangeStatus,
++          inRange: edgeInRangeStatus
+         };
++        // console.warn('vEdgeInfo:', vEdgeInfo);
+         var key = "".concat(vEdgeInfo.source, "-").concat(vEdgeInfo.target);
+         if (addedVEdgeMap[key]) {
+           addedVEdgeMap[key].size += size;
+@@ -2577,6 +2620,7 @@ var AbstractGraph = /** @class */function (_super) {
+         addedVEdgeMap[key] = vEdgeInfo;
+       }
+     });
++    console.warn('C: addedVEdgeMap', addedVEdgeMap);
+     // update the width of the virtual edges, which is the sum of merged actual edges
+     // be attention that the actual edges with same endpoints but different directions will be represented by two different virtual edges
+     this.addItems(Object.values(addedVEdgeMap).map(function (edgeInfo) {
+@@ -2620,15 +2664,30 @@ var AbstractGraph = /** @class */function (_super) {
      var cNodesCombos = [];
      var comboTrees = this.get('comboTrees');
      var found = false;
@@ -181,3 +328,191 @@ index e46df98..1631513 100644
              cNodesCombos = cNodesCombos.concat(item.getNodes());
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
+@@ -2638,27 +2697,29 @@ var AbstractGraph = /** @class */function (_super) {
+     });
+     var addedVEdgeMap = {};
+     edges.forEach(function (edge) {
++      // console.warn(`${edge.getID()} | s=${edge.getSource().getID()} | t=${edge.getTarget().getID()}`);
+       if (edge.isVisible() && !edge.getModel().isVEdge) return;
+       var source = edge.getSource();
+       var target = edge.getTarget();
+-      var sourceId = source.get('id');
+-      var targetId = target.get('id');
+       var otherEnd = null;
+       var otherEndIsSource;
+-      if (sourceId === comboModel.id || cNodesCombos.includes(source) && !cNodesCombos.includes(target)) {
++      if (source.getID() === comboModel.id || cNodesCombos.includes(source) && !cNodesCombos.includes(target)) {
+         // the source is in the combo, the target is not
+         otherEnd = target;
+         otherEndIsSource = false;
+-      } else if (targetId === comboModel.id || !cNodesCombos.includes(source) && cNodesCombos.includes(target)) {
++      } else if (target.getID() === comboModel.id || !cNodesCombos.includes(source) && cNodesCombos.includes(target)) {
+         // the target is in the combo, the source is not
+         otherEnd = source;
+         otherEndIsSource = true;
+       } else if (cNodesCombos.includes(source) && cNodesCombos.includes(target)) {
+         // both source and target are in the combo, if the target and source are both visible, show the edge
+-        if (source.isVisible() && target.isVisible()) {
++        if (source.isVisible() && target.isVisible() && edge.getModel().inRange) {
++          console.debug('1) edge shown:', edge.getID());
++          _this.updateItem(edge, {visible: true});
+           edge.show();
+         }
+       }
++
+       if (otherEnd) {
+         var _a = edge.getModel(),
+           isVEdge = _a.isVEdge,
+@@ -2669,62 +2730,108 @@ var AbstractGraph = /** @class */function (_super) {
+           _this.removeItem(edge, false);
+           return;
+         }
+-        var otherEndModel = otherEnd.getModel();
+-        // find the nearest visible ancestor
+-        while (!otherEnd.isVisible()) {
+-          var otherEndPId = otherEndModel.parentId,
+-            otherEndCId = otherEndModel.comboId;
+-          var otherEndParentId = otherEndPId || otherEndCId;
+-          otherEnd = _this.findById(otherEndParentId);
+-          if (!otherEnd || !otherEndParentId) {
+-            return; // if all the ancestors of the oppsite are all hidden, ignore the edge
+-          }
+ 
+-          otherEndModel = otherEnd.getModel();
++        // Determine the otherEnd where the new VE should connect to // <===== LESLIE
++        var otherEndC = otherEnd // <===== LESLIE
++        if(otherEnd.getModel().comboId !== undefined){ // <===== LESLIE
++          // traversal: node to combo
++          var otherEndP = _this.findById(otherEnd.getModel().comboId); // <===== LESLIE
++          // collapsed or not, 
++          // if collapsed, set otherEnd to combo (see below code)
++          if(otherEndP.getModel().collapsed) otherEndC = otherEndP // <===== LESLIE
++          // while combo has parents, traverse to parents, 
++          while(otherEndP.getModel().parentId !== undefined){ // <===== LESLIE
++            // traversal to parent
++            otherEndP=_this.findById(otherEndP.getModel().parentId); // <===== LESLIE
++            // if parent is collapsed, set otherEnd to combo parent.
++            if(otherEndP.getModel().collapsed) otherEndC = otherEndP; // <===== LESLIE
++          }
+         }
+-        var otherEndId = otherEndModel.id;
++        var otherEndId = otherEndC.getModel().id  // <===== LESLIE
++
+         var selfEnd = otherEndIsSource ? target : source;
+-        var selfEndModel = selfEnd.getModel();
+-        // find the nearest visible ancestor
+-        while (!selfEnd.isVisible()) {
+-          var selfEndPId = selfEndModel.parentId,
+-            selfEndCId = selfEndModel.comboId;
+-          var selfEndParentId = selfEndPId || selfEndCId;
+-          selfEnd = _this.findById(selfEndParentId);
+-          if (!selfEnd || !selfEndParentId) {
+-            return; // if all the ancestors of the oppsite are all hidden, ignore the edge
++
++        // Determine the selfEnd where the new VE should connect to // <===== LESLIE
++        var selfEndC = selfEnd // <===== LESLIE
++        if(selfEnd.getModel().comboId !== undefined){ // <===== LESLIE
++          // traversal: node to combo
++          var selfEndP = _this.findById(selfEnd.getModel().comboId); // <===== LESLIE
++          // collapsed or not, 
++          // if collapsed, set selfEnd to combo (see below code)
++          if(selfEndP.getModel().collapsed) selfEndC = selfEndP // <===== LESLIE
++          // while combo has parents, traverse to parents, 
++          while(selfEndP.getModel().parentId !== undefined){ // <===== LESLIE
++            // traversal to parent
++            selfEndP=_this.findById(selfEndP.getModel().parentId); // <===== LESLIE
++            // if parent is collapsed, set selfEnd to combo parent.
++            if(selfEndP.getModel().collapsed) selfEndC = selfEndP; // <===== LESLIE
+           }
++        }
++
++        var selfEndId = selfEndC.getModel().id; // LESLIE
++        var edgeInRange = edge.getModel().inRange; // Added
++
+ 
+-          if (selfEndModel.comboId === comboModel.id || selfEndModel.parentId === comboModel.id) {
+-            break; // if the next ancestor is the combo, break the while
++        if(_this.findById(selfEndId).getType() === 'combo' || _this.findById(otherEndId).getType() === 'combo') { // <===== ADDED
++          if (otherEndId) {
++            var vEdgeInfo = otherEndIsSource ? {
++              source: otherEndId,
++              target: selfEndId,
++              isVEdge: true,
++              visible: edgeInRange,
++              inRange: edgeInRange,
++              size: size
++            } : {
++              source: selfEndId,
++              target: otherEndId,
++              isVEdge: true,
++              visible: edgeInRange,
++              inRange: edgeInRange,
++              size: size
++            };
++            var vedgeId = "".concat(vEdgeInfo.source, "-").concat(vEdgeInfo.target);
++            // update the width of the virtual edges, which is the sum of merged actual edges
++            // be attention that the actual edges with same endpoints but different directions will be represented by two different virtual edges
++            if (addedVEdgeMap[vedgeId]) {
++              addedVEdgeMap[vedgeId].size += size;
++              return;
++            }
++            addedVEdgeMap[vedgeId] = vEdgeInfo;
++
++            // node which are inRange should be shown if its edge is inRange
++            // useCase: expandCombo when 1 end is a node, 1 end is a combo.
++            if(edge.getModel().inRange) {
++              var finalSelfEnd = _this.findById(selfEndId);
++              var finalOtherEnd = _this.findById(otherEndId);
++              var ends = [finalSelfEnd, finalOtherEnd];
++              ends.forEach((end) => {
++                if(end.getType() === 'node' && !end.getModel().collapsedByCombo) {
++                  end.show();
++                }
++              });
++            }          
+           }
++        } else if ((_this.findById(selfEndId).getType() === 'node' && _this.findById(otherEndId).getType() === 'node') ) {
++          // show the standard edge on expandCombo if both are found points are nodes 
++          // and the edge is inRange
++          if(edge.getModel().inRange) {
++            console.debug(' edge shown:', edge.getID());
++            _this.updateItem(edge, {visible: true}); //<--- update the model
++            edge.show(); 
++            // console.log(`inRange expand: ${edge.getID()} | s: ${edge.getSource().getID()} | t: ${edge.getTarget().getID()}`);
+             
+-          selfEndModel = selfEnd.getModel();
+-        }
+-        var selfEndId = selfEndModel.id;
+-        if (otherEndId) {
+-          var vEdgeInfo = otherEndIsSource ? {
+-            source: otherEndId,
+-            target: selfEndId,
+-            isVEdge: true,
+-            size: size
+-          } : {
+-            source: selfEndId,
+-            target: otherEndId,
+-            isVEdge: true,
+-            size: size
+-          };
+-          var vedgeId = "".concat(vEdgeInfo.source, "-").concat(vEdgeInfo.target);
+-          // update the width of the virtual edges, which is the sum of merged actual edges
+-          // be attention that the actual edges with same endpoints but different directions will be represented by two different virtual edges
+-          if (addedVEdgeMap[vedgeId]) {
+-            addedVEdgeMap[vedgeId].size += size;
++            // nodes which are inRange and not collapsedByCombo should be shown. 
++            edge.getSource().show();
++            edge.getTarget().show();
++            // console.log('source', edge.getSource());
++            // console.log('target', edge.getTarget());
+             return;
+           }
+-          addedVEdgeMap[vedgeId] = vEdgeInfo;
+         }
++
+       }
+     });
++    console.warn('E: addedVEdgeMap', addedVEdgeMap);
+     this.addItems(Object.values(addedVEdgeMap).map(function (edgeInfo) {
+       return {
+         type: 'vedge',
