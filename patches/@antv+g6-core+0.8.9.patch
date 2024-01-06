@@ -131,7 +131,7 @@ index 7d7c659..02bb896 100644
      }
      graph.emit('afteritemvisibilitychange', {
 diff --git a/node_modules/@antv/g6-core/es/graph/graph.js b/node_modules/@antv/g6-core/es/graph/graph.js
-index e46df98..41e0e95 100644
+index e46df98..3fa4691 100644
 --- a/node_modules/@antv/g6-core/es/graph/graph.js
 +++ b/node_modules/@antv/g6-core/es/graph/graph.js
 @@ -790,12 +790,13 @@ var AbstractGraph = /** @class */function (_super) {
@@ -168,15 +168,7 @@ index e46df98..41e0e95 100644
      if (stack && this.get('enabledStack')) {
        var id = object.getID();
        var type = object.getType();
-@@ -2495,6 +2499,7 @@ var AbstractGraph = /** @class */function (_super) {
-       action: 'expand',
-       item: combo
-     });
-+    console.log('hello');
-     var comboModel = combo.getModel();
-     var itemController = this.get('itemController');
-     itemController.collapseCombo(combo, stack);
-@@ -2505,17 +2510,28 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2505,17 +2509,28 @@ var AbstractGraph = /** @class */function (_super) {
      var cNodesCombos = [];
      var comboTrees = this.get('comboTrees');
      var found = false;
@@ -209,7 +201,7 @@ index e46df98..41e0e95 100644
              cNodesCombos = cNodesCombos.concat(item.getNodes());
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
-@@ -2530,6 +2546,11 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2530,6 +2545,11 @@ var AbstractGraph = /** @class */function (_super) {
          _b = _a.size,
          size = _b === void 0 ? 1 : _b;
        if (edge.isVisible() && !isVEdge) return;
@@ -221,7 +213,7 @@ index e46df98..41e0e95 100644
        var source = edge.getSource();
        var target = edge.getTarget();
        var otherEnd = null;
-@@ -2544,31 +2565,53 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2544,31 +2564,53 @@ var AbstractGraph = /** @class */function (_super) {
          otherEndIsSource = true;
        }
        if (otherEnd) {
@@ -287,7 +279,7 @@ index e46df98..41e0e95 100644
          var key = "".concat(vEdgeInfo.source, "-").concat(vEdgeInfo.target);
          if (addedVEdgeMap[key]) {
            addedVEdgeMap[key].size += size;
-@@ -2577,6 +2620,7 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2577,6 +2619,7 @@ var AbstractGraph = /** @class */function (_super) {
          addedVEdgeMap[key] = vEdgeInfo;
        }
      });
@@ -295,7 +287,7 @@ index e46df98..41e0e95 100644
      // update the width of the virtual edges, which is the sum of merged actual edges
      // be attention that the actual edges with same endpoints but different directions will be represented by two different virtual edges
      this.addItems(Object.values(addedVEdgeMap).map(function (edgeInfo) {
-@@ -2620,15 +2664,30 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2620,15 +2663,30 @@ var AbstractGraph = /** @class */function (_super) {
      var cNodesCombos = [];
      var comboTrees = this.get('comboTrees');
      var found = false;
@@ -328,7 +320,7 @@ index e46df98..41e0e95 100644
              cNodesCombos = cNodesCombos.concat(item.getNodes());
              cNodesCombos = cNodesCombos.concat(item.getCombos());
            }
-@@ -2638,27 +2697,29 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2638,27 +2696,29 @@ var AbstractGraph = /** @class */function (_super) {
      });
      var addedVEdgeMap = {};
      edges.forEach(function (edge) {
@@ -363,7 +355,7 @@ index e46df98..41e0e95 100644
        if (otherEnd) {
          var _a = edge.getModel(),
            isVEdge = _a.isVEdge,
-@@ -2669,62 +2730,108 @@ var AbstractGraph = /** @class */function (_super) {
+@@ -2669,62 +2729,108 @@ var AbstractGraph = /** @class */function (_super) {
            _this.removeItem(edge, false);
            return;
          }
