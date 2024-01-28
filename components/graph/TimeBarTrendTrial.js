@@ -26,7 +26,6 @@ const TimeBarTrendTrial
 
     useEffect(() => {
       const G6 = require('@antv/g6');
-
       //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData= populateNodesEdges(jsonData);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 45, 'quadratic-custom', 'fund-polyline', undefined);
@@ -509,10 +508,11 @@ nodeStateStyles: {
               // allNodesInDLCombo.forEach((node) => nodeDisp.push(node.getID()));
               // log('node:mouse up DLCombo holds:', nodeDisp );
   
-  
               // for draggin a  node out of nested combo group
               const combosToUpdate = getAllCombosInCombo(dragleaveCombo).concat(dragleaveCombo);
+
               combosToUpdate.forEach((combo) => {
+                if(!combo.destroyed){
                 const allNodesInCombo = getAllNodesInCombo(combo);
                 // combo.getModel().nodeCount = countNodesInCombo(combo)
                 combo.getModel().nodeCount = allNodesInCombo.length;
@@ -527,7 +527,7 @@ nodeStateStyles: {
                   combo.getModel().ioc = iocStatus;
                   newGraph.updateCombo(combo);
                 }
-  
+              }
   
               });
             }
@@ -809,27 +809,30 @@ nodeStateStyles: {
           // for updating originating combo's node count, 
           // when dragging node from it into a child of another combo
           const updatedCombosDisplay = []
+        
           combosToUpdate.forEach((combo) => {
-            updatedCombosDisplay.push(combo.getID())
-            /* UPDATE IOC */
-            // use getAllNodesInCombo, for IOC assignment and updating nodeCount
-            const nodesInCombo = getAllNodesInCombo(combo);
-            //const iocNodes = nodesInCombo.filter((node) => node.getModel().ioc);
-            if(nodesInCombo.some((node)=> node.getModel().ioc)) {
-              // log("sneeze");
-              combo.getModel().ioc = true;
-            } else {
-              // log("ah choo =", combo.getID());
-              combo.getModel().ioc = false;
-            }
-            /* UPDATE NODE COUNT */
-            combo.getModel().nodeCount = nodesInCombo.length;
-            newGraph.setItemState(combo, 'dragleave', false);
-            newGraph.setItemState(combo, 'dragenter', false);
-            if(combo.getModel().nodeCount < 1) {
-              newGraph.uncombo(combo)
-            } else {
-              newGraph.updateCombo(combo);
+            if(!combo.destroyed) {
+              updatedCombosDisplay.push(combo.getID())
+              /* UPDATE IOC */
+              // use getAllNodesInCombo, for IOC assignment and updating nodeCount
+              const nodesInCombo = getAllNodesInCombo(combo);
+              //const iocNodes = nodesInCombo.filter((node) => node.getModel().ioc);
+              if(nodesInCombo.some((node)=> node.getModel().ioc)) {
+                // log("sneeze");
+                combo.getModel().ioc = true;
+              } else {
+                // log("ah choo =", combo.getID());
+                combo.getModel().ioc = false;
+              }
+              /* UPDATE NODE COUNT */
+              combo.getModel().nodeCount = nodesInCombo.length;
+              newGraph.setItemState(combo, 'dragleave', false);
+              newGraph.setItemState(combo, 'dragenter', false);
+              if(combo.getModel().nodeCount < 1) {
+                newGraph.uncombo(combo)
+              } else {
+                newGraph.updateCombo(combo);
+              }
             }
           })
           // log('updated combos =', updatedCombosDisplay);
@@ -858,7 +861,7 @@ nodeStateStyles: {
         // for .this combo that is being dropped
         newGraph.on('combo:mouseup', (e) => {
           // log('combo:mouseup')
-          if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo !== undefined){ 
+          if(draggedOverCombos.length !== 0 && dragleaveCombo !== undefined && dragCombo !== undefined){ 
             // prevents deletion of orphan combo when dragging across graph space quickly
             // (dragged Combo id can become dragleave combo id)
             if(dragleaveCombo._cfg !== null && dragleaveCombo.getID() !== dragCombo.getID()) {
@@ -1146,33 +1149,6 @@ nodeStateStyles: {
           }
         }
   
-        // // returns true if there is an edge between the node and combo
-        // // AND that edge is TTP.
-        // function checkTTP(node, combo) {
-        //   const nEdges = node.getEdges();
-        //   let x = false;
-        //   let combosInCombo = combo.getCombos();
-        //   if (combosInCombo.length > 0) {
-        //     for (let i = 0; i < combosInCombo.length; i++) {
-        //       x = checkTTP(node, combosInCombo[i]);
-        //       if (x) break;
-        //     }
-        //   }
-        //   if (x) return x; 
-        //   let cNodes = combo.getNodes();
-        //   for (let i = 0; i < nEdges.length; i++) {
-        //     if (
-        //       cNodes.includes(nEdges[i].getSource()) ||
-        //       cNodes.includes(nEdges[i].getTarget())
-        //     ) {
-        //       if (nEdges[i].getModel().ttp) {
-        //         x = true;
-        //         break;
-        //       }
-        //     }
-        //   }
-        //   return x;
-        // }
   
         // returns true if there is an edge between the node and combo
         // AND that edge is TTP.
@@ -1213,6 +1189,7 @@ nodeStateStyles: {
         }
   
         function grabAllNodes(combo, array) {
+          if(combo.destroyed == true) return;
           let combos = combo.getCombos(); 
           let childNodes = combo.getNodes(); 
           
@@ -1220,7 +1197,6 @@ nodeStateStyles: {
           childNodes.forEach((node) => { array.push(node); });
           return array;
         }
-  
   
         function getAllCombosInCombo(outerMostCombo) {
           let arr = [];
@@ -1230,11 +1206,11 @@ nodeStateStyles: {
   
         function grabAllCombos(combo, array) {
           let cCombos = combo.getCombos();
-          if(cCombos === []){
-            array.push(combo) // <---- ERRONEOUS!
+          if(cCombos.length === 0){
             return array;
           } else {
             for(let i = 0; i < cCombos.length; i++) {
+
               array.push(cCombos[i])
               if (cCombos[i].getCombos().length > 0) {
                 array.concat(grabAllCombos(cCombos[i], array))
@@ -1327,6 +1303,8 @@ nodeStateStyles: {
     
         // DO NOT DELETE 
         newGraph.on("canvas:click", function (event) {
+          log(newGraph);
+          
           const nodes = newGraph.getNodes();
           log('NODES:', nodes);
           nodes.forEach((node) => {
