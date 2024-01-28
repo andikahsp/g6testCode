@@ -9,8 +9,11 @@ import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
 
 let log = console.log; 
-let nodeA = "";
-let nodeB = "";
+let IdOfNodeA = "";
+let IdOfNodeB = "";
+let nodeAModel = {};
+let nodeBModel = {};
+
 let nodeDrag = false;
 let comboDrop = false;
 let dragCombo;
@@ -464,7 +467,7 @@ nodeStateStyles: {
               }
             }
           });
-          nodeA = e.item._cfg.id;
+          IdOfNodeA = e.item._cfg.id;
         })
   
         newGraph.on('node:mouseleave', (e) => {    
@@ -595,23 +598,17 @@ nodeStateStyles: {
         newGraph.on('node:dragend', (e) => {
           // nodeDrag status variable needs to be reset
           nodeDrag = false;
-        });
-  
-        // check that the node that is being dragged, does not have a  comboId,  
-        newGraph.on('node:dragenter', (e) => {
-          //log('node:dragenter');
-          const nodeBModel = e.item._cfg.model;
-          nodeB = e.item._cfg.id;
-          let nodeAModel = {};
+
+          // createCombo when nodeA is released on receiving combo, nodeB.
           newGraph.getNodes().forEach((node) => {
-            if (node._cfg.id === nodeA) {
+            if (node._cfg.id === IdOfNodeA) {
               nodeAModel = node._cfg.model
             }
           });
   
           if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
           (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
-            if (nodeA !== "" && nodeB !== nodeA ) { 
+            if (IdOfNodeA !== "" && IdOfNodeB !== IdOfNodeA ) { 
               
               let iocStatus = false;
               const comboCount = newGraph.getCombos().length;
@@ -627,7 +624,7 @@ nodeStateStyles: {
                 id: newComboId, 
                 nodeCount: "",
                 ioc: iocStatus
-              }, [`${nodeA}`, `${nodeB}`]);
+              }, [`${IdOfNodeA}`, `${IdOfNodeB}`]);
               
               const newCombo = newGraph.findById(newComboId);
               if(newCombo) {
@@ -642,6 +639,16 @@ nodeStateStyles: {
               }
             }
           }
+
+        });
+  
+        // check that the node that is being dragged, does not have a  comboId,  
+        newGraph.on('node:dragenter', (e) => {
+          //log('node:dragenter');
+          nodeBModel = e.item._cfg.model;
+          console.log('nodeB model', nodeBModel)
+          IdOfNodeB = e.item._cfg.id;
+        
         });
   
         newGraph.on("node:mouseup", (e) => {
