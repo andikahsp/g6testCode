@@ -467,7 +467,7 @@ nodeStateStyles: {
               }
             }
           });
-          IdOfNodeA = e.item._cfg.id;
+
         })
   
         newGraph.on('node:mouseleave', (e) => {    
@@ -499,7 +499,7 @@ nodeStateStyles: {
           } 
         })
   
-        newGraph.on('node:mouseup', (e) => {
+        newGraph.on('node:mouseup', (e) => {          
           if (comboDraggedOver !== undefined && e.item.getModel().comboId === undefined) {
             if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
               // log('draggedover combos on node mouseup', draggedOverCombos)
@@ -593,6 +593,8 @@ nodeStateStyles: {
           // we need this check when dragging nodes in or out of combo 
           // to differentiate when combo is moved (dragged)
           nodeDrag = true; 
+
+          IdOfNodeA = e.item._cfg.id;
         })
   
         newGraph.on('node:dragend', (e) => {
@@ -639,7 +641,6 @@ nodeStateStyles: {
               }
             }
           }
-
         });
   
         // check that the node that is being dragged, does not have a  comboId,  
