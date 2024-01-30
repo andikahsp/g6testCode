@@ -1,0 +1,25 @@
+comboExpandTTP
+
+- for the combo clicked
+  - grab inside combos + inside nodes
+
+
+- if there are nodes inside the combo, 
+   > forEach child node:  get all neighbors
+                               ↳ forEach neighbor: checkTTP → if TTP: getEdges of .this interior node
+                                                                       ↳ forEachEdge of .this node: set TTP glyph to true
+
+- if there are combos inside the combo,
+   > forEach inCombo → if inCombo is collapsed: get all neighbors of .this collapsed inCombo, [accounts for the nodes inside the collapsed inCombos] / [HOW TO MAP vedge back to edge for collapsed combos]
+                                                        ↳ forEach neighbor: if .this neighbor is a node & it is not a node inside the clicked PARENT combo: 1) find the normal edges coming out from the clicked collapsed combo 
+                                                                                                                                                            2) find TTP status of the normal edge, set TTPstatus based on that
+                                                                                                                                                            3) break the loop based on the TTPstatus is true, 
+                                                                                                                                                               (because we only need 1 normal edge to be TTP to set the representative vEdge to TTP)
+                                                                                                                                                               ↳[IF TTP]: 
+
+- 
+                                                                                                                                                          
+
+                                   
+        
+        
