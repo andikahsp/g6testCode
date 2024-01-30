@@ -641,13 +641,17 @@ nodeStateStyles: {
               }
             }
           }
+          // Reset Node A and Node B on releasing node:drag
+          IdOfNodeA = "";
+          IdOfNodeB = "";
+          nodeAModel = {};
+          nodeBModel = {};
         });
   
         // check that the node that is being dragged, does not have a  comboId,  
         newGraph.on('node:dragenter', (e) => {
           //log('node:dragenter');
           nodeBModel = e.item._cfg.model;
-          console.log('nodeB model', nodeBModel)
           IdOfNodeB = e.item._cfg.id;
         
         });
@@ -955,42 +959,31 @@ nodeStateStyles: {
           allEdgesInRange = allEdgesInRange.concat(nodeEdgesInRange);
         });
         
-        const allEdgesDisp = [];
-        allEdgesInRange.forEach((edge) => allEdgesDisp.push(edge.getID()));
-        console.log('allEdges =', allEdgesDisp);
+        // const allEdgesDisp = [];
+        // allEdgesInRange.forEach((edge) => allEdgesDisp.push(edge.getID()));
+        // console.log('allEdges =', allEdgesDisp);
   
+        
+        const extractNodeIdsFromVEdgeEnd = (endpoint) =>{
+          const nodes = getAllNodesInCombo(endpoint);
+          return nodes.map(x=> x.getID());
+        }
+        
         cVEdges.forEach((vEdge) => { 
           // create empty array for holding standard edges
           veMap[vEdge.getID()] = [];
-        })
-        for (let i = 0; i< cVEdges.length; i++) {
-          let veSourceNodeIds = [];
-          let veTargetNodeIds = [];
-          const veSource = cVEdges[i].getSource();
-          const veTarget = cVEdges[i].getTarget();
-          if(veSource.getType() === 'combo') {
-            const vSourceNodes = getAllNodesInCombo(veSource);
-            vSourceNodes.forEach((sNode) => {
-              veSourceNodeIds.push(sNode.getID());
-            });
-           }
-           if(veTarget.getType() === 'combo') {
-            const vTargetNodes = getAllNodesInCombo(veTarget);
-            vTargetNodes.forEach((vTarget) => {
-              veTargetNodeIds.push(vTarget.getID())
-            });
-          }
-  
-          for(let j = 0; j < allEdgesInRange.length; j++) {
-            const source = allEdgesInRange[j].getSource();
-            const target = allEdgesInRange[j].getTarget();
-            if((veSource.getID() === source.getID() || veSourceNodeIds.includes(source.getID()) ) && 
-            (veTarget.getID() === target.getID() || veTargetNodeIds.includes(target.getID()) ) 
-            ) {
-             veMap[cVEdges[i].getID()].push(allEdgesInRange[j]);
+
+          const veSourceIds = vEdge.getSource().getType() === 'combo' ? extractNodeIdsFromVEdgeEnd(vEdge.getSource()) : [];
+          const veTargetIds = vEdge.getTarget().getType() === 'combo' ? extractNodeIdsFromVEdgeEnd(vEdge.getTarget()) : [];
+
+          allEdgesInRange.forEach((nEdge) => {
+            if((vEdge.getSource().getID() === nEdge.getSource().getID() || veSourceIds.includes(nEdge.getSource().getID())) && (vEdge.getTarget().getID() === nEdge.getTarget().getID() || veTargetIds.includes(nEdge.getTarget().getID()))) {
+              veMap[vEdge.getID()].push(nEdge);
             }
-          }
-        }
+          })
+        })
+
+
         cVEdges.forEach((vEdge) => {
           const edgesRepresented = veMap[vEdge.getID()];
           if (edgesRepresented.some((edge) => edge.getModel().ttp)) {
@@ -1006,6 +999,7 @@ nodeStateStyles: {
         if (nodes.length > 0) {
           for (let i = 0; i < nodes.length; i++) {
             const neighbours = nodes[i].getNeighbors();
+            console.log('comboExpandTTP, neighbors of internal nodes', neighbours);
             let ttp = false;
             neighbours.forEach((neighbour) => {
               if (neighbour.getType() === "combo") {
@@ -1039,10 +1033,11 @@ nodeStateStyles: {
                   !nodes.includes(neighbours[i])
                 ) {
                   let ttp = false;
-                  const allCNodes = getAllNodesInCombo(inCombo);
-                  for (let j = 0; j < allCNodes.length; j++) {
-                    if (allCNodes[j].getNeighbors().includes(neighbours[i])) {
-                      const CNodeEdges = allCNodes[j].getEdges();
+                  // get all the normal edges that are inside the childCombo
+                  const inComboNodes = getAllNodesInCombo(inCombo);
+                  for (let j = 0; j < inComboNodes.length; j++) {
+                    if (inComboNodes[j].getNeighbors().includes(neighbours[i])) {
+                      const CNodeEdges = inComboNodes[j].getEdges();
                       for (let k = 0; k < CNodeEdges.length; k++) {
                         if (
                           CNodeEdges[k].getSource() === neighbours[i] ||
@@ -1313,25 +1308,25 @@ nodeStateStyles: {
         newGraph.on("canvas:click", function (event) {
           log(newGraph);
           
-          const nodes = newGraph.getNodes();
-          log('NODES:', nodes);
-          nodes.forEach((node) => {
-            log(`     ${node.getID()} | cBC: ${node.getModel().collapsedByCombo} | inRange: ${node.getModel().inRange}\n           | visible: ${node.isVisible()}`);
+          // const nodes = newGraph.getNodes();
+          // log('NODES:', nodes);
+          // nodes.forEach((node) => {
+          //   log(`     ${node.getID()} | cBC: ${node.getModel().collapsedByCombo} | inRange: ${node.getModel().inRange}\n           | visible: ${node.isVisible()}`);
   
-          })
-          const edges = newGraph.getEdges();
-          log('EDGES:', edges);
-          edges.forEach((edge) => {
-            log(`     ${edge.getID()} | s= ${edge.getSource().getID()}       | t= ${edge.getTarget().getID()}\n           | cBC: ${edge.getModel().collapsedByCombo} | inRange: ${edge.getModel().inRange}\n           | visible: ${edge.isVisible()}`);
+          // })
+          // const edges = newGraph.getEdges();
+          // log('EDGES:', edges);
+          // edges.forEach((edge) => {
+          //   log(`     ${edge.getID()} | s= ${edge.getSource().getID()}       | t= ${edge.getTarget().getID()}\n           | cBC: ${edge.getModel().collapsedByCombo} | inRange: ${edge.getModel().inRange}\n           | visible: ${edge.isVisible()}`);
   
-          })
-          const combos = newGraph.getCombos();
-          log('COMBOS:', combos);
-          const vEdges = newGraph.get('vedges');
-          log('VEdges:', vEdges);
-          vEdges.forEach((VEdge) => {
-            log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}\n         | ttp: ${VEdge.getModel().ttp}`);
-          })
+          // })
+          // const combos = newGraph.getCombos();
+          // log('COMBOS:', combos);
+          // const vEdges = newGraph.get('vedges');
+          // log('VEdges:', vEdges);
+          // vEdges.forEach((VEdge) => {
+          //   log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}\n         | ttp: ${VEdge.getModel().ttp}`);
+          // })
           });
   
   
