@@ -601,7 +601,45 @@ export const data =
                   ],
                   "ioc": false,
                   "comboId": "combo2"
-            }
+            },
+            {
+                  "id": "68",
+                  "inRange": true,
+                  "visible": true,
+                  "type": "node",
+                  "label": "SELF-LOOPING",
+                  "display": {
+                        "labels": [
+                              "Process"
+                        ],
+                        "score_ioc": null,
+                        "tag": ""
+                  },
+                  "properties": [
+                        {
+                              "_t": [
+                                    "WindowsModelBase",
+                                    "Event4663Model"
+                              ],
+                              "eventID": 4663,
+                              "computerName": "QDS7.stella.local",
+                              "recordNumber": 3470923,
+                              "time": "11-04-2022 15:46:42",
+                              "logsourceTime": 1636098441,
+                              "accesses": "WriteData (or AddFile)     AppendData (or AddSubdirectory or CreatePipeInstance)",
+                              "accountName": "dennis.r",
+                              "accountDomain": "STELLA",
+                              "objectType": "File",
+                              "originatingComputer": "10.0.5.87",
+                              "objectName": "C:\\Users\\dennis.r\\Downloads\\newdata.docx.enc",
+                              "processName": "C:\\Users\\dennis.r\\AppData\\Local\\Temp\\charlie10.exe",
+                              "path": "C:\\Users\\dennis.r\\AppData\\Local\\Temp\\charlie10.exe",
+                              "Title": "charlie10.exe",
+                              "tag": ""
+                        }
+                  ],
+                  "ioc": false
+            },
       ],
       "edges": [
             {
@@ -610,7 +648,7 @@ export const data =
                         "1667576802": 1,
                         "1667577869": 5,
                         "1667577822": 7,
-                        "1667577823": 5
+                        "1667577823": 6
                   },
                   "firstDate": 1667576802,
                   "lastDate": 1667577869
@@ -1389,6 +1427,51 @@ export const data =
                         1667577823
                   ],
                   "label": "Write File",
+                  "g": null,
+                  "ttp": false,
+                  "inRange": true,
+                  "visible": true,
+                  "frequency": 1,
+                  "merged_edges": {
+                        "ids": [
+                              "54"
+                        ],
+                        "score_ttp": [
+                              "0"
+                        ]
+                  },
+                  "properties": [
+                        {
+                              "_t": [
+                                    "WindowsModelBase",
+                                    "Event4663Model"
+                              ],
+                              "eventID": 4663,
+                              "computerName": "QDS7.stella.local",
+                              "recordNumber": 3474339,
+                              "time": "11-04-2022 16:03:43",
+                              "logsourceTime": 1636099459,
+                              "accesses": "WriteData (or AddFile)     AppendData (or AddSubdirectory or CreatePipeInstance)",
+                              "accountName": "client5",
+                              "accountDomain": "STELLA",
+                              "objectType": "File",
+                              "originatingComputer": "10.0.5.87",
+                              "objectName": "C:\\Users\\client5\\Downloads\\quotation.docx.enc",
+                              "processName": "C:\\Users\\client5\\AppData\\Local\\Temp\\charlie10.exe",
+                              "Title": "Write File",
+                              "tag": ""
+                        }
+                  ]
+            },
+            {
+                  "id": "68-68-Termination",
+                  "type": "edge",
+                  "source": "68",
+                  "target": "68",
+                  "date": [
+                        1667577823
+                  ],
+                  "label": "68-68-SELF-LOOPING",
                   "g": null,
                   "ttp": false,
                   "inRange": true,

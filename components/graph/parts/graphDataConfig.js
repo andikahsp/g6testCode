@@ -1,5 +1,6 @@
 import { imageURLs } from "./imageURLs";
 
+// TODO: should just return the jsonData instead of building another graphData.
 export function populateNodesEdges (jsonData) {
 
     const graphData = {
@@ -83,6 +84,12 @@ export function populateNodesEdges (jsonData) {
         graphData["combos"].push(jsonData["combos"][i]);
       }
     }
+
+    // for self-looping.
+    const selfLoopingEdges = graphData["edges"].filter((edge) => edge.source ===  edge.target)
+    selfLoopingEdges.forEach((selfEdge) => {
+      selfEdge["type"] = "loop"
+    })
 
     // CyGraph injects calculated information based on graphData back into it (i.e. coordinates)
     console.log('graphData =', graphData); 
