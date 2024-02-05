@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // import { data as jsonData } from './sourceActiveDirLog';
 // import { data as jsonData } from './sourceCheckPointLog';
 // import { data as jsonData } from './sourceWinLog';
-import { data as jsonData } from './graph-data/sourceWinLog2';
+import { data as jsonData } from './graph-data/sourceWinLog-selfLooping';
 //import { data as jsonData } from './sourceIocTtp';
 import { cCircleComboShape, circleNodeShape, fundPolyline, customQuadratic,} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
@@ -31,7 +31,7 @@ const TimeBarTrendTrial
       const G6 = require('@antv/g6');
       //transform rawQuery jsonData into nodeEdgeData
       const nodeEdgeData= populateNodesEdges(jsonData);
-      G6.Util.processParallelEdges(nodeEdgeData.edges, 45, 'quadratic-custom', 'fund-polyline', undefined);
+      G6.Util.processParallelEdges(nodeEdgeData.edges, 90, 'quadratic-custom', 'fund-polyline', undefined);
 
       const container = ref.current;
       const width = container.scrollWidth;
@@ -610,7 +610,7 @@ nodeStateStyles: {
   
           if ((('comboId' in nodeBModel !== true) || nodeBModel.comboId === undefined) && 
           (('comboId' in nodeAModel !== true) || nodeAModel.comboId === undefined)) { // if it has a comboId, do not create combo
-            if (IdOfNodeA !== "" && IdOfNodeB !== IdOfNodeA ) { 
+            if (IdOfNodeA !== "" && IdOfNodeB !== "" && IdOfNodeB !== IdOfNodeA ) { 
               
               let iocStatus = false;
               const comboCount = newGraph.getCombos().length;
