@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 // import { data as jsonData } from './sourceActiveDirLog';
 // import { data as jsonData } from './sourceCheckPointLog';
 // import { data as jsonData } from './sourceWinLog';
-import { data as jsonData } from './graph-data/sourceWinLog2';
+// import { data as jsonData } from './graph-data/sourceWinLog2';
+import { data as jsonData } from './graph-data/sourceOrg';
 //import { data as jsonData } from './sourceIocTtp';
 import { cCircleComboShape, circleNodeShape, fundPolyline, customQuadratic,} from "./parts/elements";
 import { getUTCHrMinSec } from "./utilities/convertUTC";
 import { populateNodesEdges } from "./parts/graphDataConfig";
+import { populateNodesEdgesOrg } from "./parts/graphDataConfigOrg";
 
 let log = console.log; 
 let nodeA = "";
@@ -28,7 +30,7 @@ const TimeBarTrendTrial
       const G6 = require('@antv/g6');
 
       //transform rawQuery jsonData into nodeEdgeData
-      const nodeEdgeData= populateNodesEdges(jsonData);
+      const nodeEdgeData= populateNodesEdgesOrg(jsonData);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 45, 'quadratic-custom', 'fund-polyline', undefined);
 
       const container = ref.current;
@@ -38,31 +40,178 @@ const TimeBarTrendTrial
 
       // const range = 18; // number of units that window will show
 
-      const timeBarInfo = nodeEdgeData["info"][0]
-      const range = timeBarInfo.firstDate - timeBarInfo.lastDate; // number of units that window will show
-      const axisMin = timeBarInfo["firstDate"] - 500;
-      const axisMax = /* timeBarInfo["firstDate"] + 18 + 5; */ timeBarInfo["lastDate"] + 500;
+      // const timeBarInfo = nodeEdgeData["info"][0]
+      // const range = timeBarInfo.firstDate - timeBarInfo.lastDate; // number of units that window will show
+      // const axisMin = timeBarInfo["firstDate"] - 500;
+      // const axisMax = /* timeBarInfo["firstDate"] + 18 + 5; */ timeBarInfo["lastDate"] + 500;
+      // // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
+      // // time = 6:59.08 am
+      // // window: 6:58.59am  - 6:59.17 am (60seconds)
+      // for (let i = axisMin; i < axisMax; i++) {
+      //   //log(`i = ${i}`);
+      //   const keyString = i.toString();
+      //   if (keyString in timeBarInfo["dateFreq"]) {
+      //     timeBarData.push({
+      //       date: i,
+      //       value: timeBarInfo["dateFreq"][keyString]
+      //     });
+      //   } else {
+      //     timeBarData.push({
+      //       date: i,
+      //       value: 0
+      //     });
+      //   }
+      //   //log(`${i}seconds, timeString=${timeString}`)
+      // }
+
+      // // log("timeBarData = ", timeBarData);
+
+      // const nodeSize = nodeEdgeData["nodes"][0].size; // originally set in graphDataConfig
+
+      // //log(G6.TimeBar);
+      // const newTimebar = new G6.TimeBar({
+      //   x: 0,
+      //   y: 0,
+      //   width,
+      //   height: 150,
+      //   padding: 20,
+      //   type: 'trend',
+      //   tick: {
+      //     tickLabelFormatter: (d) => {
+      //       // convert the data accordingly
+      //      // log(`d => ${JSON.stringify(d, null, 3)}`);
+      //      return getUTCHrMinSec(d.date);
+      //     //  return d
+      //   },
+      //     tickLabelStyle:{ 
+      //       fontSize: 13, 
+      //       fontFamily: 'Segoe UI',
+      //       fillOpacity: 0.9,
+      //       stroke: '#686868',
+      //       strokeOpacity: 0.3,
+      //     },
+      //     tickLineStyle: {
+      //       width: 30, //<<==== no effect, not working
+      //       height: 15, //<===== no effect, not working 
+      //       //offset: 250, //<===== no effect, not working
+      //       stroke: '#686868',
+      //       lineWidth: 2.5,  
+      //       strokeOpacity: 0.6,
+      //     }
+      // },
+      //   trend: {
+      //     height: 60,
+      //     data: timeBarData,
+      //     smooth: false,
+      //     lineStyle: {
+      //       stroke: 'transparent', // 'blue',
+      //       lineWidth: 10,
+      //     },
+      //     isArea: true,
+      //     areaStyle:{
+      //       fill: 'orange', // 'pink'
+      //     },
+      //   },
+      //   slider: { 
+      //     backgroundStyle: { // ShapeStyle object format
+      //       fill: 'transparent', 
+      //     },
+      //     foregroundStyle: { // ShapeStyle object format
+      //       fill: 'lightgrey', //'cyan',
+      //       fillOpacity: 0.25,
+      //     }, 
+      //     height: 60,
+      //     start: 0.1,
+      //     end: 0.9,
+      //     handlerStyle:{
+      //       height: 500, // <===== not working
+      //       width: 2, 
+      //       fill:'gray',
+      //       fillOpacity:0.7,
+      //       stroke: 'lightgray',
+      //       strokeOpacity: 0.7,
+      //       /* style:{  //<========== not working
+      //       }, */
+      //     },
+      //   },
+      //   /* textStyle of slider display texts */
+      //   textStyle: { 
+      //     fill: 'black',
+      //     fontFamily: 'Arial',
+      //     fontSize: 0, // <=== turn off displayed text with 0.
+      //   },
+      //   backgroundStyle: {
+      //     fill: 'black'
+      //   },
+      //   controllerCfg:{
+      //     speed: 9.955, // slider playback speed, default = 1, Max = <10 { tickInterval / ((10 - speed) * 1000 / 60) }
+      //     fontFamily: 'Arial',
+      //     fontSize: 10,
+      //     fill: 'transparent',
+      //     stroke: 'transparent',
+      //     preBtnStyle: {
+      //       fill: '#6C6C6C',
+      //       stroke: '#6C6C6C'
+      //     },
+      //     nextBtnStyle: {
+      //       fill: '#6C6C6C',
+      //       stroke: '#6C6C6C'
+      //     },
+      //     playBtnStyle: {
+      //       stroke: '#6C6C6C'
+      //     },
+      //     speedControllerStyle: {
+      //       pointer: {
+      //         fill: '#6C6C6C',
+      //         fillOpacity:1,
+      //         stroke: '#6C6C6C',
+      //       },
+      //       scroller: {
+      //         fill: '#6C6C6C',
+      //         fillOpacity:0,
+      //         stroke: '#6C6C6C',
+      //       },
+      //       text: {
+      //         fill: '#6C6C6C',
+      //         fillOpacity:0,
+      //         stroke: '#6C6C6C',
+      //       }, 
+      //     },
+      //     /** whether hide the 'time type controller' on the right-bottom */
+      //     hideTimeTypeController: true,
+      //     timeTypeControllerStyle: {
+      //       text:{
+      //         fillOpacity:0.0, 
+      //         stroke: 'purple',
+      //         fontFamily:'Arial',
+      //       },
+      //       box: {
+      //         fillOpacity:0.0,
+      //         stroke: 'gray',
+      //       }
+      //     },
+      //     timePointControllerText:'time point',
+      //     timeRangeControllerText:'time range',
+      //   }
+      // });
+
+      const range = 18; // number of units that window will show
+      const axisMin = jsonData.logsourceTime - (range / 2);
+      const axisMax = jsonData.logsourceTime + (range / 2) + 1;
+     
+
       // Scale: Seconds | Cyvestigo 18 seconds window for seconds scale
       // time = 6:59.08 am
       // window: 6:58.59am  - 6:59.17 am (60seconds)
       for (let i = axisMin; i < axisMax; i++) {
         //log(`i = ${i}`);
-        const keyString = i.toString();
-        if (keyString in timeBarInfo["dateFreq"]) {
-          timeBarData.push({
-            date: i,
-            value: timeBarInfo["dateFreq"][keyString]
-          });
-        } else {
-          timeBarData.push({
-            date: i,
-            value: 0
-          });
-        }
+        timeBarData.push({
+          date: i,
+          value: Math.round(Math.random() * 200),
+        });
         //log(`${i}seconds, timeString=${timeString}`)
       }
 
-      // log("timeBarData = ", timeBarData);
 
       const nodeSize = nodeEdgeData["nodes"][0].size; // originally set in graphDataConfig
 
@@ -78,8 +227,8 @@ const TimeBarTrendTrial
           tickLabelFormatter: (d) => {
             // convert the data accordingly
            // log(`d => ${JSON.stringify(d, null, 3)}`);
-           return getUTCHrMinSec(d.date);
-          //  return d
+            // return getUTCHrMinSec(d.date);
+            return d;
         },
           tickLabelStyle:{ 
             fontSize: 13, 
@@ -107,7 +256,7 @@ const TimeBarTrendTrial
           },
           isArea: true,
           areaStyle:{
-            fill: 'orange', // 'pink'
+            fill: 'lightgrey', // 'pink'
           },
         },
         slider: { 
@@ -123,7 +272,7 @@ const TimeBarTrendTrial
           end: 0.9,
           handlerStyle:{
             height: 500, // <===== not working
-            width: 2, 
+            width: 3, 
             fill:'gray',
             fillOpacity:0.7,
             stroke: 'lightgray',
@@ -142,7 +291,7 @@ const TimeBarTrendTrial
           fill: 'black'
         },
         controllerCfg:{
-          speed: 9.955, // slider playback speed, default = 1, Max = <10 { tickInterval / ((10 - speed) * 1000 / 60) }
+          speed: 2, // slider playback speed, default = 1, Max = <10 { tickInterval / ((10 - speed) * 1000 / 60) }
           fontFamily: 'Arial',
           fontSize: 10,
           fill: 'transparent',
@@ -194,6 +343,7 @@ const TimeBarTrendTrial
       });
 
     
+      
       
       // constrained the layout inside the area
       // x: offset dist from left in px ? X-coordinate of the first node?
@@ -329,8 +479,8 @@ const TimeBarTrendTrial
             // lineWidth: 1.5, // this is to be commented out. handled at elements.js
           },
           labelCfg: {
+            position:'left',
             style: {
-              position: 'bottom',
               fill: 'transparent',
               fontFamily: 'Arial',
               fontSize: 11
@@ -1250,7 +1400,7 @@ nodeStateStyles: {
             //turn on node highlight
             newGraph.updateItem(element, {
               style:{
-                fill: 'white',
+                fill: 'transparent',
               },
               labelCfg:{
                 style:{
@@ -1327,25 +1477,26 @@ nodeStateStyles: {
     
         // DO NOT DELETE 
         newGraph.on("canvas:click", function (event) {
-          const nodes = newGraph.getNodes();
-          log('NODES:', nodes);
-          nodes.forEach((node) => {
-            log(`     ${node.getID()} | cBC: ${node.getModel().collapsedByCombo} | inRange: ${node.getModel().inRange}\n           | visible: ${node.isVisible()}`);
+          // const nodes = newGraph.getNodes();
+          // log('NODES:', nodes);
+          // nodes.forEach((node) => {
+          //   log(`     ${node.getID()} | cBC: ${node.getModel().collapsedByCombo} | inRange: ${node.getModel().inRange}\n           | visible: ${node.isVisible()}`);
   
-          })
-          const edges = newGraph.getEdges();
-          log('EDGES:', edges);
-          edges.forEach((edge) => {
-            log(`     ${edge.getID()} | s= ${edge.getSource().getID()}       | t= ${edge.getTarget().getID()}\n           | cBC: ${edge.getModel().collapsedByCombo} | inRange: ${edge.getModel().inRange}\n           | visible: ${edge.isVisible()}`);
+          // })
+          // const edges = newGraph.getEdges();
+          // log('EDGES:', edges);
+          // edges.forEach((edge) => {
+          //   log(`     ${edge.getID()} | s= ${edge.getSource().getID()}       | t= ${edge.getTarget().getID()}\n           | cBC: ${edge.getModel().collapsedByCombo} | inRange: ${edge.getModel().inRange}\n           | visible: ${edge.isVisible()}`);
   
-          })
-          const combos = newGraph.getCombos();
-          log('COMBOS:', combos);
-          const vEdges = newGraph.get('vedges');
-          log('VEdges:', vEdges);
-          vEdges.forEach((VEdge) => {
-            log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}\n         | ttp: ${VEdge.getModel().ttp}`);
-          })
+          // })
+          // const combos = newGraph.getCombos();
+          // log('COMBOS:', combos);
+          // const vEdges = newGraph.get('vedges');
+          // log('VEdges:', vEdges);
+          // vEdges.forEach((VEdge) => {
+          //   log(`     ${VEdge.getID()} | \n         | s= ${VEdge.getSource().getID()}      | t= ${VEdge.getTarget().getID()}\n         | visible: ${VEdge.isVisible()} | inRange: ${VEdge.getModel().inRange}\n         | ttp: ${VEdge.getModel().ttp}`);
+          // })
+          log('newGraph', newGraph)
           });
   
   

@@ -13,15 +13,17 @@ return [
 /* config for all combos */
 export const cCircleComboShape = {
   drawShape: function draw(cfg, group) {
+    console.log('cfg:', cfg)
     // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
     const style = cfg.style
     // Add a circle shape as keyShape which is the same as the extended 'circle' type Combo
-    const circle = group.addShape('circle', {
+    const circle = group.addShape('rect', {
       attrs: {
         ...style,
         x: 0,
         y: 0,
-        r: style.r,
+        width:1000,
+        height:200
       },
       draggable: true,
       // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
@@ -32,47 +34,29 @@ export const cCircleComboShape = {
     group.addShape('text', {
       attrs: {
           text:cfg.label || cfg.id,
-          x: style.r * 0.50 + 20, 
-          y: (style.r - 20) * - 1,
           fontFamily: 'Arial',
           fontSize: 15,
           fill: 'black',
           stroke: 'grey',
+          x:-cfg.size[0]/2,
+          y:-cfg.size[1]/2,
+
       },
       draggable: true, 
       name: 'combo-id-label'
     });
+    // group.addShape('text', {
+    //   attrs: {
+    //     text: cfg.label,
+    //     x: 0 , // center label text based on text length
+    //     y: 0 ,
+    //     fill:'black',
+    //     // ...cfg.labelCfg?.style,
+    //   },
+    //   draggable: true,
+    //   name: 'combo-id-label',
+    // });
 
-    // Add the badge shape
-    group.addShape('marker', {
-      attrs: {
-        ...style,
-        opacity: 1,
-        x: 0,
-        y: style.r,
-        r: 13,
-        symbol: circleIcon,
-        fill: 'red',
-        stroke: 'black',
-      },
-      draggable: true,
-      // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-      name: 'combo-marker-shape',
-    });
-    // text that goes into the marker/badge
-    group.addShape('text', {
-      attrs: {
-          text:cfg.nodeCount,
-          x: style.r - 1,
-          y: style.r,
-          fontFamily: 'Arial',
-          fontSize: 19,
-          fill: 'white',
-          stroke: 'white',
-      },
-      draggable: true, 
-      name: 'combo-marker-nodeCount'
-    });
 
     let badgeFillColor = 'transparent';
     let badgeStrokeColor = 'transparent';
@@ -89,110 +73,82 @@ export const cCircleComboShape = {
     // because iocBadge must !== null, when creating Combo & when adding or deleting nodes, 
     // we must draw the shape first, and then only change colors according to state. 
     // Add the IOC badge shape
-    group.addShape('marker', {
-      attrs: {
-        ...style,
-        opacity: 1,
-        x: 0 - 25,
-        y: 0 + (-1 * style.r + 5) ,
-        r: 10,
-        symbol: circleIcon,
-        fill: badgeFillColor,
-        stroke: badgeStrokeColor,
-        lineWidth: 2
-      },
-      draggable: true,
-      // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-      name: 'combo-ioc-badge',
-    });
-    // text that goes into the marker/badge
-    group.addShape('text', {
-      attrs: {
-          text:"I", //<--- change text here
-          x: 0  - 28,
-          y: 0 + (-1 * style.r + 14),
-          fontFamily: 'TimesNewRoman',
-          fontSize: 17,
-          fill: textFillColor,
-          stroke: textStrokeColor,
-      },
-      draggable: true, 
-      name: 'combo-ioc-glyph-text'
-    });
     return circle;
   },
 
   // Define the updating logic for the marker (after Collapsed)
-  afterUpdate: function afterUpdate(cfg, combo) {
-    const self = this;
-    // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
-    const style = self.getShapeStyle(cfg);
-    const group = combo.get('group');
+  // afterUpdate: function afterUpdate(cfg, combo) {
+  //   const self = this;
+  //   // Get the shape style, where the style.r corresponds to the R in the Illustration of Built-in Rect Combo
+  //   const style = self.getShapeStyle(cfg);
+  //   const group = combo.get('group');
 
-    // Find the comboKeyShape in the graphics group of the Combo
-    const comboShape = group.find((ele) => ele.get('name') === 'combo-keyShape');
-    // Find the marker shape in the graphics group of the Combo
-    const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
-    // Find textLabel shape in the graphics group of the Combo
-    const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-nodeCount');
-    // Find comboId shape in the graphics group of the Combo
-    const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
-    // Find ioc badge shape 
-    const iocBadge = group.find((ele) => ele.get('name') === 'combo-ioc-badge');
-    // Find ioc glyph text
-    const iocText = group.find((ele) => ele.get('name') === 'combo-ioc-glyph-text');
-    // colors if ioc is false; 
-    let badgeFillColor = 'transparent';
-    let badgeStrokeColor = 'transparent';
-    let textFillColor = 'transparent';
-    let textStrokeColor = 'transparent';
+  //   // Find the comboKeyShape in the graphics group of the Combo
+  //   const comboShape = group.find((ele) => ele.get('name') === 'combo-keyShape');
+  //   // Find the marker shape in the graphics group of the Combo
+  //   const marker = group.find((ele) => ele.get('name') === 'combo-marker-shape');
+  //   // Find textLabel shape in the graphics group of the Combo
+  //   const textLabel = group.find((ele) => ele.get('name') === 'combo-marker-nodeCount');
+  //   // Find comboId shape in the graphics group of the Combo
+  //   const idLabel = group.find((ele) => ele.get('name') === 'combo-id-label');
+  //   // Find ioc badge shape 
+  //   const iocBadge = group.find((ele) => ele.get('name') === 'combo-ioc-badge');
+  //   // Find ioc glyph text
+  //   const iocText = group.find((ele) => ele.get('name') === 'combo-ioc-glyph-text');
+  //   // colors if ioc is false; 
+  //   let badgeFillColor = 'transparent';
+  //   let badgeStrokeColor = 'transparent';
+  //   let textFillColor = 'transparent';
+  //   let textStrokeColor = 'transparent';
 
-    // Update the comboKeyShape
-    comboShape.attr({
-      fill: cfg.collapsed ? 'white' : 'transparent',
-      r: cfg.collapsed ? 28 : style.r,
-      lineWidth: cfg.collapsed ? 4 : 1 
-    });
-    // Update the marker shape
-    marker.attr({
-      x: style.r * 0.50,
-      y: (style.r - 10) * - 1,
-    });
-    //Update the textlabel
-    textLabel.attr({
-      text: cfg.nodeCount,
-      x: cfg.nodeCount.toString().length === 1 ? style.r * 0.50 - 5.63 : style.r * 0.50 - 10, 
-      y: (style.r - 20) * - 1,
-    });
-    //Update the idlabel
-    idLabel.attr({
-      text: cfg.id,
-      x: style.r * 0.50 + 20, 
-      y: (style.r - 20) * - 1,
-    });
+  //   // Update the comboKeyShape
+  //   comboShape.attr({
+  //     fill: cfg.collapsed ? 'white' : 'transparent',
+  //     // r: cfg.collapsed ? 28 : style.r,
+  //     // width: cfg.collapsed ? 500: style.width,
+  //     // height: cfg.collapsed ? 100: style.height,
+  //     lineWidth: cfg.collapsed ? 4 : 1 
+  //   });
+  //   // Update the marker shape
+  //   marker.attr({
+  //     x: style.r * 0.50,
+  //     y: (style.r - 10) * - 1,
+  //   });
+  //   //Update the textlabel
+  //   textLabel.attr({
+  //     text: cfg.nodeCount,
+  //     x: cfg.nodeCount.toString().length === 1 ? style.r * 0.50 - 5.63 : style.r * 0.50 - 10, 
+  //     y: (style.r - 20) * - 1,
+  //   });
+  //   //Update the idlabel
+  //   idLabel.attr({
+  //     text: cfg.id,
+  //     x: style.r * 0.50 + 20, 
+  //     y: (style.r - 20) * - 1,
+  //   });
 
-    if(cfg.ioc !== undefined && cfg.ioc) {
-      badgeFillColor = 'orange';
-      badgeStrokeColor = 'black';
-      textFillColor = 'white';
-      textStrokeColor = 'white';
-    }
-      // update the ioc badge position when the combo is expanded
-      iocBadge.attr({
-        x: style.r * 0.50 * -1, 
-        y: (style.r - 10) * - 1,
-        fill: badgeFillColor,
-        stroke: badgeStrokeColor,
-      })
-      // update the ioc glyph text position when the combo is expanded
-      iocText.attr({
-        x: (style.r * 0.50 * -1 ) - 3,
-        y: ((style.r - 10) * -1 ) + 9,
-        fill: textFillColor,
-        stroke: textStrokeColor,
-      })
+  //   if(cfg.ioc !== undefined && cfg.ioc) {
+  //     badgeFillColor = 'orange';
+  //     badgeStrokeColor = 'black';
+  //     textFillColor = 'white';
+  //     textStrokeColor = 'white';
+  //   }
+  //     // update the ioc badge position when the combo is expanded
+  //     iocBadge.attr({
+  //       x: style.r * 0.50 * -1, 
+  //       y: (style.r - 10) * - 1,
+  //       fill: badgeFillColor,
+  //       stroke: badgeStrokeColor,
+  //     })
+  //     // update the ioc glyph text position when the combo is expanded
+  //     iocText.attr({
+  //       x: (style.r * 0.50 * -1 ) - 3,
+  //       y: ((style.r - 10) * -1 ) + 9,
+  //       fill: textFillColor,
+  //       stroke: textStrokeColor,
+  //     })
 
-  },
+  // },
 }; 
 
 /* config for all nodes */

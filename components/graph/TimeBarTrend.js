@@ -20,16 +20,18 @@ const TimeBarTrend
     const [newGraph, setGraph] = useState(null);
     const [timeBar, setTimeBar] = useState(null);
 
+    console.log(jsonData)
     useEffect(() => {
       const G6 = require('@antv/g6');
-
+      const container = ref.current;
+      
       //transform rawQuery jsonData into nodeEdgeData
-      const nodeEdgeData = populateNodesEdgesOrg(jsonData);
+      const nodeEdgeData = populateNodesEdgesOrg(jsonData, container);
       G6.Util.processParallelEdges(nodeEdgeData.edges, 45, 'quadratic-custom', 'fund-polyline', undefined);
 
-      const container = ref.current;
-      const width = container.scrollWidth;
-      const height = (container.scrollHeight || 700) - 100;
+
+      const width = container?.scrollWidth;
+      const height = container?.scrollheight || 1000;
       const timeBarData = [];
 
       const range = 18; // number of units that window will show
@@ -226,7 +228,7 @@ const TimeBarTrend
       G6.registerCombo(
         'cCircle', // name that we decide for the custom Combo model
         cCircleComboShape,
-        'circle', // built-in combo shape to extend from
+        'rect', // built-in combo shape to extend from
       );
 
       /* ******* CUSTOM EDGES ******* */
@@ -247,19 +249,16 @@ const TimeBarTrend
       
       //log(G6.Graph);
       const newGraph = new G6.Graph({
-        type: 'gforce',
         container: ref.current,
         width: width,
         height: height + 55,
         height: height + 55,
         linkCenter: false,
-        plugins: [newTimebar],
         layout: {
-          // type: 'grid',  // force, force2 messes with collapseCombo Edges
-          //center: [200, 200],
-          center: [800, 340], 
+          layout:'none',
+          center: [800, 340], // andika - The center of the layout
           preventOverlap: true,
-          nodeSpacing: 5, 
+          nodeSpacing: 50, // andika - minimum distance between nodes to prevent node overlappings.
           linkDistance: d => {
             if (d.source.id === 'node0') {
               return 200;
@@ -268,7 +267,7 @@ const TimeBarTrend
           },
           nodeStrength: 0.5,
           edgeStrength: 0.1,
-          collideStrength: 1,
+          collideStrength: 1, // andika - The strength of force for preventing node overlappings. The range is [0, 1]
           onTick,
           
         },
@@ -305,8 +304,7 @@ const TimeBarTrend
         groupByTypes: false,
         defaultCombo: {
           type: 'cCircle', 
-          size: 40, // The minimum size of the Combo
-          padding: 10,
+          size: [width-100,100],
           style: {
             position:'bottom',
             stroke: 'gray',
@@ -315,7 +313,7 @@ const TimeBarTrend
           },
           labelCfg: {
             style: {
-              position: 'bottom',
+              position: 'left',
               fill: 'transparent',
               fontFamily: 'Arial',
               fontSize: 12
@@ -357,20 +355,20 @@ const TimeBarTrend
         modes: {
           default: [
             'drag-node',
-            {
-              type: 'drag-canvas',
-              enableOptimize: false, // enable the optimize to hide the shapes beside nodes' keyShape
-            },
-            {
-              type: 'zoom-canvas',
-              enableOptimize: false, // enable the optimize to hide the shapes beside nodes' keyShape
-            },
-            'drag-combo', 
-            {
-              type: 'collapse-expand-combo',
-              trigger: 'click',
-              relayout: false, // do not relayout after collapsing or expanding
-            },
+            // {
+            //   type: 'drag-canvas',
+            //   enableOptimize: false, // enable the optimize to hide the shapes beside nodes' keyShape
+            // },
+            // {
+            //   type: 'zoom-canvas',
+            //   enableOptimize: false, // enable the optimize to hide the shapes beside nodes' keyShape
+            // },
+            // 'drag-combo', 
+            // {
+            //   type: 'collapse-expand-combo',
+            //   trigger: 'click',
+            //   relayout: false, // do not relayout after collapsing or expanding
+            // },
           ],
         },
         labelCfg: {
@@ -484,8 +482,11 @@ const TimeBarTrend
         } 
       })
 
+      // andika - "node don't have combo id" update combo IoC and nodeCount when node is drag leave from a combo, handle nested combo 
       newGraph.on('node:mouseup', (e) => {
+        // andika - node was dragged over at least in 1 combo, node don't have combo id
         if (comboDraggedOver !== undefined && e.item.getModel().comboId === undefined) {
+          // andika - node was dragged out of a combo
           if(dragleaveCombo !== undefined && dragleaveCombo._cfg !== null) {
             // log('draggedover combos on node mouseup', draggedOverCombos)
             // log('node mouseup- dragleaveCombo', dragleaveCombo.getID());
@@ -543,7 +544,7 @@ const TimeBarTrend
         });
         // log('EDGE =', e.item);
       });
-  
+      
       newGraph.on('edge:mouseleave', (e) => {
         //newGraph.setItemState(e.item, 'hover', false)
         // turn off edge highlight
@@ -584,7 +585,8 @@ const TimeBarTrend
         nodeDrag = false;
       });
 
-      // check that the node that is being dragged, does not have a  comboId,  
+      // check that the node that is being dragged, does not have a  comboId,
+      // andika - node A is dragged node, node B is destination node. if both don't have comboId, create new combo.
       newGraph.on('node:dragenter', (e) => {
         //log('node:dragenter');
         const nodeBModel = e.item._cfg.model;
@@ -631,17 +633,18 @@ const TimeBarTrend
         }
       });
 
+      // andika - "node have comboId"
       newGraph.on("node:mouseup", (e) => {
         if (e.item.getModel().comboId != undefined) {
           const comboIdOfNode = e.item.getModel().comboId;
           const combo = newGraph.findById(comboIdOfNode);
-          newGraph.setItemState(e.item, "dragenter", true);
+          newGraph.setItemState(e.item, "dragenter", true); // andika - e.item is a node, dont have dragenter state
           const currentNodeCount = countNodesInCombo(combo);
           if (e.item._cfg.model.nodeCount === "") {  // <----- what is this for?
             log("POOOOOOOOOOOOOT", e.item.getID());
             e.item._cfg.model.nodeCount = currentNodeCount;
           } 
-          else {
+          else { //andika - node is being dragged and leave a combo, update IoC of dragLleaveCombo
             if (nodeDrag === true && dragleaveCombo !== undefined) {
               // when moving nodes between different nested combos and different combos
               //for updating the subtraction of node count from outermost combo
@@ -678,6 +681,7 @@ const TimeBarTrend
         newGraph.setItemState(e.item, 'dragleave', false);
       });
 
+      // andika -- e.item is a combo where node/combo passed by. pushed to array draggedOverCombos
       newGraph.on('combo:dragover', (e) => {
         // log('combo:dragover =', e.item.getID());
         comboDraggedOver = e.item;
@@ -845,6 +849,7 @@ const TimeBarTrend
       // for .this combo that is being dropped
       newGraph.on('combo:mouseup', (e) => {
         // log('combo:mouseup')
+        // andika - has combos passed, leaving a combo, and the combo getting dragged
         if(draggedOverCombos !== [] && dragleaveCombo !== undefined && dragCombo !== undefined){ 
           // prevents deletion of orphan combo when dragging across graph space quickly
           // (dragged Combo id can become dragleave combo id)
@@ -1237,7 +1242,7 @@ const TimeBarTrend
           //turn on node highlight
           newGraph.updateItem(element, {
             style:{
-              fill: 'white',
+              fill: 'transparent',
             },
             labelCfg:{
               style:{

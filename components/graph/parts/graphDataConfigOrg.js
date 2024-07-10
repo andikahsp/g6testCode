@@ -1,9 +1,11 @@
 import { imageURLs } from "./imageURLs";
 
-export function populateNodesEdgesOrg (jsonData) {
+export function populateNodesEdgesOrg (jsonData, container) {
 
     // This format if we want to customise shapes and sizes according
     // to data
+    const width = container.scrollWidth;
+    console.log('width:',width)
     
     const image = { type: 'image', 
                      size: 36};
@@ -27,10 +29,12 @@ export function populateNodesEdgesOrg (jsonData) {
         //   { id: 'node0', ...circle, /* img: imageURLs[0], */ comboId: 'combo1',  label: /* 'node0' */jsonData.computerName, /* date: jsonData.logsourceTime */ ioc: false, inRange: true },
         //   { id: 'node1', ...image, img: imageURLs[1], comboId: 'combo4',  label: 'node1'/* jsonData.logonProcess */, /* date: jsonData.logsourceTime */ ioc: false, inRange: true},
         //  { id: 'node2', ...triangle, /* img: imageURLs[2], */ /* comboId: 'combo3',  */ label: /* 'node2' */jsonData.originatingComputer, /* date: 1636095550 */ ioc: false, inRange: true},    
-        { id: 'node3', ...circle, icon: {img: imageURLs[3]}, comboId: 'combo1',  label: 'node3'/* `vector` */, /* date: 1636095551 */ ioc: false, inRange: true},  
-        { id: 'node4', ...circle, icon: {img: imageURLs[4]}, /* comboId: 'combo3',  */ label: 'node4'/* `vector` */, /* date: 1636095552 */ ioc: true, inRange: true},  
-        { id: 'node5', ...circle, icon: {img: imageURLs[5]}, /* comboId: 'combo4',  */ label: 'node5'/* `vector` */, /* date: 1636095553 */ ioc: false, inRange: true}, 
-        { id: 'node6', ...circle, icon: {img: imageURLs[6]}, comboId: 'combo3',  label: 'node6'/* `vector` */, /* date: 1636095553 */ ioc: false, inRange: true}, 
+        { id: 'node3',x:-100 ,...circle, icon: {img: imageURLs[3]}, comboId: 'Level-5',  label: 'node3'/* `vector` */, /* date: 1636095551 */ ioc: false, inRange: true},  
+        { id: 'node4',x:-100, ...circle, icon: {img: imageURLs[4]},  comboId: 'Level-4',   label: 'node4'/* `vector` */, /* date: 1636095552 */ ioc: true, inRange: true},  
+        { id: 'node5',x:100, ...circle, icon: {img: imageURLs[5]}, comboId: 'Level-5',  label: 'node5'/* `vector` */, /* date: 1636095553 */ ioc: false, inRange: true}, 
+        { id: 'node6',x:100, ...circle, icon: {img: imageURLs[6]}, comboId: 'Level-4',  labwel: 'node6'/* `vector` */, /* date: 1636095553 */ ioc: false, inRange: true}, 
+        { id: 'node7',x:-100 ,...circle, icon: {img: imageURLs[3]}, comboId: 'Level-3',  label: 'node7'/* `vector` */, /* date: 1636095551 */ ioc: false, inRange: true},  
+        { id: 'node8',x:100, ...circle, icon: {img: imageURLs[4]},  comboId: 'Level-3',   label: 'node8'/* `vector` */, /* date: 1636095552 */ ioc: true, inRange: true}, 
         // { id: 'node7', ...image, img: imageURLs[7], comboId: 'combo4', label: 'node7'/* `vector` */, /* date: 1636095553 */ ioc: false, inRange: true}, 
         //   { id: 'node8', ...image, img: imageURLs[8], comboId: 'combo4', label: 'node8'/* `vector` */, /* date: 1636095553 */ ioc: false, inRange: true}, 
         //   { id: 'node9', ...image, img: imageURLs[9], label: 'node9'/* `vector` */, /* date: 1636095552 */ ioc: false, inRange: true},  
@@ -154,8 +158,8 @@ export function populateNodesEdgesOrg (jsonData) {
         // },
         { 
           id: 'edge9',
-          source: 'node3', 
-          target: 'node4', 
+          source: 'node4', 
+          target: 'node3', 
           frequency: 2,
           ttp: true, 
           label: 'edge9', // <----- LABEL
@@ -168,39 +172,66 @@ export function populateNodesEdgesOrg (jsonData) {
         },
        ],
        combos: [
-        {
-          id: 'combo1', // <----- LABEL
-          nodeCount: 1,     // <----- nodeCount
-          parentId: 'combo2',
-          inRange: true, 
+        // {
+        //   id: 'Level-1', // <----- LABEL
+        //   nodeCount: 1,     // <----- nodeCount
+        //   inRange: true, 
           
-        },
+        // },
+        // {
+        //   id: 'Level-2',
+        //   nodeCount: 1,
+        //   inRange: true, 
+        // },
         {
-          id: 'combo2',
-          nodeCount: 1,
-          // parentId: 'combo3',
-          inRange: true, 
-        },
-        {
-          id: 'combo3', // <----- LABEL
+          id: 'Level-1', // <----- LABEL
           nodeCount: 1,     // <----- nodeCount
           inRange: true, 
-          ioc: true, 
-          parentId: 'combo4'
+          x: width/2,
+          y: 700,
         },
         {
-          id: 'combo4', // <----- LABEL
-          nodeCount: 2,     // <----- nodeCount
+          id: 'Level-2', // <----- LABEL
+          nodeCount: 1,     // <----- nodeCount
           inRange: true, 
-          ioc: true, 
-          parentId: 'combo5'
+          x: width/2,
+          y: 550,
         },
         {
-          id: 'combo5', // <----- LABEL
-          nodeCount: 2,     // <----- nodeCount
-          ioc: true,
-          inRange: true
+          id: 'Level-3', // <----- LABEL
+          nodeCount: 1,     // <----- nodeCount
+          inRange: true, 
+          x: width/2,
+          y: 400,
         },
+        {
+          id: 'Level-4', // <----- LABEL
+          nodeCount: 1,     // <----- nodeCount
+          inRange: true, 
+          x: width/2,
+          y: 250,
+        },
+        {
+          id: 'Level-5', // <----- LABEL
+          nodeCount: 1,     // <----- nodeCount
+          inRange: true, 
+          x: width/2,
+          y: 100,
+        },
+
+        // {
+        //   id: 'combo4', // <----- LABEL
+        //   nodeCount: 2,     // <----- nodeCount
+        //   inRange: true, 
+        //   ioc: true, 
+        //   parentId: 'combo5'
+        // },
+        // {
+        //   id: 'combo5', // <----- LABEL
+        //   nodeCount: 2,     // <----- nodeCount
+        //   ioc: true,
+        //   inRange: true
+        // },
         // {
         //   id: 'combo6', // <----- LABEL
         //   nodeCount: 1,     // <----- nodeCount
